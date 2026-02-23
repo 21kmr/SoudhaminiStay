@@ -683,7 +683,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
         </div>
         <div class="field">
           <label>Contact Number in India *</label>
-          <input type="tel" id="intl-contact-india" placeholder="Local SIM or WhatsApp number" oninput="checkDetails()">
+          <input type="tel" id="intl-contact-india" placeholder="Local SIM or Telegram or WhatsApp number" oninput="checkDetails()">
         </div>
         <div class="field">
           <label>Emergency Contact (home country)</label>
@@ -783,8 +783,8 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
     </div>
     <div class="pay-confirm-note" style="margin-top:18px">
       <p>✦ After paying, tap <strong>I Have Paid — Confirm Booking</strong> below.<br>
-      ✦ Host will verify your payment and send a WhatsApp confirmation within <strong>15–30 minutes</strong>.<br>
-      ✦ Your booking ref will be sent to your WhatsApp number.</p>
+      ✦ Host will verify your payment and send a Telegram confirmation within <strong>15–30 minutes</strong>.<br>
+      ✦ Your booking ref will be sent to your Telegram.</p>
     </div>
     <button class="btn-primary" id="btn-confirm-booking" onclick="submitBooking()" style="background:var(--moss)">✓ I Have Paid — Confirm Booking</button>
   </div>
@@ -1714,7 +1714,7 @@ function renderHP(){
       </div>
       <div class="bc-grid">
         <div class="bc-field"><label>Primary Guest</label><span>${bk.g1n||'—'}</span></div>
-        <div class="bc-field"><label>WhatsApp</label><span>${bk.g1p||'—'}</span></div>
+        <div class="bc-field"><label>WhatsApp/Telegram</label><span>${bk.g1p||'—'}</span></div>
         <div class="bc-field"><label>Room</label><span>${bk.roomLabel||bk.room||'—'}${bk.twoGuests?' · 2 guests':''}</span></div>
         <div class="bc-field"><label>Check-in</label><span>${fmtDate(bk.checkin)}</span></div>
         <div class="bc-field"><label>Check-out</label><span>${fmtDate(bk.checkout)}</span></div>
