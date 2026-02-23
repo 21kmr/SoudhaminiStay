@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Soudhamini Stay — Book Your Room</title>
+<title>Shanthi &amp; Sangha @ Soudhamini — Book Your Room</title>
 <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -15,6 +15,20 @@
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;font-size:15px;line-height:1.6;min-height:100vh;overflow-x:hidden;}
+
+
+/* ── ACCESSIBILITY FONT ADJUSTER ─────────────────────────────── */
+.a11y-bar{display:flex;align-items:center;justify-content:center;gap:6px;padding:7px 16px;background:var(--warm);border-bottom:1px solid var(--border);}
+.a11y-label{font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-s);}
+.a11y-btn{width:28px;height:28px;border-radius:50%;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:'DM Mono',monospace;font-size:0.75rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;font-weight:700;line-height:1;}
+.a11y-btn:hover{background:var(--clay);color:#fff;border-color:var(--clay);}
+.a11y-size{font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--clay);min-width:32px;text-align:center;letter-spacing:0.08em;}
+
+
+/* ── HOME BUTTON ─────────────────────────────────────────────── */
+.home-btn{position:absolute;top:12px;right:14px;background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.35);color:var(--text);padding:6px 14px;border-radius:100px;font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;transition:all 0.22s;backdrop-filter:blur(4px);}
+.home-btn:hover{background:var(--clay);color:#fff;border-color:var(--clay);}
+header h1:hover em{color:var(--terr);}
 
 /* ADMIN BAR */
 #admin-bar{background:var(--terr);color:#fff;padding:8px 20px;display:none;align-items:center;justify-content:space-between;font-family:'DM Mono',monospace;font-size:0.66rem;letter-spacing:0.12em;text-transform:uppercase;position:relative;z-index:100;}
@@ -400,11 +414,22 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
   </div>
 </div>
 
-<header>
+<header style="position:relative">
+  <button class="home-btn" onclick="goHome()" title="Start over / go to home">🏠 Home</button>
   <span class="leaf-div">❧ ❧ ❧</span>
-  <h1><em>Soudhamini</em> Stay</h1>
-  <p class="tagline">Peaceful Rooms · Simple Living · Sattvic Stays</p>
+  <h1 onclick="goHome()" style="cursor:pointer;user-select:none"><em>Shanthi &amp; Sangha</em> @ Soudhamini</h1>
+  <p class="tagline">Sattvic Living · Peaceful Stays · Simple Being</p>
 </header>
+
+
+<!-- ACCESSIBILITY FONT ADJUSTER -->
+<div class="a11y-bar">
+  <span class="a11y-label">Text Size</span>
+  <button class="a11y-btn" onclick="adjustFont(-1)" title="Decrease text size">A−</button>
+  <span class="a11y-size" id="a11y-size-display">100%</span>
+  <button class="a11y-btn" onclick="adjustFont(1)" title="Increase text size">A+</button>
+  <button class="a11y-btn" onclick="resetFont()" title="Reset text size" style="font-size:0.55rem;width:34px;border-radius:100px">Reset</button>
+</div>
 
 <div class="fac-strip">
   <span>Hot Water Geyser</span>
@@ -433,21 +458,23 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
     <p style="font-size:0.86rem;color:var(--text-mid);margin-bottom:4px">Tap a room to select. Prices are per day per room. Add a second guest for +50%.</p>
     <div class="room-grid">
       <div class="room-card" id="card-attached" onclick="selectRoom('attached')">
-        <h3>Private Bath</h3>
-        <div class="room-tag">Room with attached washroom</div>
+        <h3>Shanthi</h3>
+        <div class="room-tag">Private washroom · peaceful solitude</div>
         <div class="price-rows">
-          <div class="price-row"><span class="pr-label">Short Stay<br><em style="font-style:italic;text-transform:none;letter-spacing:0;font-size:0.9em;color:var(--text-mid)">(≤ 5 days)</em></span><span class="pr-amount">₹2,000 <small>/day</small></span></div>
-          <div class="price-row"><span class="pr-label">Long Stay<br><em style="font-style:italic;text-transform:none;letter-spacing:0;font-size:0.9em;color:var(--text-mid)">(> 5 days)</em></span><span class="pr-amount">₹1,500 <small>/day</small></span></div>
+          <div class="price-row"><span class="pr-label">Short Stay<br><em style="font-style:italic;text-transform:none;letter-spacing:0;font-size:0.9em;color:var(--text-mid)">(≤ 5 days)</em></span><span class="pr-amount" id="pr-attached-short">₹2,000 <small>/day</small></span></div>
+          <div class="price-row"><span class="pr-label">Long Stay<br><em style="font-style:italic;text-transform:none;letter-spacing:0;font-size:0.9em;color:var(--text-mid)">(> 5 days)</em></span><span class="pr-amount" id="pr-attached-long">₹1,500 <small>/day</small></span></div>
         </div>
+        <div class="intl-price-note" style="display:none;margin-top:6px;font-family:'DM Mono',monospace;font-size:0.58rem;color:#4a5fa0;background:#e8edf8;padding:5px 8px;border-radius:4px;text-align:center">🌏 +₹500/day international surcharge included</div>
         <div id="attached-booked-badge" style="display:none;margin-top:8px;font-family:'DM Mono',monospace;font-size:0.58rem;color:#c0392b;background:#fdeaea;padding:5px 8px;border-radius:4px;text-align:center">📅 Dates unavailable — choose different dates</div>
       </div>
       <div class="room-card" id="card-common" onclick="selectRoom('common')">
-        <h3>Common Bath</h3>
-        <div class="room-tag">Room with shared washroom</div>
+        <h3>Sangha</h3>
+        <div class="room-tag">Shared washroom · community spirit</div>
         <div class="price-rows">
-          <div class="price-row"><span class="pr-label">Short Stay<br><em style="font-style:italic;text-transform:none;letter-spacing:0;font-size:0.9em;color:var(--text-mid)">(≤ 5 days)</em></span><span class="pr-amount">₹1,500 <small>/day</small></span></div>
-          <div class="price-row"><span class="pr-label">Long Stay<br><em style="font-style:italic;text-transform:none;letter-spacing:0;font-size:0.9em;color:var(--text-mid)">(> 5 days)</em></span><span class="pr-amount">₹1,000 <small>/day</small></span></div>
+          <div class="price-row"><span class="pr-label">Short Stay<br><em style="font-style:italic;text-transform:none;letter-spacing:0;font-size:0.9em;color:var(--text-mid)">(≤ 5 days)</em></span><span class="pr-amount" id="pr-common-short">₹1,500 <small>/day</small></span></div>
+          <div class="price-row"><span class="pr-label">Long Stay<br><em style="font-style:italic;text-transform:none;letter-spacing:0;font-size:0.9em;color:var(--text-mid)">(> 5 days)</em></span><span class="pr-amount" id="pr-common-long">₹1,000 <small>/day</small></span></div>
         </div>
+        <div class="intl-price-note" style="display:none;margin-top:6px;font-family:'DM Mono',monospace;font-size:0.58rem;color:#4a5fa0;background:#e8edf8;padding:5px 8px;border-radius:4px;text-align:center">🌏 +₹500/day international surcharge included</div>
         <div id="common-booked-badge" style="display:none;margin-top:8px;font-family:'DM Mono',monospace;font-size:0.58rem;color:#c0392b;background:#fdeaea;padding:5px 8px;border-radius:4px;text-align:center">📅 Dates unavailable — choose different dates</div>
       </div>
     </div>
@@ -472,7 +499,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
       <span class="plus-badge">+ 50%</span>
     </label>
 
-    <div class="timing-note">✦ Check-in: 2:00 PM &nbsp;·&nbsp; Check-out: 11:30 AM &nbsp;·&nbsp; Max 2 guests per room</div>
+        <div class="timing-note">✦ Check-in: 2:00 PM &nbsp;·&nbsp; Check-out: 11:30 AM &nbsp;·&nbsp; Max 2 guests per room</div>
     <button class="btn-primary" id="btn-to-dates" disabled onclick="goTo(2)">Continue to Dates →</button>
   </div>
 </div>
@@ -480,6 +507,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 <!-- PAGE 2: DATES -->
 <div class="page" id="page2">
   <div class="sec-label">Step 2 — Select Dates</div>
+  <div id="selected-room-indicator" style="display:none;text-align:center;margin-bottom:10px;font-family:'DM Mono',monospace;font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--terr);background:var(--warm);border:1px solid var(--border);border-radius:100px;padding:7px 18px;display:inline-block"></div>
   <div class="card">
     <div class="date-row">
       <div class="field"><label>Check-in Date</label><input type="date" id="checkin" onchange="calcStay()"></div>
@@ -516,50 +544,86 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
       <div class="guest-sec-title">Primary Guest</div>
       <div class="two-col">
         <div class="field full-row">
-          <label>Full Name * (as per ID)</label>
+          <label id="g1-name-label">Full Name * (as per Aadhaar)</label>
           <input type="text" id="g1-name" placeholder="Full name as on Aadhaar / Passport" oninput="checkDetails()">
         </div>
         <div class="field">
-          <label>WhatsApp Number *</label>
+          <label>Telegram / WhatsApp Number *</label>
           <input type="tel" id="g1-phone" placeholder="+91 98765 43210" oninput="checkDetails()">
-          <div class="wa-note">💬 Must be active on WhatsApp</div>
+          <div class="wa-note">💬 Active on Telegram (preferred) or WhatsApp</div>
         </div>
       </div>
       <div style="margin-top:12px">
-        <div class="field"><label>Aadhaar / Government ID *</label></div>
-        <div class="upload-box" onclick="document.getElementById('g1-id-file').click()">
-          <p>📎 Tap to upload Aadhaar / Govt ID</p>
+        <div class="field"><label id="g1-id-label">Aadhaar Card *</label></div>
+        <div class="upload-box" id="g1-id-box" onclick="document.getElementById('g1-id-file').click()">
+          <p>📎 Tap to upload Aadhaar Card</p>
           <small>JPG, PNG or PDF · Front side · Max 5MB</small>
           <img id="g1-id-preview" class="upload-preview-img" alt="">
           <div id="g1-id-pdf" class="upload-pdf-badge">📄 PDF uploaded ✓</div>
         </div>
         <input type="file" id="g1-id-file" class="hidden" accept="image/*,application/pdf" onchange="handleUpload('g1-id')">
+      <!-- Teacher discount — Guest 1 -->
+      <label style="margin-top:11px;display:flex;align-items:center;gap:10px;padding:11px 13px;background:#f0f7ff;border-radius:8px;border:1.5px solid #4a7fc0;cursor:pointer">
+        <input type="checkbox" id="teacher-chk-g1" onchange="toggleTeacher()" style="width:16px;height:16px;accent-color:#4a7fc0;flex-shrink:0;cursor:pointer">
+        <div style="flex:1">
+          <strong style="display:block;font-size:0.84rem;color:#2c5282">Full-time Teacher?</strong>
+          <span style="font-family:'DM Mono',monospace;font-size:0.55rem;letter-spacing:0.07em;text-transform:uppercase;color:#4a7fc0">Upload ID to avail 25% off your share</span>
+        </div>
+        <span style="font-family:'DM Mono',monospace;font-size:0.56rem;background:#4a7fc0;color:#fff;padding:2px 8px;border-radius:100px;white-space:nowrap">− 25%</span>
+      </label>
+      <div id="teacher-id-section-g1" style="display:none;margin-top:8px">
+        <div class="upload-box" onclick="document.getElementById('teacher-id-g1-file').click()" style="border-color:#4a7fc0;padding:14px 10px">
+          <p style="color:#2c5282;margin:0 0 3px">📎 Tap to upload Teacher ID Card</p>
+          <small>Art of Living Teacher ID · JPG, PNG or PDF</small>
+          <img id="teacher-id-g1-preview" class="upload-preview-img" alt="">
+          <div id="teacher-id-g1-pdf" class="upload-pdf-badge" style="display:none">📄 PDF uploaded ✓</div>
+        </div>
+        <input type="file" id="teacher-id-g1-file" class="hidden" accept="image/*,application/pdf" onchange="handleUpload('teacher-id-g1');checkDetails()">
+      </div>
       </div>
     </div>
 
-    <!-- SECOND GUEST -->
+        <!-- SECOND GUEST -->
     <div class="guest-section" id="second-guest-section" style="display:none">
       <div class="guest-sec-title">Second Guest (Spouse / Friend)</div>
       <div class="two-col">
         <div class="field full-row">
-          <label>Full Name * (as per ID)</label>
+          <label id="g2-name-label">Full Name * (as per Aadhaar)</label>
           <input type="text" id="g2-name" placeholder="Full name" oninput="checkDetails()">
         </div>
         <div class="field">
-          <label>WhatsApp Number</label>
+          <label>Telegram / WhatsApp Number</label>
           <input type="tel" id="g2-phone" placeholder="+91 98765 43210">
-          <div class="wa-note">💬 Confirmation will also be sent here</div>
+          <div class="wa-note">✈ Telegram / 💬 WhatsApp — confirmation sent here</div>
         </div>
       </div>
       <div style="margin-top:12px">
-        <div class="field"><label>Aadhaar / Government ID *</label></div>
+        <div class="field"><label>Aadhaar Card *</label></div>
         <div class="upload-box" onclick="document.getElementById('g2-id-file').click()">
-          <p>📎 Tap to upload Aadhaar / Govt ID</p>
-          <small>JPG, PNG or PDF · Max 5MB</small>
+          <p>📎 Tap to upload Aadhaar Card</p>
+          <small>JPG, PNG or PDF · Front side · Max 5MB</small>
           <img id="g2-id-preview" class="upload-preview-img" alt="">
           <div id="g2-id-pdf" class="upload-pdf-badge">📄 PDF uploaded ✓</div>
         </div>
         <input type="file" id="g2-id-file" class="hidden" accept="image/*,application/pdf" onchange="handleUpload('g2-id')">
+      <!-- Teacher discount — Guest 2 -->
+      <label style="margin-top:11px;display:flex;align-items:center;gap:10px;padding:11px 13px;background:#f0f7ff;border-radius:8px;border:1.5px solid #4a7fc0;cursor:pointer">
+        <input type="checkbox" id="teacher-chk-g2" onchange="toggleTeacher()" style="width:16px;height:16px;accent-color:#4a7fc0;flex-shrink:0;cursor:pointer">
+        <div style="flex:1">
+          <strong style="display:block;font-size:0.84rem;color:#2c5282">Full-time Teacher?</strong>
+          <span style="font-family:'DM Mono',monospace;font-size:0.55rem;letter-spacing:0.07em;text-transform:uppercase;color:#4a7fc0">Upload ID to avail 25% off your share</span>
+        </div>
+        <span style="font-family:'DM Mono',monospace;font-size:0.56rem;background:#4a7fc0;color:#fff;padding:2px 8px;border-radius:100px;white-space:nowrap">− 25%</span>
+      </label>
+      <div id="teacher-id-section-g2" style="display:none;margin-top:8px">
+        <div class="upload-box" onclick="document.getElementById('teacher-id-g2-file').click()" style="border-color:#4a7fc0;padding:14px 10px">
+          <p style="color:#2c5282;margin:0 0 3px">📎 Tap to upload Teacher ID Card</p>
+          <small>Art of Living Teacher ID · JPG, PNG or PDF</small>
+          <img id="teacher-id-g2-preview" class="upload-preview-img" alt="">
+          <div id="teacher-id-g2-pdf" class="upload-pdf-badge" style="display:none">📄 PDF uploaded ✓</div>
+        </div>
+        <input type="file" id="teacher-id-g2-file" class="hidden" accept="image/*,application/pdf" onchange="handleUpload('teacher-id-g2');checkDetails()">
+      </div>
       </div>
     </div>
 
@@ -640,26 +704,43 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
     <div class="summary-box" id="summary-box"></div>
   </div>
   <div class="rules-section">
-    <h2>House Rules &amp; Guidelines</h2>
+    <h2>Facilities &amp; House Rules</h2>
+
+    <!-- WASTE SEGREGATION — PROMINENT -->
+    <div style="background:linear-gradient(135deg,#f0fdf4,#e8f5ea);border:2px solid var(--sage);border-radius:var(--r);padding:18px;margin-bottom:18px">
+      <div style="font-family:'DM Mono',monospace;font-size:0.62rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--moss);margin-bottom:12px;display:flex;align-items:center;gap:10px">
+        ♻ Waste Segregation — Ashram Protocol
+        <span style="flex:1;height:1px;background:var(--sage);display:block"></span>
+        <span style="font-size:0.55rem;background:var(--moss);color:#fff;padding:2px 8px;border-radius:100px">Required of All Guests</span>
+      </div>
+      <div class="bins">
+        <div class="bin blue"><div class="bin-icon">🔵</div><div class="bin-label">Blue Bin</div><p>Paper, plastics, cleaned food containers</p></div>
+        <div class="bin green"><div class="bin-icon">🟢</div><div class="bin-label">Green Bin</div><p>Food scraps, fruit &amp; vegetable waste</p></div>
+        <div class="bin yell"><div class="bin-icon">🟡</div><div class="bin-label">Yellow Bin</div><p>Sanitary items — pads, diapers (cleaned)</p></div>
+      </div>
+      <p style="font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.09em;color:var(--moss);margin-top:10px;text-align:center;text-transform:uppercase">Bins in the service area · Strict ashram protocol — no exceptions</p>
+    </div>
+
+    <!-- FACILITIES -->
+    <div style="font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--clay);margin-bottom:10px;display:flex;align-items:center;gap:10px">Facilities <span style="flex:1;height:1px;background:var(--border)"></span></div>
+    <div class="rules-grid" style="margin-bottom:18px">
+      <div class="rule-item"><div class="rule-icon">🚿</div><p><strong>Hot Water Geyser</strong>In washroom. Runs on mains power only — not on DG backup.</p></div>
+      <div class="rule-item"><div class="rule-icon">⚡</div><p><strong>24/7 Power + DG Backup</strong>Uninterrupted supply with generator. Geyser excluded from DG circuit.</p></div>
+      <div class="rule-item"><div class="rule-icon">🫧</div><p><strong>Washing Machine</strong>Available for guest use. Bring your own detergent; schedule with host.</p></div>
+      <div class="rule-item"><div class="rule-icon">🚰</div><p><strong>RO Water + Kettle</strong>RO purified drinking water and kettle provided for warming water.</p></div>
+      <div class="rule-item"><div class="rule-icon">🏛️</div><p><strong>Portico for Sadhana</strong>Fresh-air portico open for yoga, meditation and morning practice.</p></div>
+    </div>
+
+    <!-- HOUSE RULES -->
+    <div style="font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--clay);margin-bottom:10px;display:flex;align-items:center;gap:10px">House Rules <span style="flex:1;height:1px;background:var(--border)"></span></div>
     <div class="rules-grid">
-      <div class="rule-item"><div class="rule-icon">🚿</div><p><strong>Hot Water Geyser</strong>Available in washroom. Does not run on DG — available when mains power is on.</p></div>
-      <div class="rule-item"><div class="rule-icon">⚡</div><p><strong>24/7 Power + DG Backup</strong>Uninterrupted power supply with generator backup. Geyser excluded from DG circuit.</p></div>
-      <div class="rule-item"><div class="rule-icon">🫧</div><p><strong>Washing Machine</strong>Available for guest use. Bring your own detergent. Schedule with host to avoid conflicts.</p></div>
-      <div class="rule-item"><div class="rule-icon">🚰</div><p><strong>RO Water &amp; Kettle</strong>RO purified drinking water available. Kettle provided for warming water.</p></div>
-      <div class="rule-item"><div class="rule-icon">🏛️</div><p><strong>Portico for Sadhana</strong>Opening to fresh air — available for yoga, meditation and morning practice.</p></div>
       <div class="rule-item"><div class="rule-icon">🚫</div><p><strong>No Footwear Inside</strong>Remove footwear at entrance without exception.</p></div>
-      <div class="rule-item"><div class="rule-icon">👥</div><p><strong>Registered Guests Only</strong>Only guests who have registered and uploaded ID may stay. No unregistered visitors.</p></div>
-      <div class="rule-item"><div class="rule-icon">🔑</div><p><strong>Key Deposit — ₹500</strong>₹500 from deposit deducted if key is lost or not returned on checkout.</p></div>
-      <div class="rule-item"><div class="rule-icon">🧹</div><p><strong>Cleanliness Deposit — ₹500</strong>₹500 from deposit deducted if room is severely soiled. Maid's decision is final.</p></div>
-      <div class="rule-item"><div class="rule-icon">💰</div><p><strong>Refundable Deposit — ₹1,000</strong>Included in advance payment. Refunded within 24hrs of checkout minus any deductions.</p></div>
+      <div class="rule-item"><div class="rule-icon">👥</div><p><strong>Registered Guests Only</strong>Only ID-verified registered guests may stay. No unregistered visitors.</p></div>
+      <div class="rule-item"><div class="rule-icon">🔑</div><p><strong>Key Deposit — ₹500</strong>Deducted if key is lost or not returned at checkout.</p></div>
+      <div class="rule-item"><div class="rule-icon">🧹</div><p><strong>Cleanliness Deposit — ₹500</strong>Deducted if room is severely soiled. Maid's assessment is final.</p></div>
+      <div class="rule-item"><div class="rule-icon">💰</div><p><strong>Refundable Deposit — ₹1,000</strong>Included in advance. Refunded within 24hrs of checkout minus deductions.</p></div>
     </div>
-    <div class="sec-label" style="margin-top:20px">Waste Segregation — Ashram Protocol</div>
-    <div class="bins">
-      <div class="bin blue"><div class="bin-icon">🔵</div><div class="bin-label">Blue Bin</div><p>Paper, plastics, cleaned food containers</p></div>
-      <div class="bin green"><div class="bin-icon">🟢</div><div class="bin-label">Green Bin</div><p>Food scraps, fruit &amp; vegetable waste</p></div>
-      <div class="bin yell"><div class="bin-icon">🟡</div><div class="bin-label">Yellow Bin</div><p>Sanitary items — pads, diapers (cleaned)</p></div>
-    </div>
-    <p style="font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.1em;color:var(--sage);margin-top:8px;text-align:center;text-transform:uppercase">Bins in the service area</p>
+    
     <div class="agree-row">
       <input type="checkbox" id="agree" onchange="toggleConfirm()">
       <label for="agree">I have read and agree to all house rules, waste protocol, refundable deposit terms, and pricing. All registered guest IDs have been uploaded.</label>
@@ -714,8 +795,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 <div class="success-card" id="success-card">
   <div class="success-icon">🌿</div>
   <h2>Booking Request Sent!</h2>
-  <p>Host will verify payment and confirm via WhatsApp within 30 minutes.</p>
-  <div class="booking-ref" id="booking-ref">REF: SDM-000000</div>
+  <p>Host will verify your payment and confirm via Telegram within 30 minutes.</p>
   <div class="summary-box" id="success-summary" style="text-align:left;margin:13px 0"></div>
   <div class="checkin-note">
     ✦ Check-in: 2:00 PM on your arrival date<br>
@@ -733,7 +813,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 <!-- GALLERY -->
 <section class="gallery-section" id="gallery-section">
   <div class="gallery-header">
-    <div><h2><em>Soudhamini Stay</em> — A Glance</h2><p>A glimpse of your home away from home</p></div>
+    <div><h2><em>Shanthi &amp; Sangha @ Soudhamini</em> — A Glance</h2><p>A glimpse of your home away from home</p></div>
   </div>
   <div class="gallery-tabs">
     <button class="gallery-tab active" onclick="filterGallery('all',this)">All</button>
@@ -744,7 +824,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
   <div class="gallery-grid" id="gallery-grid"></div>
 </section>
 
-<footer id="site-footer">Soudhamini Stay · Peaceful Simple Living · Waste Segregated with Ashram Care</footer>
+<footer id="site-footer">Shanthi &amp; Sangha @ Soudhamini · Peaceful Simple Living · Waste Segregated with Ashram Care</footer>
 
 <!-- MODALS -->
 <!-- Admin Login -->
@@ -777,7 +857,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
     <span class="m-label">Caption</span>
     <input type="text" id="adm-caption" placeholder="e.g. Portico morning view">
     <span class="m-label">Category</span>
-    <select id="adm-cat"><option value="room">Room</option><option value="common">Common Areas</option></select>
+    <select id="adm-cat"><option value="room">Shanthi</option><option value="common">Sangha / Common</option></select>
     <button class="btn-primary" id="btn-adm-upload" disabled onclick="doAdminUpload()">Upload ✦</button>
   </div>
 </div>
@@ -797,7 +877,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 const CFG={
   APPS_SCRIPT_URL:'https://script.google.com/macros/s/AKfycbw-u3Y5CFWZVnXsgMFArqsscoYmbHDXqcAaEEJRvbsOR1eQ2FTpZZKnAKLwHQyR0siC6g/exec',
   OWNER_WA:'919148212422',
-  PROP:'Soudhamini Stay',
+  PROP:'Shanthi & Sangha @ Soudhamini',
   ADMIN_PW:'ss1213',
   HOST_PW:'ss1213',  // Change this! Password for host panel
   UPI_ID:'shruthips@sbi',
@@ -846,7 +926,7 @@ confirmedBookings=loadConfirmed();
 
 // ── STATE ───────────────────────────────────────────────
 let selRoom=null,nights=0,totalRoomCost=0,advanceAmt=0,grandTotal=0;
-let twoGuests=false,intlGuest=false,adminMode=false;
+let twoGuests=false,intlGuest=false,teacherDiscount=false,adminMode=false;
 const prices={attached:{short:2000,long:1500},common:{short:1500,long:1000}};
 const DEPOSIT=1000,SECOND_MULT=1.5;
 const pFiles={adm:[]};
@@ -870,11 +950,35 @@ function selectRoom(t){
   document.getElementById('card-common').classList.toggle('selected',t==='common');
   document.getElementById('btn-to-dates').disabled=false;
   checkDateConflict();
+  // Show selected room on date page
+  const ind=document.getElementById('selected-room-indicator');
+  if(ind){ind.textContent='🛏 '+(t==='attached'?'Shanthi — Private Washroom':'Sangha — Shared Washroom');ind.style.display='block';}
 }
 
 function toggleIntl(){
   intlGuest=document.getElementById('intl-guest-chk').checked;
   document.getElementById('intl-section').style.display=intlGuest?'block':'none';
+  // Update name labels
+  const nameLabel=intlGuest?'Full Name * (as per Passport)':'Full Name * (as per Aadhaar)';
+  document.getElementById('g1-name-label').textContent=nameLabel;
+  const g2lbl=document.getElementById('g2-name-label');
+  if(g2lbl)g2lbl.textContent=nameLabel;
+  // Update ID upload for primary guest
+  const idLabel=document.getElementById('g1-id-label');
+  const idBox=document.getElementById('g1-id-box');
+  if(idLabel)idLabel.textContent=intlGuest?'Passport (Bio Data Page) *':'Aadhaar Card *';
+  if(idBox){
+    idBox.querySelector('p').textContent=intlGuest?'📎 Tap to upload Passport (Bio Data Page)':'📎 Tap to upload Aadhaar Card';
+  }
+  // Update room card prices dynamically when intl toggled
+  const sur=intlGuest?CFG.INTL_SURCHARGE:0;
+  const fmt=n=>'₹'+n.toLocaleString('en-IN');
+  const el=id=>document.getElementById(id);
+  if(el('pr-attached-short')) el('pr-attached-short').innerHTML=fmt(prices.attached.short+sur)+' <small>/day</small>';
+  if(el('pr-attached-long'))  el('pr-attached-long').innerHTML=fmt(prices.attached.long+sur)+' <small>/day</small>';
+  if(el('pr-common-short'))   el('pr-common-short').innerHTML=fmt(prices.common.short+sur)+' <small>/day</small>';
+  if(el('pr-common-long'))    el('pr-common-long').innerHTML=fmt(prices.common.long+sur)+' <small>/day</small>';
+  document.querySelectorAll('.intl-price-note').forEach(n=>n.style.display=intlGuest?'block':'none');
   recalc(); calcStay();
   checkDetails();
 }
@@ -882,8 +986,30 @@ function toggleIntl(){
 function toggleTwo(){
   twoGuests=document.getElementById('two-guests-chk').checked;
   document.getElementById('second-guest-section').style.display=twoGuests?'block':'none';
-  recalc(); calcStay();
+  if(!twoGuests){
+    // Clear g2 teacher when second guest removed
+    const g2=document.getElementById('teacher-chk-g2');
+    if(g2)g2.checked=false;
+    const s2=document.getElementById('teacher-id-section-g2');
+    if(s2)s2.style.display='none';
+  }
+  toggleTeacher(); // recomputes teacherDiscount and recalcs
+  calcStay();
   checkDetails();
+}
+
+function toggleTeacher(){
+  const g1=document.getElementById('teacher-chk-g1');
+  const g2=document.getElementById('teacher-chk-g2');
+  const t1=g1?g1.checked:false;
+  const t2=g2&&twoGuests?g2.checked:false;
+  teacherDiscount=t1||t2; // true if at least one is a teacher
+  // Show/hide ID upload per guest
+  const s1=document.getElementById('teacher-id-section-g1');
+  const s2=document.getElementById('teacher-id-section-g2');
+  if(s1)s1.style.display=t1?'block':'none';
+  if(s2)s2.style.display=t2?'block':'none';
+  recalc(); calcStay(); checkDetails();
 }
 
 function recalc(){
@@ -892,8 +1018,23 @@ function recalc(){
   const baseRate=prices[selRoom][isLong?'long':'short'];
   const intlSurcharge=intlGuest?CFG.INTL_SURCHARGE:0;
   const rate=baseRate+intlSurcharge;
-  const gMult=twoGuests?SECOND_MULT:1;
-  totalRoomCost=rate*nights*gMult;
+  if(!twoGuests){
+    // Single guest
+    const g1=document.getElementById('teacher-chk-g1');
+    const t1=g1?g1.checked:false;
+    const mult=t1?0.75:1;
+    totalRoomCost=Math.round(rate*nights*mult);
+  } else {
+    // Two guests — each pays half of (rate*nights*1.5), teacher gets 25% off their half
+    const g1=document.getElementById('teacher-chk-g1');
+    const g2=document.getElementById('teacher-chk-g2');
+    const t1=g1?g1.checked:false;
+    const t2=g2?g2.checked:false;
+    const fullCost=rate*nights*SECOND_MULT; // base cost for 2 guests
+    const g1share=fullCost/2*(t1?0.75:1);
+    const g2share=fullCost/2*(t2?0.75:1);
+    totalRoomCost=Math.round(g1share+g2share);
+  }
   advanceAmt=Math.round(totalRoomCost*0.5);
   grandTotal=advanceAmt+DEPOSIT;
 }
@@ -942,7 +1083,12 @@ function calcStay(){
   const gMult=twoGuests?' × 1.5 (2 guests)':''
   const intlNote=intlGuest?' + ₹500 intl surcharge':''
   document.getElementById('stay-info').classList.add('vis');
-  document.getElementById('stay-desc').textContent=`${nights} night${nights>1?'s':''} · ${isLong?'Long Stay':'Short Stay'} · ₹${rate.toLocaleString('en-IN')}/day${intlNote}${gMult}`;
+  const g1chk=document.getElementById('teacher-chk-g1');
+  const g2chk=document.getElementById('teacher-chk-g2');
+  const t1=g1chk?g1chk.checked:false;
+  const t2=g2chk&&twoGuests?g2chk.checked:false;
+  const teacherNote=t1&&t2?' − 25% off both guests':t1?' − 25% off Guest 1':t2?' − 25% off Guest 2':'';
+  document.getElementById('stay-desc').textContent=`${nights} night${nights>1?'s':''} · ${isLong?'Long Stay':'Short Stay'} · ₹${rate.toLocaleString('en-IN')}/day${intlNote}${gMult}${teacherNote}`;
   document.getElementById('stay-price-display').textContent=`₹${totalRoomCost.toLocaleString('en-IN')} total`;
   document.getElementById('stay-note-text').textContent=isLong?'✦ Long stay rate applied (> 5 days)':'✦ Standard short stay rate (≤ 5 days)';
   document.getElementById('deposit-box').classList.add('vis');
@@ -976,6 +1122,16 @@ function checkDetails(){
     const a2=document.getElementById('g2-id-file').files.length>0;
     ok=ok&&n2&&a2;
   }
+  const g1t=document.getElementById('teacher-chk-g1');
+  const g2t=document.getElementById('teacher-chk-g2');
+  if(g1t&&g1t.checked){
+    const tid1=document.getElementById('teacher-id-g1-file').files.length>0;
+    ok=ok&&tid1;
+  }
+  if(g2t&&g2t.checked&&twoGuests){
+    const tid2=document.getElementById('teacher-id-g2-file').files.length>0;
+    ok=ok&&tid2;
+  }
   if(intlGuest){
     const addr=document.getElementById('intl-address').value.trim();
     const arr=document.getElementById('intl-arrival-date').value;
@@ -1000,7 +1156,7 @@ function buildSummary(){
   const g1p=document.getElementById('g1-phone').value;
   const g2n=twoGuests?document.getElementById('g2-name').value:'';
   const g2p=twoGuests?document.getElementById('g2-phone').value:'';
-  const roomLabel=selRoom==='attached'?'Private Bath':'Common Bath';
+  const roomLabel=selRoom==='attached'?'Shanthi':'Sangha';
   const isLong=nights>5;
   const baseRate=prices[selRoom][isLong?'long':'short'];
   const rate=baseRate+(intlGuest?CFG.INTL_SURCHARGE:0);
@@ -1014,7 +1170,7 @@ function buildSummary(){
     ['Check-in',fmtDate(ci)+' · 2:00 PM'],
     ['Check-out',fmtDate(co)+' · 11:30 AM'],
     ['Duration',nights+' nights · '+(isLong?'Long Stay':'Short Stay')],
-    ['Rate','₹'+rate.toLocaleString('en-IN')+'/day'+(twoGuests?' × 1.5':'')],
+    ['Rate','₹'+rate.toLocaleString('en-IN')+'/day'+(twoGuests?' × 1.5':'')+(teacherNote?(' '+teacherNote):'')],
     ['Total Room Cost','₹'+totalRoomCost.toLocaleString('en-IN')],
     ['Deposit (refundable)','₹1,000'],
     ['Pay Now (50% + deposit)','₹'+grandTotal.toLocaleString('en-IN')],
@@ -1041,7 +1197,7 @@ async function submitBooking(){
   const g1p=document.getElementById('g1-phone').value.trim();
   const g2n=twoGuests?document.getElementById('g2-name').value.trim():'';
   const g2p=twoGuests?document.getElementById('g2-phone').value.trim():'';
-  const roomLabel=selRoom==='attached'?'Private Bath':'Common Bath';
+  const roomLabel=selRoom==='attached'?'Shanthi':'Sangha';
   const isLong=nights>5;const stayType=isLong?'Long Stay':'Short Stay';
   const baseRate=prices[selRoom][isLong?'long':'short'];
   const rate=baseRate+(intlGuest?CFG.INTL_SURCHARGE:0);
@@ -1050,7 +1206,7 @@ async function submitBooking(){
 
   // Google Sheets
   if(CFG.APPS_SCRIPT_URL&&CFG.APPS_SCRIPT_URL!=='YOUR_APPS_SCRIPT_WEB_APP_URL_HERE'){
-    try{ await fetch(CFG.APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({ref,g1n,g1p,g2n,g2p,room:roomLabel,stayType,checkin:ci,checkout:co,nights,rate,totalRoomCost,advance:advanceAmt,deposit:DEPOSIT,grandTotal,twoGuests,intlGuest,status:'PENDING',submittedAt:new Date().toISOString()})}); }
+    try{ await fetch(CFG.APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({ref,g1n,g1p,g2n,g2p,room:roomLabel,stayType,checkin:ci,checkout:co,nights,rate,totalRoomCost,advance:advanceAmt,deposit:DEPOSIT,grandTotal,twoGuests,intlGuest,status:'PENDING',teacherG1:document.getElementById('teacher-chk-g1')?document.getElementById('teacher-chk-g1').checked:false,teacherG2:twoGuests&&document.getElementById('teacher-chk-g2')?document.getElementById('teacher-chk-g2').checked:false,submittedAt:new Date().toISOString()})}); }
     catch(e){console.warn(e);}
   }
 
@@ -1060,9 +1216,15 @@ async function submitBooking(){
 
   // Messages
   const intlNote=intlGuest?'\n🌏 International Guest (+₹500/day Form C required)':''
+  const t1own=document.getElementById('teacher-chk-g1')?document.getElementById('teacher-chk-g1').checked:false;
+  const t2own=twoGuests&&document.getElementById('teacher-chk-g2')?document.getElementById('teacher-chk-g2').checked:false;
+  const teacherNote2=(t1own||t2own)?`
+🎓 TEACHER DISCOUNT APPLIED
+   ${t1own?'✓ '+g1n+' (Guest 1) — 25% off their share':''}${t1own&&t2own?'\n   ':''}${t2own?'✓ '+g2n+' (Guest 2) — 25% off their share':''}
+   Total after discount: ₹${totalRoomCost.toLocaleString('en-IN')}`:'';
   const ownerMsg=`🏠 *New Booking — ${CFG.PROP}*
 
-📋 Ref: ${ref}${intlNote}
+📋 Ref: ${ref}${intlNote}${teacherNote2}
 💰 Paid: ₹${grandTotal.toLocaleString('en-IN')} (advance + deposit)
 
 👤 Guest 1: ${g1n} · ${g1p}${twoGuests&&g2n?'\n👤 Guest 2: '+g2n+(g2p?' · '+g2p:''):''}
@@ -1139,7 +1301,7 @@ Today is checkout — *${fmtDate(co)}*
 Thank you for your stay! Please do leave us a review 🌿`;
 
   // Build success screen
-  document.getElementById('booking-ref').textContent='Ref: '+ref;
+  // booking ref not displayed to guest
   const sumRows=[
     ['Primary Guest',g1n+' · '+g1p],
     ...(twoGuests&&g2n?[['Second Guest',g2n+(g2p?' · '+g2p:'')]]:[]),
@@ -1156,19 +1318,31 @@ Thank you for your stay! Please do leave us a review 🌿`;
   const waMk=(phone,msg,emoji,label,cls)=>
     `<a href="https://wa.me/${phone}?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener" class="wa-btn ${cls}">${emoji} ${label}</a>`;
   const h1=g1Phone.length>=10, h2=g2Phone.length>=10;
+  // Build Telegram deep links (primary) and WA (secondary)
+  const tgMk=(phone,msg,emoji,label,cls)=>{
+    // Telegram: t.me/+phonenumber for direct message (works if they have TG)
+    const tgUrl='https://t.me/+'+phone.replace(/^0+/,'');
+    return `<a href="${tgUrl}" target="_blank" rel="noopener" class="wa-btn ${cls}" title="Send via Telegram">${emoji} ${label} <span style='font-size:0.5rem;opacity:0.8'>Telegram</span></a>`;
+  };
+  const waMk2=(phone,msg,emoji,label)=>{
+    return `<a href="https://wa.me/${phone}?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener" class="wa-btn wa-terr" title="Send via WhatsApp" style="font-size:0.54rem;padding:6px 11px">${emoji} WhatsApp</a>`;
+  };
   document.getElementById('wa-panel-success').innerHTML=`
-    <div class="wa-panel-title" style="margin-bottom:6px">📲 Send Reminders to Guest${h2?'s':''}</div>
-    <div style="font-family:'DM Mono',monospace;font-size:0.58rem;color:var(--moss);margin-bottom:10px;letter-spacing:0.07em">Host has been notified automatically. Use these to send reminders at the right time.</div>
+    <div class="wa-panel-title" style="margin-bottom:4px">📲 Reminders — Auto-sent by system on the day</div>
+    <div style="font-family:'DM Mono',monospace;font-size:0.58rem;color:var(--moss);margin-bottom:10px;letter-spacing:0.07em">✦ Check-in reminder auto-sent to host the day before · Checkout reminder sent on departure day via Telegram.<br>Use buttons below only if you need to send manually.</div>
     <div class="wa-panel-title">Guest 1 — ${g1n}</div>
-    <div class="wa-btn-row">
-      ${h1?waMk(g1Phone,g1Reminder,'🌅','Check-in Reminder','wa-clay'):''}
-      ${h1?waMk(g1Phone,g1Checkout,'🌄','Checkout Reminder','wa-terr'):''}
+    <div class="wa-btn-row" style="align-items:center">
+      ${h1?tgMk(g1Phone,g1Reminder,'🌅','Check-in Reminder','wa-clay'):''}
+      ${h1?waMk2(g1Phone,g1Reminder,'🌅','Check-in'):''}
+      ${h1?tgMk(g1Phone,g1Checkout,'🌄','Checkout Reminder','wa-terr'):''}
+      ${h1?waMk2(g1Phone,g1Checkout,'🌄','Checkout'):''}
     </div>
-    <div class="wa-hint">Send Check-in Reminder the day before arrival · Checkout Reminder on departure morning</div>
-    ${h2?`<div class="wa-panel-title" style="margin-top:13px">Guest 2 — ${g2n}</div>
-    <div class="wa-btn-row">
-      ${waMk(g2Phone,g1Reminder.replace(g1n,g2n),'🌅','Check-in Reminder','wa-clay')}
-      ${waMk(g2Phone,g1Checkout.replace(g1n,g2n),'🌄','Checkout Reminder','wa-terr')}
+    ${h2?`<div class="wa-panel-title" style="margin-top:11px">Guest 2 — ${g2n}</div>
+    <div class="wa-btn-row" style="align-items:center">
+      ${tgMk(g2Phone,g1Reminder.replace(g1n,g2n),'🌅','Check-in Reminder','wa-clay')}
+      ${waMk2(g2Phone,g1Reminder.replace(g1n,g2n),'🌅','Check-in')}
+      ${tgMk(g2Phone,g1Checkout.replace(g1n,g2n),'🌄','Checkout Reminder','wa-terr')}
+      ${waMk2(g2Phone,g1Checkout.replace(g1n,g2n),'🌄','Checkout')}
     </div>`:''}
   `;
 
@@ -1178,14 +1352,19 @@ Thank you for your stay! Please do leave us a review 🌿`;
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
+function goHome(){
+  window.location.reload();
+}
+
 function resetBooking(){
   selRoom=null;nights=0;totalRoomCost=0;advanceAmt=0;grandTotal=0;
-  twoGuests=false;intlGuest=false;
+  twoGuests=false;intlGuest=false;teacherDiscount=false;
   document.getElementById('success-card').classList.remove('visible');
   document.getElementById('stepper').style.display='flex';
   ['card-attached','card-common'].forEach(id=>document.getElementById(id).classList.remove('selected'));
   ['intl-guest-chk','two-guests-chk','agree'].forEach(id=>document.getElementById(id).checked=false);
-  ['intl-section','second-guest-section'].forEach(id=>document.getElementById(id).style.display='none');
+  ['teacher-chk-g1','teacher-chk-g2'].forEach(id=>{const e=document.getElementById(id);if(e)e.checked=false;});
+  ['intl-section','second-guest-section','teacher-id-section-g1','teacher-id-section-g2'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display='none';});
   ['checkin','checkout','g1-name','g1-phone','g2-name','g2-phone'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   ['g1-id-file','g2-id-file','intl-photo-file','intl-passport-id-file','intl-visa-file'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   ['g1-id-preview','g2-id-preview','intl-photo-preview','intl-passport-id-preview','intl-visa-preview'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display='none';});
@@ -1276,11 +1455,69 @@ function renderGallery(){
 }
 function delGallery(i){if(confirm('Remove this item?')){ galleryData.splice(i,1);renderGallery(); }}
 function doAdminUpload(){
-  const cap=document.getElementById('adm-caption').value.trim()||'Soudhamini Stay';
+  const cap=document.getElementById('adm-caption').value.trim()||'Shanthi & Sangha @ Soudhamini';
   const cat=document.getElementById('adm-cat').value;
-  pFiles.adm.forEach(f=>{const r=new FileReader();r.onload=ev=>{const isV=f.type.startsWith('video/');galleryData.unshift(isV?{type:'video',cat:'video',src:URL.createObjectURL(f),thumb:ev.target.result,label:cap,duration:'—',aspect:'16/9'}:{type:'image',cat,src:ev.target.result,label:cap,aspect:'4/3'});renderGallery();};r.readAsDataURL(f);});
-  pFiles.adm=[];document.getElementById('adm-previews').innerHTML='';document.getElementById('adm-caption').value='';document.getElementById('btn-adm-upload').disabled=true;
+  const files=[...pFiles.adm];
+  if(files.length===0)return;
+  // Close modal immediately so user sees gallery updating
   closeModal('admin-upload-modal');
+  pFiles.adm=[];
+  document.getElementById('adm-previews').innerHTML='';
+  document.getElementById('adm-caption').value='';
+  document.getElementById('btn-adm-upload').disabled=true;
+
+  let processed=0;
+  const total=files.length;
+  const done=()=>{processed++;if(processed>=total)renderGallery();};
+
+  files.forEach(f=>{
+    const isV=f.type.startsWith('video/');
+    if(isV){
+      const videoUrl=URL.createObjectURL(f);
+      const video=document.createElement('video');
+      video.crossOrigin='anonymous';
+      video.muted=true;
+      video.playsInline=true;
+      video.preload='metadata';
+      // Must attach to DOM for some browsers to load metadata
+      video.style.cssText='position:fixed;opacity:0;pointer-events:none;width:1px;height:1px;';
+      document.body.appendChild(video);
+      video.onloadedmetadata=()=>{video.currentTime=Math.min(1,video.duration*0.1);};
+      video.onseeked=()=>{
+        try{
+          const canvas=document.createElement('canvas');
+          canvas.width=320;canvas.height=180;
+          canvas.getContext('2d').drawImage(video,0,0,320,180);
+          const thumb=canvas.toDataURL('image/jpeg',0.75);
+          const dur=video.duration?formatDur(video.duration):'—';
+          galleryData.unshift({type:'video',cat,src:videoUrl,thumb,label:cap,duration:dur,aspect:'16/9'});
+        }catch(e){
+          galleryData.unshift({type:'video',cat,src:videoUrl,thumb:'',label:cap,duration:'—',aspect:'16/9'});
+        }
+        document.body.removeChild(video);
+        done();
+      };
+      video.onerror=()=>{
+        galleryData.unshift({type:'video',cat,src:videoUrl,thumb:'',label:cap,duration:'—',aspect:'16/9'});
+        try{document.body.removeChild(video);}catch(e){}
+        done();
+      };
+      video.src=videoUrl;
+      video.load();
+    } else {
+      const r=new FileReader();
+      r.onload=ev=>{
+        galleryData.unshift({type:'image',cat,src:ev.target.result,label:cap,aspect:'4/3'});
+        done();
+      };
+      r.readAsDataURL(f);
+    }
+  });
+}
+
+function formatDur(s){
+  const m=Math.floor(s/60),sec=Math.round(s%60);
+  return m+':'+String(sec).padStart(2,'0');
 }
 
 // ── LIGHTBOX ────────────────────────────────────────────
@@ -1346,7 +1583,7 @@ async function loadBookingsFromSheet(){
       sheetConfirmed.forEach(sb=>{
         if(!confirmedBookings.find(c=>c.ref===sb.ref)){
           confirmedBookings.push({
-            ref:sb.ref,room:sb.room==='Private Bath'?'attached':'common',
+            ref:sb.ref,room:sb.room==='Shanthi'?'attached':'common',
             roomLabel:sb.room,g1n:sb.g1n||sb.guestName,g1p:sb.g1p||sb.phone,
             checkin:sb.checkin,checkout:sb.checkout,nights:sb.nights,
             stayType:sb.stayType,rate:sb.rate,totalRoomCost:sb.totalRoomCost||sb.total,
@@ -1359,7 +1596,7 @@ async function loadBookingsFromSheet(){
       sheetPending.forEach(sb=>{
         if(!pendingBookings.find(p=>p.ref===sb.ref)&&!confirmedBookings.find(c=>c.ref===sb.ref)){
           pendingBookings.push({
-            ref:sb.ref,room:sb.room==='Private Bath'?'attached':'common',
+            ref:sb.ref,room:sb.room==='Shanthi'?'attached':'common',
             roomLabel:sb.room,g1n:sb.g1n||sb.guestName,g1p:sb.g1p||sb.phone,
             g2n:sb.g2n||'',g2p:sb.g2p||'',
             checkin:sb.checkin,checkout:sb.checkout,nights:sb.nights,
@@ -1488,7 +1725,8 @@ function renderHP(){
       </div>
       <div class="bc-actions">
         ${isPending?`<button class="bc-btn confirm" data-confirm="${bk.ref}" onclick="confirmBooking('${bk.ref}')">✓ Confirm &amp; Block Dates</button>`:''}
-        ${g1Phone.length>=10?`<a href="https://wa.me/${g1Phone}?text=${waMsg}" target="_blank" rel="noopener" class="bc-btn wa-guest">💬 WA Confirmation to Guest</a>`:''}
+        ${g1Phone.length>=10?`<a href="https://t.me/+${g1Phone}" target="_blank" rel="noopener" class="bc-btn" style="background:#229ED9;color:#fff">✈ Telegram Guest</a>`:''}
+        ${g1Phone.length>=10?`<a href="https://wa.me/${g1Phone}?text=${waMsg}" target="_blank" rel="noopener" class="bc-btn wa-guest">💬 WA Confirmation</a>`:''}
         <a href="https://wa.me/${CFG.OWNER_WA}?text=${encodeURIComponent('📋 Ref: '+bk.ref+' · '+bk.g1n+' · '+fmtDate(bk.checkin)+' → '+fmtDate(bk.checkout))}" target="_blank" rel="noopener" class="bc-btn wa-owner">💬 WA to Self</a>
         <button class="bc-btn cancel" onclick="cancelBooking('${bk.ref}')">✕ Cancel</button>
       </div>
@@ -1511,8 +1749,8 @@ function renderHPCalendar(container, confirmed){
     for(let d=new Date(from);d<to;d.setDate(d.getDate()+1)){
       const key=d.toISOString().split('T')[0];
       if(!dateMap[key])dateMap[key]={attached:false,common:false};
-      if(bk.room==='attached'||bk.roomLabel==='Private Bath')dateMap[key].attached=true;
-      if(bk.room==='common'||bk.roomLabel==='Common Bath')dateMap[key].common=true;
+      if(bk.room==='attached'||bk.roomLabel==='Shanthi')dateMap[key].attached=true;
+      if(bk.room==='common'||bk.roomLabel==='Sangha')dateMap[key].common=true;
     }
   });
 
@@ -1521,8 +1759,8 @@ function renderHPCalendar(container, confirmed){
 
   let calHTML=`<div class="hp-calendar"><h3>📅 Availability — ${monthName}</h3>
   <div class="cal-legend">
-    <span><span class="cal-dot attached"></span>Private Bath booked</span>
-    <span><span class="cal-dot common"></span>Common Bath booked</span>
+    <span><span class="cal-dot attached"></span>Shanthi booked</span>
+    <span><span class="cal-dot common"></span>Sangha booked</span>
     <span><span class="cal-dot both"></span>Both rooms booked</span>
   </div>
   <div class="cal-grid">
@@ -1537,8 +1775,8 @@ function renderHPCalendar(container, confirmed){
     let tag='';
     if(info){
       if(info.attached&&info.common){cls+=' booked-both';tag='Both rooms';}
-      else if(info.attached){cls+=' booked-attached';tag='Private Bath';}
-      else if(info.common){cls+=' booked-common';tag='Common Bath';}
+      else if(info.attached){cls+=' booked-attached';tag='Shanthi';}
+      else if(info.common){cls+=' booked-common';tag='Sangha';}
     }
     if(isToday)cls+=' today';
     calHTML+=`<div class="${cls}"><span class="cal-day-num">${d}</span>${tag?`<span class="cal-day-tag">${tag}</span>`:''}</div>`;
@@ -1553,6 +1791,24 @@ function renderHPCalendar(container, confirmed){
   container.innerHTML=calHTML;
 }
 
+
+// ── FONT SIZE ADJUSTER ────────────────────────────────────────
+let fontScale=parseInt(localStorage.getItem('sdm_font')||'0');
+function applyFont(){
+  const pct=100+fontScale*10;
+  document.documentElement.style.fontSize=pct+'%';
+  document.getElementById('a11y-size-display').textContent=pct+'%';
+}
+function adjustFont(dir){
+  fontScale=Math.max(-2,Math.min(4,fontScale+dir));
+  localStorage.setItem('sdm_font',fontScale);
+  applyFont();
+}
+function resetFont(){
+  fontScale=0;localStorage.setItem('sdm_font','0');applyFont();
+}
+applyFont();
+
 // ── INIT ────────────────────────────────────────────
 renderGallery();
 </script>
@@ -1560,7 +1816,7 @@ renderGallery();
 <div class="host-panel" id="host-panel">
   <div class="hp-header">
     <div>
-      <h2>Host Panel — Soudhamini Stay</h2>
+      <h2>Host Panel — Shanthi &amp; Sangha @ Soudhamini</h2>
       <div class="hp-header-meta">Booking management &amp; confirmation</div>
     </div>
     <button class="hp-close" onclick="closeHostPanel()">✕ Close</button>
