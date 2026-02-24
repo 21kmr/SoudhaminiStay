@@ -49,7 +49,7 @@ header h1 em{font-style:italic;color:var(--terr);}
 
 /* STEPPER */
 .stepper{display:flex;align-items:center;max-width:760px;margin:24px auto 20px;padding:0 20px;}
-.step-node{display:flex;flex-direction:column;align-items:center;flex:1;position:relative;}
+.step-node{display:flex;flex-direction:column;align-items:center;flex:1;position:relative;cursor:default;}.step-node.done,.step-node.active{cursor:pointer;}
 .step-node:not(:last-child)::after{content:'';position:absolute;top:17px;left:50%;width:100%;height:2px;background:var(--border);z-index:0;transition:background 0.4s;}
 .step-node.done:not(:last-child)::after{background:var(--sage);}
 .step-circle{width:34px;height:34px;border-radius:50%;border:2px solid var(--border);background:var(--surface);color:var(--text-s);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:0.68rem;z-index:1;transition:all 0.3s;position:relative;}
@@ -337,6 +337,40 @@ main{max-width:860px;margin:0 auto;padding:0 20px 60px;}
 .lb-counter{font-family:'DM Mono',monospace;font-size:0.54rem;color:rgba(245,240,232,0.3);margin-top:3px;text-align:center;}
 
 
+
+/* ── BOOKING CALENDAR ────────────────────────────────────── */
+.bk-cal-wrap{background:var(--bg);border-radius:var(--r);overflow:hidden;margin-bottom:4px;}
+.bk-cal-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--warm);}
+.bk-cal-nav{background:none;border:1px solid var(--border);border-radius:6px;width:32px;height:32px;font-size:1.2rem;cursor:pointer;color:var(--clay);transition:all 0.18s;display:flex;align-items:center;justify-content:center;}
+.bk-cal-nav:hover{background:var(--clay);color:#fff;}
+.bk-cal-month{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:400;color:var(--text);}
+.bk-cal-legend{display:flex;gap:12px;padding:8px 16px;flex-wrap:wrap;border-bottom:1px solid var(--border);}
+.bk-cal-legend span{font-family:'DM Mono',monospace;font-size:0.54rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-mid);display:flex;align-items:center;gap:5px;}
+.bk-dot{width:10px;height:10px;border-radius:50%;display:inline-block;}
+.bk-dot.available{background:var(--sage-lt);border:1px solid var(--sage);}
+.bk-dot.booked-s{background:#fde8da;border:1px solid var(--terr);}
+.bk-dot.selected-s{background:var(--moss);border:1px solid var(--moss);}
+.bk-dot.today-s{background:var(--clay);border:1px solid var(--clay);}
+.bk-cal-days-header{display:grid;grid-template-columns:repeat(7,1fr);padding:8px 8px 4px;gap:3px;}
+.bk-cal-days-header span{font-family:'DM Mono',monospace;font-size:0.52rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-s);text-align:center;}
+.bk-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;padding:0 8px 10px;}
+.bk-day{min-height:38px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--text-mid);position:relative;transition:all 0.15s;cursor:pointer;user-select:none;}
+.bk-day.empty{cursor:default;}
+.bk-day.past{color:var(--text-s);cursor:not-allowed;opacity:0.4;}
+.bk-day.today-day{font-weight:700;color:var(--clay);background:rgba(168,108,70,0.1);}
+.bk-day.booked-day{background:#fde8da;color:var(--terr);cursor:not-allowed;position:relative;}
+.bk-day.booked-day::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(-45deg,transparent,transparent 3px,rgba(139,74,42,0.08) 3px,rgba(139,74,42,0.08) 6px);border-radius:6px;}
+.bk-day.avail-day{background:var(--surface);}
+.bk-day.avail-day:hover{background:var(--sage-lt);color:var(--moss);transform:scale(1.06);}
+.bk-day.sel-start{background:var(--moss);color:#fff;border-radius:6px 0 0 6px;}
+.bk-day.sel-end{background:var(--moss);color:#fff;border-radius:0 6px 6px 0;}
+.bk-day.sel-start.sel-end{border-radius:6px;}
+.bk-day.sel-range{background:rgba(93,120,84,0.18);color:var(--moss);}
+.bk-day.sel-start,.bk-day.sel-end{z-index:1;}
+.bk-cal-selection{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--sage-lt);border-top:1px solid var(--sage);font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.08em;color:var(--moss);}
+.bk-clear-btn{background:none;border:1px solid var(--sage);color:var(--moss);padding:3px 10px;border-radius:100px;font-family:'DM Mono',monospace;font-size:0.54rem;cursor:pointer;transition:all 0.18s;}
+.bk-clear-btn:hover{background:var(--moss);color:#fff;}
+
 /* ── HOST PANEL ──────────────────────────────────────────── */
 .host-panel{display:none;position:fixed;inset:0;background:var(--bg);z-index:3000;overflow-y:auto;flex-direction:column;}
 .host-panel.open{display:flex;}
@@ -442,11 +476,11 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 
 <!-- STEPPER -->
 <div class="stepper" id="stepper">
-  <div class="step-node active" id="sn1"><div class="step-circle">1</div><div class="step-label">Room</div></div>
-  <div class="step-node" id="sn2"><div class="step-circle">2</div><div class="step-label">Dates</div></div>
-  <div class="step-node" id="sn3"><div class="step-circle">3</div><div class="step-label">Guests</div></div>
-  <div class="step-node" id="sn4"><div class="step-circle">4</div><div class="step-label">Review</div></div>
-  <div class="step-node" id="sn5"><div class="step-circle">5</div><div class="step-label">Payment</div></div>
+  <div class="step-node active" id="sn1" onclick="stepJump(1)"><div class="step-circle">1</div><div class="step-label">Room</div></div>
+  <div class="step-node" id="sn2" onclick="stepJump(2)"><div class="step-circle">2</div><div class="step-label">Dates</div></div>
+  <div class="step-node" id="sn3" onclick="stepJump(3)"><div class="step-circle">3</div><div class="step-label">Guests</div></div>
+  <div class="step-node" id="sn4" onclick="stepJump(4)"><div class="step-circle">4</div><div class="step-label">Review</div></div>
+  <div class="step-node" id="sn5" onclick="stepJump(5)" title="Payment"><div class="step-circle">5</div><div class="step-label">Payment</div></div>
 </div>
 
 <main>
@@ -509,12 +543,33 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
   <div class="sec-label">Step 2 — Select Dates</div>
   <div id="selected-room-indicator" style="display:none;text-align:center;margin-bottom:10px;font-family:'DM Mono',monospace;font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--terr);background:var(--warm);border:1px solid var(--border);border-radius:100px;padding:7px 18px;display:inline-block"></div>
   <div class="card">
-    <div class="date-row">
-      <div class="field"><label>Check-in Date</label><input type="date" id="checkin" onchange="calcStay()"></div>
-      <div class="field"><label>Check-out Date</label><input type="date" id="checkout" onchange="calcStay()"></div>
+    <!-- BOOKING CALENDAR -->
+    <div class="bk-cal-wrap">
+      <div class="bk-cal-header">
+        <button class="bk-cal-nav" onclick="calNav(-1)">&#8249;</button>
+        <span class="bk-cal-month" id="cal-month-label"></span>
+        <button class="bk-cal-nav" onclick="calNav(1)">&#8250;</button>
+      </div>
+      <div class="bk-cal-legend">
+        <span><span class="bk-dot available"></span>Available</span>
+        <span><span class="bk-dot booked-s"></span>Booked</span>
+        <span><span class="bk-dot selected-s"></span>Your stay</span>
+        <span><span class="bk-dot today-s"></span>Today</span>
+      </div>
+      <div class="bk-cal-days-header">
+        <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+      </div>
+      <div class="bk-cal-grid" id="bk-cal-grid"></div>
+      <div class="bk-cal-selection" id="bk-cal-selection" style="display:none">
+        <span id="bk-sel-text"></span>
+        <button class="bk-clear-btn" onclick="clearCalSel()">✕ Clear</button>
+      </div>
     </div>
+    <!-- Hidden inputs kept for rest of form logic -->
+    <input type="hidden" id="checkin">
+    <input type="hidden" id="checkout">
     <div id="date-conflict-msg" style="display:none;margin-top:8px;padding:9px 12px;background:#fdeaea;border:1px solid #e07070;border-radius:5px;font-family:'DM Mono',monospace;font-size:0.62rem;color:#c0392b;letter-spacing:0.07em">
-      ⚠ These dates are already booked for the selected room. Please choose different dates or a different room.
+      ⚠ Those dates are already booked for this room. Please select different dates.
     </div>
     <div class="stay-info" id="stay-info">
       <span id="stay-desc"></span>
@@ -683,7 +738,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
         </div>
         <div class="field">
           <label>Contact Number in India *</label>
-          <input type="tel" id="intl-contact-india" placeholder="Local SIM or Telegram or WhatsApp number" oninput="checkDetails()">
+          <input type="tel" id="intl-contact-india" placeholder="Local SIM or WhatsApp number" oninput="checkDetails()">
         </div>
         <div class="field">
           <label>Emergency Contact (home country)</label>
@@ -783,8 +838,8 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
     </div>
     <div class="pay-confirm-note" style="margin-top:18px">
       <p>✦ After paying, tap <strong>I Have Paid — Confirm Booking</strong> below.<br>
-      ✦ Host will verify your payment and send a Telegram confirmation within <strong>15–30 minutes</strong>.<br>
-      ✦ Your booking ref will be sent to your Telegram.</p>
+      ✦ Host will verify your payment and send a WhatsApp confirmation within <strong>15–30 minutes</strong>.<br>
+      ✦ Your booking ref will be sent to your WhatsApp number.</p>
     </div>
     <button class="btn-primary" id="btn-confirm-booking" onclick="submitBooking()" style="background:var(--moss)">✓ I Have Paid — Confirm Booking</button>
   </div>
@@ -824,6 +879,9 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
   <div class="gallery-grid" id="gallery-grid"></div>
 </section>
 
+<div style="text-align:center;padding:8px;font-family:'DM Mono',monospace;font-size:0.54rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-s)">
+  👁 Visitors: <span id="visitor-count">—</span>
+</div>
 <footer id="site-footer">Shanthi &amp; Sangha @ Soudhamini · Peaceful Simple Living · Waste Segregated with Ashram Care</footer>
 
 <!-- MODALS -->
@@ -1042,6 +1100,7 @@ function recalc(){
 function goTo(p){
   document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
   document.getElementById('page'+p).classList.add('active');
+  if(p===2)renderCal(); // refresh calendar with latest bookings
   for(let i=1;i<=5;i++){
     const n=document.getElementById('sn'+i);
     n.classList.remove('active','done');
@@ -1365,6 +1424,7 @@ function resetBooking(){
   ['intl-guest-chk','two-guests-chk','agree'].forEach(id=>document.getElementById(id).checked=false);
   ['teacher-chk-g1','teacher-chk-g2'].forEach(id=>{const e=document.getElementById(id);if(e)e.checked=false;});
   ['intl-section','second-guest-section','teacher-id-section-g1','teacher-id-section-g2'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display='none';});
+  calSelStart=null;calSelEnd=null;
   ['checkin','checkout','g1-name','g1-phone','g2-name','g2-phone'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   ['g1-id-file','g2-id-file','intl-photo-file','intl-passport-id-file','intl-visa-file'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   ['g1-id-preview','g2-id-preview','intl-photo-preview','intl-passport-id-preview','intl-visa-preview'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display='none';});
@@ -1714,7 +1774,7 @@ function renderHP(){
       </div>
       <div class="bc-grid">
         <div class="bc-field"><label>Primary Guest</label><span>${bk.g1n||'—'}</span></div>
-        <div class="bc-field"><label>WhatsApp/Telegram</label><span>${bk.g1p||'—'}</span></div>
+        <div class="bc-field"><label>WhatsApp</label><span>${bk.g1p||'—'}</span></div>
         <div class="bc-field"><label>Room</label><span>${bk.roomLabel||bk.room||'—'}${bk.twoGuests?' · 2 guests':''}</span></div>
         <div class="bc-field"><label>Check-in</label><span>${fmtDate(bk.checkin)}</span></div>
         <div class="bc-field"><label>Check-out</label><span>${fmtDate(bk.checkout)}</span></div>
@@ -1809,8 +1869,178 @@ function resetFont(){
 }
 applyFont();
 
+
+// ── BOOKING CALENDAR ──────────────────────────────────────────
+let calYear=new Date().getFullYear(), calMonth=new Date().getMonth();
+let calSelStart=null, calSelEnd=null, calSelecting=false;
+
+function calNav(dir){
+  calMonth+=dir;
+  if(calMonth>11){calMonth=0;calYear++;}
+  if(calMonth<0){calMonth=11;calYear--;}
+  renderCal();
+}
+
+function getBookedDates(){
+  // Build set of booked date strings for selected room
+  const booked=new Set();
+  confirmedBookings.forEach(bk=>{
+    if(bk.room!==selRoom)return;
+    const from=new Date(bk.checkin+'T00:00:00');
+    const to=new Date(bk.checkout+'T00:00:00');
+    for(let d=new Date(from);d<to;d.setDate(d.getDate()+1)){
+      booked.add(d.toISOString().split('T')[0]);
+    }
+  });
+  return booked;
+}
+
+function renderCal(){
+  const grid=document.getElementById('bk-cal-grid');
+  if(!grid)return;
+  const label=document.getElementById('cal-month-label');
+  const today=new Date();today.setHours(0,0,0,0);
+  const todayStr=today.toISOString().split('T')[0];
+  const booked=getBookedDates();
+  const monthName=new Date(calYear,calMonth,1).toLocaleDateString('en-IN',{month:'long',year:'numeric'});
+  if(label)label.textContent=monthName;
+
+  const firstDay=new Date(calYear,calMonth,1).getDay();
+  const daysInMonth=new Date(calYear,calMonth+1,0).getDate();
+
+  grid.innerHTML='';
+  // Empty cells
+  for(let i=0;i<firstDay;i++){
+    const e=document.createElement('div');e.className='bk-day empty';grid.appendChild(e);
+  }
+  for(let d=1;d<=daysInMonth;d++){
+    const dateStr=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const dateObj=new Date(dateStr+'T00:00:00');
+    const el=document.createElement('div');
+    el.textContent=d;
+    let cls='bk-day';
+    const isPast=dateObj<today;
+    const isBooked=booked.has(dateStr);
+    const isToday=dateStr===todayStr;
+
+    // Check if in selected range
+    let inRange=false,isStart=false,isEnd=false;
+    if(calSelStart&&calSelEnd){
+      const s=calSelStart<calSelEnd?calSelStart:calSelEnd;
+      const e2=calSelStart<calSelEnd?calSelEnd:calSelStart;
+      isStart=dateStr===s;isEnd=dateStr===e2;
+      inRange=dateStr>s&&dateStr<e2;
+    } else if(calSelStart&&!calSelEnd){
+      isStart=dateStr===calSelStart;
+    }
+
+    if(isPast){cls+=' past';}
+    else if(isBooked){cls+=' booked-day';}
+    else if(isStart){cls+=' avail-day sel-start'+(calSelEnd?' ':' sel-end');}
+    else if(isEnd){cls+=' avail-day sel-end';}
+    else if(inRange){cls+=' avail-day sel-range';}
+    else{cls+=' avail-day';}
+    if(isToday&&!isStart&&!isEnd)cls+=' today-day';
+
+    el.className=cls;
+    if(!isPast&&!isBooked){
+      el.onclick=()=>calClick(dateStr);
+    }
+    grid.appendChild(el);
+  }
+  updateCalSelection();
+}
+
+function calClick(dateStr){
+  if(!selRoom){alert('Please select a room first.');return;}
+  if(!calSelStart||calSelEnd){
+    // Start fresh selection
+    calSelStart=dateStr; calSelEnd=null;
+  } else {
+    // Second click — set end
+    if(dateStr<=calSelStart){calSelStart=dateStr;calSelEnd=null;}
+    else{
+      // Check no booked dates in range
+      const booked=getBookedDates();
+      const s=calSelStart,e=dateStr;
+      let hasBooked=false;
+      const cur=new Date(s+'T00:00:00');
+      const end=new Date(e+'T00:00:00');
+      while(cur<end){
+        if(booked.has(cur.toISOString().split('T')[0])){hasBooked=true;break;}
+        cur.setDate(cur.getDate()+1);
+      }
+      if(hasBooked){
+        document.getElementById('date-conflict-msg').style.display='block';
+        calSelStart=null;calSelEnd=null;
+      } else {
+        document.getElementById('date-conflict-msg').style.display='none';
+        calSelEnd=dateStr;
+        // Set hidden inputs and trigger calcStay
+        document.getElementById('checkin').value=calSelStart;
+        document.getElementById('checkout').value=calSelEnd;
+        calcStay();
+      }
+    }
+  }
+  renderCal();
+}
+
+function updateCalSelection(){
+  const sel=document.getElementById('bk-cal-selection');
+  const txt=document.getElementById('bk-sel-text');
+  if(calSelStart&&calSelEnd){
+    const nights=Math.round((new Date(calSelEnd)-new Date(calSelStart))/(1000*60*60*24));
+    const fmt=d=>new Date(d+'T00:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short'});
+    txt.textContent=fmt(calSelStart)+' → '+fmt(calSelEnd)+' · '+nights+' night'+(nights>1?'s':'');
+    sel.style.display='flex';
+  } else if(calSelStart){
+    txt.textContent='Tap checkout date to complete selection';
+    sel.style.display='flex';
+  } else {
+    sel.style.display='none';
+  }
+}
+
+function clearCalSel(){
+  calSelStart=null;calSelEnd=null;
+  document.getElementById('checkin').value='';
+  document.getElementById('checkout').value='';
+  document.getElementById('date-conflict-msg').style.display='none';
+  calcStay();
+  renderCal();
+}
+
+// ── STEP JUMP ─────────────────────────────────────────────────
+// Allow clicking done steps to jump back
+function stepJump(p){
+  const node=document.getElementById('sn'+p);
+  if(!node)return;
+  // Only allow jumping to done steps or current active step
+  if(!node.classList.contains('done')&&!node.classList.contains('active'))return;
+  goTo(p);
+}
+
+// ── VISITOR COUNTER ────────────────────────────────────────────
+// Uses countapi.xyz — free, no account needed
+async function loadVisitorCount(){
+  try{
+    // Hit counter increments on each page load
+    const res=await fetch('https://api.countapi.xyz/hit/soudhamini-stay/visits');
+    const data=await res.json();
+    const el=document.getElementById('visitor-count');
+    if(el&&data.value)el.textContent=Number(data.value).toLocaleString('en-IN');
+  } catch(e){
+    const el=document.getElementById('visitor-count');
+    if(el)el.textContent='—';
+  }
+}
+loadVisitorCount();
+
+
 // ── INIT ────────────────────────────────────────────
 renderGallery();
+renderCal();
 </script>
 <!-- HOST PANEL -->
 <div class="host-panel" id="host-panel">
