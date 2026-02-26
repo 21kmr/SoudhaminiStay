@@ -31,7 +31,7 @@ body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;font-s
 header h1:hover em{color:var(--terr);}
 
 /* ADMIN BAR */
-#admin-bar{background:var(--terr);color:#fff;padding:8px 20px;display:none;align-items:center;justify-content:space-between;font-family:'DM Mono',monospace;font-size:0.66rem;letter-spacing:0.12em;position:sticky;top:0;z-index:200;text-transform:uppercase;position:relative;z-index:100;}
+#admin-bar{background:var(--terr);color:#fff;padding:8px 20px;display:none;align-items:center;justify-content:space-between;font-family:'DM Mono',monospace;font-size:0.66rem;letter-spacing:0.12em;text-transform:uppercase;position:relative;z-index:100;}
 #admin-bar.visible{display:flex !important;}
 .admin-btn{padding:5px 13px;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);color:#fff;border-radius:100px;font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:background 0.2s;}
 .admin-btn:hover{background:rgba(255,255,255,0.35);}
@@ -738,7 +738,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
         </div>
         <div class="field">
           <label>Contact Number in India *</label>
-          <input type="tel" id="intl-contact-india" placeholder="Local SIM or Telegram or WhatsApp number" oninput="checkDetails()">
+          <input type="tel" id="intl-contact-india" placeholder="Local SIM or WhatsApp number" oninput="checkDetails()">
         </div>
         <div class="field">
           <label>Emergency Contact (home country)</label>
@@ -838,8 +838,8 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
     </div>
     <div class="pay-confirm-note" style="margin-top:18px">
       <p>✦ After paying, tap <strong>I Have Paid — Confirm Booking</strong> below.<br>
-      ✦ Host will verify your payment and send a Telegram or WhatsApp confirmation within <strong>15–30 minutes</strong>.<br>
-      ✦ Your booking ref will be sent to your Telegram or WhatsApp number.</p>
+      ✦ Host will verify your payment and send a WhatsApp confirmation within <strong>15–30 minutes</strong>.<br>
+      ✦ Your booking ref will be sent to your WhatsApp number.</p>
     </div>
     <button class="btn-primary" id="btn-confirm-booking" onclick="submitBooking()" style="background:var(--moss)">✓ I Have Paid — Confirm Booking</button>
   </div>
@@ -879,11 +879,10 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
   <div class="gallery-grid" id="gallery-grid"></div>
 </section>
 
-<div style="text-align:center;padding:10px 16px;font-family:'DM Mono',monospace;font-size:0.54rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-s);display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px;border-top:1px solid var(--border)">
-  <span>👁 Visitors: <span id="visitor-count">—</span></span>
-  <span style="opacity:0.3">·</span>
-  <span id="visitor-geo" style="text-transform:none;letter-spacing:0.05em">📍 —</span>
+<div style="text-align:center;padding:8px;font-family:'DM Mono',monospace;font-size:0.54rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-s)">
+  👁 Visitors: <span id="visitor-count">—</span>
 </div>
+<span id="visitor-geo" style="display:none"></span>
 <footer id="site-footer">Shanthi &amp; Sangha @ Soudhamini · Peaceful Simple Living · Waste Segregated with Ashram Care</footer>
 
 <!-- MODALS -->
@@ -1004,13 +1003,11 @@ let curFilter='all',lbItems=[],lbIdx=0;
 
 // ── BOOKING FLOW ────────────────────────────────────────
 function selectRoom(t){
-  selRoom=t;
+  if(!selRoom||selRoom!==t){ selRoom=t; }
+  else { return; }
   document.getElementById('card-attached').classList.toggle('selected',t==='attached');
   document.getElementById('card-common').classList.toggle('selected',t==='common');
   document.getElementById('btn-to-dates').disabled=false;
-  // Refresh calendar for new room if already on page 2
-  if(calSelStart||calSelEnd){clearCalSel();}
-  renderCal();
   checkDateConflict();
   // Show selected room on date page
   const ind=document.getElementById('selected-room-indicator');
@@ -1252,26 +1249,7 @@ function fmtDate(d){
   return new Date(d+'T00:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
 }
 
-let isSubmitting=false;
-function submitBooking(){
-  if(isSubmitting)return;
-  const ci=document.getElementById('checkin').value;
-  const co=document.getElementById('checkout').value;
-  // Last-moment conflict check against confirmed bookings
-  if(isConflict(selRoom,ci,co)){
-    alert('⚠ Sorry — these dates were just booked by someone else. Please select different dates.');
-    calSelStart=null;calSelEnd=null;
-    document.getElementById('checkin').value='';
-    document.getElementById('checkout').value='';
-    goTo(2); renderCal();
-    return;
-  }
-  // Check for duplicate pending booking
-  const dupCheck=pendingBookings.find(b=>b.room===selRoom&&b.checkin===ci&&b.checkout===co);
-  if(dupCheck){alert('A booking for these dates is already being processed. Please wait for host confirmation.');return;}
-  isSubmitting=true;
-  const btn=document.getElementById('btn-confirm-booking');
-  if(btn){btn.disabled=true;btn.textContent='⏳ Sending…';btn.style.opacity='0.7';}
+async function submitBooking(){
   const ref='SDM-'+Math.random().toString(36).substr(2,6).toUpperCase();
   const ci=document.getElementById('checkin').value;
   const co=document.getElementById('checkout').value;
@@ -1286,28 +1264,9 @@ function submitBooking(){
   const g1Phone=g1p.replace(/\D/g,'');
   const g2Phone=g2p.replace(/\D/g,'');
 
-  // Read uploaded files as base64 for email attachment
-  const bookingDocs=[];
-  const readFileB64=f=>new Promise(res=>{const r=new FileReader();r.onload=e=>res({name:f.name,type:f.type,data:e.target.result.split(',')[1]});r.onerror=()=>res(null);r.readAsDataURL(f);});
-  const fileSources=[
-    {id:'g1-id-file',label:intlGuest?'Passport_'+g1n:'Aadhaar_'+g1n},
-    {id:'g2-id-file',label:intlGuest?'Passport_'+g2n:'Aadhaar_'+g2n},
-    {id:'teacher-id-g1-file',label:'TeacherID_'+g1n},
-    {id:'teacher-id-g2-file',label:'TeacherID_'+g2n},
-    {id:'intl-photo-file',label:'PassportPhoto_'+g1n},
-    {id:'intl-passport-id-file',label:'PassportID_'+g1n},
-  ];
-  for(const fs of fileSources){
-    const el=document.getElementById(fs.id);
-    if(el&&el.files&&el.files[0]){
-      const b64=await readFileB64(el.files[0]);
-      if(b64)bookingDocs.push({...b64,label:fs.label});
-    }
-  }
-
-  // Google Sheets + email + docs
+  // Google Sheets
   if(CFG.APPS_SCRIPT_URL&&CFG.APPS_SCRIPT_URL!=='YOUR_APPS_SCRIPT_WEB_APP_URL_HERE'){
-    try{ await fetch(CFG.APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({ref,g1n,g1p,g2n,g2p,room:roomLabel,stayType,checkin:ci,checkout:co,nights,rate,totalRoomCost,advance:advanceAmt,deposit:DEPOSIT,grandTotal,twoGuests,intlGuest,status:'PENDING',geoCity:visitorGeo?visitorGeo.city:'',geoState:visitorGeo?visitorGeo.state:'',geoCountry:visitorGeo?visitorGeo.country:'',geoIP:visitorGeo?visitorGeo.ip:'',teacherG1:document.getElementById('teacher-chk-g1')?document.getElementById('teacher-chk-g1').checked:false,teacherG2:twoGuests&&document.getElementById('teacher-chk-g2')?document.getElementById('teacher-chk-g2').checked:false,docs:bookingDocs,submittedAt:new Date().toISOString()})}); }
+    try{ await fetch(CFG.APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({ref,g1n,g1p,g2n,g2p,room:roomLabel,stayType,checkin:ci,checkout:co,nights,rate,totalRoomCost,advance:advanceAmt,deposit:DEPOSIT,grandTotal,twoGuests,intlGuest,status:'PENDING',teacherG1:document.getElementById('teacher-chk-g1')?document.getElementById('teacher-chk-g1').checked:false,teacherG2:twoGuests&&document.getElementById('teacher-chk-g2')?document.getElementById('teacher-chk-g2').checked:false,submittedAt:new Date().toISOString()})}); }
     catch(e){console.warn(e);}
   }
 
@@ -1413,25 +1372,7 @@ Thank you for your stay! Please do leave us a review 🌿`;
     ['Paid (advance + deposit)','₹'+grandTotal.toLocaleString('en-IN')],
     ['Balance at checkout','₹'+(totalRoomCost-advanceAmt).toLocaleString('en-IN')],
   ];
-  // Build uploads summary
-  const uploadItems=[];
-  const g1id=document.getElementById('g1-id-file');
-  if(g1id&&g1id.files[0])uploadItems.push({guest:g1n,type:intlGuest?'Passport':'Aadhaar',file:g1id.files[0].name});
-  const g2id=document.getElementById('g2-id-file');
-  if(twoGuests&&g2id&&g2id.files[0])uploadItems.push({guest:g2n||'Guest 2',type:intlGuest?'Passport':'Aadhaar',file:g2id.files[0].name});
-  const t1f=document.getElementById('teacher-id-g1-file');
-  if(t1f&&t1f.files[0])uploadItems.push({guest:g1n,type:'Teacher ID',file:t1f.files[0].name});
-  const t2f=document.getElementById('teacher-id-g2-file');
-  if(t2f&&t2f.files[0])uploadItems.push({guest:g2n||'Guest 2',type:'Teacher ID',file:t2f.files[0].name});
-  const intlPhoto=document.getElementById('intl-photo-file');
-  if(intlPhoto&&intlPhoto.files[0])uploadItems.push({guest:g1n,type:'Passport Photo',file:intlPhoto.files[0].name});
-
-  document.getElementById('success-summary').innerHTML=sumRows.map(r=>`<div class="summary-row"><span class="lbl">${r[0]}</span><span>${r[1]}</span></div>`).join('')+
-    (uploadItems.length?`<div style="margin-top:12px;padding:10px 12px;background:#f0f7ff;border-radius:6px;border:1px solid #c5d5f0">
-      <div style="font-family:'DM Mono',monospace;font-size:0.54rem;letter-spacing:0.14em;text-transform:uppercase;color:#2c5282;margin-bottom:7px">📎 Documents Uploaded</div>
-      ${uploadItems.map(u=>`<div style="font-size:0.78rem;color:#2c5282;display:flex;gap:6px;margin-bottom:4px"><span style="font-family:'DM Mono',monospace;font-size:0.58rem;background:#4a7fc0;color:#fff;padding:1px 7px;border-radius:3px;white-space:nowrap">${u.type}</span><span>${u.guest}</span></div>`).join('')}
-      <div style="font-family:'DM Mono',monospace;font-size:0.52rem;color:#4a7fc0;margin-top:7px;letter-spacing:0.05em">✦ Uploaded copies emailed to host automatically · Originals verified at check-in</div>
-    </div>`:'');
+  document.getElementById('success-summary').innerHTML=sumRows.map(r=>`<div class="summary-row"><span class="lbl">${r[0]}</span><span>${r[1]}</span></div>`).join('');
 
   // WA buttons
   const waMk=(phone,msg,emoji,label,cls)=>
@@ -1444,7 +1385,7 @@ Thank you for your stay! Please do leave us a review 🌿`;
     return `<a href="${tgUrl}" target="_blank" rel="noopener" class="wa-btn ${cls}" title="Send via Telegram">${emoji} ${label} <span style='font-size:0.5rem;opacity:0.8'>Telegram</span></a>`;
   };
   const waMk2=(phone,msg,emoji,label)=>{
-    return `<a href="https://wa.me/${phone}?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener" class="wa-btn wa-terr" title="Send via Telegram or WhatsApp" style="font-size:0.54rem;padding:6px 11px">${emoji} Telegram or WhatsApp</a>`;
+    return `<a href="https://wa.me/${phone}?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener" class="wa-btn wa-terr" title="Send via WhatsApp" style="font-size:0.54rem;padding:6px 11px">${emoji} WhatsApp</a>`;
   };
   document.getElementById('wa-panel-success').innerHTML=`
     <div class="wa-panel-title" style="margin-bottom:4px">📲 Reminders — Auto-sent by system on the day</div>
@@ -1469,8 +1410,6 @@ Thank you for your stay! Please do leave us a review 🌿`;
   document.getElementById('success-card').classList.add('visible');
   document.getElementById('stepper').style.display='none';
   window.scrollTo({top:0,behavior:'smooth'});
-  // isSubmitting stays true — button stays disabled permanently after success
-  // It resets only when user goes back to page 1 via resetBooking()
 }
 
 function goHome(){
@@ -1487,7 +1426,6 @@ function resetBooking(){
   ['teacher-chk-g1','teacher-chk-g2'].forEach(id=>{const e=document.getElementById(id);if(e)e.checked=false;});
   ['intl-section','second-guest-section','teacher-id-section-g1','teacher-id-section-g2'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display='none';});
   calSelStart=null;calSelEnd=null;
-  isSubmitting=false;
   ['checkin','checkout','g1-name','g1-phone','g2-name','g2-phone'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   ['g1-id-file','g2-id-file','intl-photo-file','intl-passport-id-file','intl-visa-file'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   ['g1-id-preview','g2-id-preview','intl-photo-preview','intl-passport-id-preview','intl-visa-preview'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display='none';});
@@ -1513,7 +1451,6 @@ function adminLogin(){
     document.body.classList.add('admin-mode');closeModal('admin-login-modal');
     document.getElementById('admin-pw').value='';document.getElementById('admin-err').style.display='none';
     renderGallery();
-    setTimeout(()=>{const g=document.getElementById('gallery-section');if(g)g.scrollIntoView({behavior:'smooth',block:'start'});},300);
   } else if(pw===CFG.HOST_PW){
     closeModal('admin-login-modal');
     document.getElementById('admin-pw').value='';document.getElementById('admin-err').style.display='none';
@@ -1577,7 +1514,7 @@ function renderGallery(){
     grid.appendChild(div);
   });
 }
-function delGallery(i){if(confirm('Remove this item?')){ galleryData.splice(i,1);renderGallery();saveGallery(); }}
+function delGallery(i){if(confirm('Remove this item?')){ galleryData.splice(i,1);renderGallery(); }}
 function doAdminUpload(){
   const cap=document.getElementById('adm-caption').value.trim()||'Shanthi & Sangha @ Soudhamini';
   const cat=document.getElementById('adm-cat').value;
@@ -1592,46 +1529,42 @@ function doAdminUpload(){
 
   let processed=0;
   const total=files.length;
-  const done=()=>{processed++;if(processed>=total){renderGallery();saveGallery();}};
+  const done=()=>{processed++;if(processed>=total)renderGallery();};
 
   files.forEach(f=>{
     const isV=f.type.startsWith('video/');
     if(isV){
-      // Read as base64 for persistence (survives page reload)
-      const reader=new FileReader();
-      reader.onload=ev=>{
-        const videoDataUrl=ev.target.result; // base64 — persists in localStorage
-        const video=document.createElement('video');
-        video.crossOrigin='anonymous';
-        video.muted=true;
-        video.playsInline=true;
-        video.preload='metadata';
-        video.style.cssText='position:fixed;opacity:0;pointer-events:none;width:1px;height:1px;';
-        document.body.appendChild(video);
-        video.onloadedmetadata=()=>{video.currentTime=Math.min(1,video.duration*0.1);};
-        video.onseeked=()=>{
-          try{
-            const canvas=document.createElement('canvas');
-            canvas.width=320;canvas.height=180;
-            canvas.getContext('2d').drawImage(video,0,0,320,180);
-            const thumb=canvas.toDataURL('image/jpeg',0.75);
-            const dur=video.duration?formatDur(video.duration):'—';
-            galleryData.unshift({type:'video',cat,src:videoDataUrl,thumb,label:cap,duration:dur,aspect:'16/9'});
-          }catch(e){
-            galleryData.unshift({type:'video',cat,src:videoDataUrl,thumb:'',label:cap,duration:'—',aspect:'16/9'});
-          }
-          document.body.removeChild(video);
-          done();
-        };
-        video.onerror=()=>{
-          galleryData.unshift({type:'video',cat,src:videoDataUrl,thumb:'',label:cap,duration:'—',aspect:'16/9'});
-          try{document.body.removeChild(video);}catch(e){}
-          done();
-        };
-        video.src=videoDataUrl;
-        video.load();
+      const videoUrl=URL.createObjectURL(f);
+      const video=document.createElement('video');
+      video.crossOrigin='anonymous';
+      video.muted=true;
+      video.playsInline=true;
+      video.preload='metadata';
+      // Must attach to DOM for some browsers to load metadata
+      video.style.cssText='position:fixed;opacity:0;pointer-events:none;width:1px;height:1px;';
+      document.body.appendChild(video);
+      video.onloadedmetadata=()=>{video.currentTime=Math.min(1,video.duration*0.1);};
+      video.onseeked=()=>{
+        try{
+          const canvas=document.createElement('canvas');
+          canvas.width=320;canvas.height=180;
+          canvas.getContext('2d').drawImage(video,0,0,320,180);
+          const thumb=canvas.toDataURL('image/jpeg',0.75);
+          const dur=video.duration?formatDur(video.duration):'—';
+          galleryData.unshift({type:'video',cat,src:videoUrl,thumb,label:cap,duration:dur,aspect:'16/9'});
+        }catch(e){
+          galleryData.unshift({type:'video',cat,src:videoUrl,thumb:'',label:cap,duration:'—',aspect:'16/9'});
+        }
+        document.body.removeChild(video);
+        done();
       };
-      reader.readAsDataURL(f);
+      video.onerror=()=>{
+        galleryData.unshift({type:'video',cat,src:videoUrl,thumb:'',label:cap,duration:'—',aspect:'16/9'});
+        try{document.body.removeChild(video);}catch(e){}
+        done();
+      };
+      video.src=videoUrl;
+      video.load();
     } else {
       const r=new FileReader();
       r.onload=ev=>{
@@ -1783,50 +1716,6 @@ function cancelBooking(ref){
 
 function fmtDateShort(d){if(!d)return'—';return new Date(d+'T00:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short'});}
 
-// ── HOST PANEL VISITORS TAB ─────────────────────────────────
-function renderHPVisitors(){
-  const body=document.getElementById('hp-list');
-  if(!body)return;
-  let log=[];
-  try{log=JSON.parse(localStorage.getItem('sdm_visit_log')||'[]');}catch(e){}
-  if(!log.length){
-    body.innerHTML='<div style="text-align:center;padding:30px;color:var(--text-s);font-family:'DM Mono',monospace;font-size:0.65rem">No visitor data yet. Will collect from next page visit.</div>';
-    return;
-  }
-  const byCountry={},byState={};
-  log.forEach(v=>{
-    const c=v.country||'Unknown';
-    const s=(v.state||'Unknown')+(c!=='Unknown'?' ('+c+')':'');
-    byCountry[c]=(byCountry[c]||0)+1;
-    byState[s]=(byState[s]||0)+1;
-  });
-  const cRows=Object.entries(byCountry).sort((a,b)=>b[1]-a[1]).map(([c,n])=>
-    `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:0.82rem"><span>${c}</span><strong style="color:var(--clay)">${n}</strong></div>`).join('');
-  const sRows=Object.entries(byState).sort((a,b)=>b[1]-a[1]).slice(0,15).map(([s,n])=>
-    `<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:0.78rem;color:var(--text-mid)"><span>${s}</span><strong style="color:var(--moss)">${n}</strong></div>`).join('');
-  const rRows=log.slice(0,25).map(v=>{
-    const cc=v.countryCode||'';
-    const flag=cc.length===2?String.fromCodePoint(...[...cc].map(c=>0x1F1E6-65+c.charCodeAt(0))):'🌐';
-    const loc=[v.city,v.state,v.country].filter(Boolean).join(', ')||'Unknown';
-    const t=v.time?new Date(v.time).toLocaleString('en-IN',{timeZone:'Asia/Kolkata',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'';
-    return `<div style="padding:7px 0;border-bottom:1px solid var(--border)">
-      <div style="font-size:0.82rem">${flag} ${loc}</div>
-      <div style="font-family:'DM Mono',monospace;font-size:0.52rem;color:var(--text-s);margin-top:2px">${t}${v.org?' · '+v.org:''}</div>
-    </div>`;
-  }).join('');
-  body.innerHTML=`
-    <div style="padding:10px 12px;background:var(--warm);border-radius:var(--r);margin-bottom:12px;font-family:'DM Mono',monospace;font-size:0.58rem;color:var(--text-s);letter-spacing:0.07em">
-      📊 ${log.length} visit${log.length>1?'s':''} recorded · Stored on this device · Resets if browser data is cleared
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
-      <div><div style="font-family:'DM Mono',monospace;font-size:0.55rem;text-transform:uppercase;letter-spacing:0.14em;color:var(--clay);margin-bottom:7px">By Country</div>${cRows||'—'}</div>
-      <div><div style="font-family:'DM Mono',monospace;font-size:0.55rem;text-transform:uppercase;letter-spacing:0.14em;color:var(--moss);margin-bottom:7px">By State / Region</div>${sRows||'—'}</div>
-    </div>
-    <div style="font-family:'DM Mono',monospace;font-size:0.55rem;text-transform:uppercase;letter-spacing:0.14em;color:var(--text-mid);margin-bottom:8px">Recent Visits (last 25)</div>
-    ${rRows}
-    <button onclick="if(confirm('Clear all visitor log data?')){localStorage.removeItem('sdm_visit_log');renderHPVisitors();}" style="margin-top:14px;background:none;border:1px solid var(--border);padding:6px 14px;border-radius:100px;font-family:'DM Mono',monospace;font-size:0.56rem;cursor:pointer;color:var(--text-s)">🗑 Clear Visit Log</button>`;
-}
-
 function buildWAConfirmMsg(bk){
   return `🌿 *Booking Confirmed — ${CFG.PROP}*
 
@@ -1888,7 +1777,7 @@ function renderHP(){
       </div>
       <div class="bc-grid">
         <div class="bc-field"><label>Primary Guest</label><span>${bk.g1n||'—'}</span></div>
-        <div class="bc-field"><label>Telegram or WhatsApp</label><span>${bk.g1p||'—'}</span></div>
+        <div class="bc-field"><label>WhatsApp</label><span>${bk.g1p||'—'}</span></div>
         <div class="bc-field"><label>Room</label><span>${bk.roomLabel||bk.room||'—'}${bk.twoGuests?' · 2 guests':''}</span></div>
         <div class="bc-field"><label>Check-in</label><span>${fmtDate(bk.checkin)}</span></div>
         <div class="bc-field"><label>Check-out</label><span>${fmtDate(bk.checkout)}</span></div>
@@ -1906,6 +1795,90 @@ function renderHP(){
       </div>
     </div>`;
   }).join('');
+}
+
+
+// ── HOST PANEL: VISITOR GEOGRAPHY ───────────────────────────────────
+function renderHPVisitors(){
+  const body=document.getElementById("hp-list");
+  if(!body)return;
+  let log=[];
+  try{log=JSON.parse(localStorage.getItem("sdm_visit_log")||"[]");}catch(e){}
+
+  if(!log.length){
+    body.innerHTML="<div style='text-align:center;padding:40px 20px;color:var(--text-s);font-size:0.8rem;line-height:2'><div style='font-size:2rem'>🌍</div>No visitor data yet.<br><small>Data collected as guests browse — host panel only</small></div>";
+    return;
+  }
+
+  const byCountry={},byState={},byCity={};
+  log.forEach(function(v){
+    var c=v.country||"Unknown";
+    var s=(v.state||c);
+    var ci=(v.city||s);
+    byCountry[c]=(byCountry[c]||0)+1;
+    var sk=s+(s!==c?" · "+c:"");
+    byState[sk]=(byState[sk]||0)+1;
+    var ck=ci+(ci!==s?" · "+s:"");
+    byCity[ck]=(byCity[ck]||0)+1;
+  });
+
+  function mkTable(obj,col,limit){
+    limit=limit||20;
+    var rows=Object.entries(obj).sort(function(a,b){return b[1]-a[1];}).slice(0,limit);
+    if(!rows.length)return "<div style='color:#999;font-size:0.75rem'>—</div>";
+    return rows.map(function(r){
+      return "<div style='display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:0.78rem'><span>"+r[0]+"</span><strong style='color:"+col+"'>"+r[1]+"</strong></div>";
+    }).join("");
+  }
+
+  var totalIndia=log.filter(function(v){return v.countryCode==="IN"||v.country==="India";}).length;
+  var totalIntl=log.length-totalIndia;
+
+  var recentRows=log.slice(0,30).map(function(v){
+    var cc=(v.countryCode||"").toUpperCase();
+    var flag="🌐";
+    try{if(cc.length===2)flag=String.fromCodePoint(127397+cc.charCodeAt(0),127397+cc.charCodeAt(1));}catch(e){}
+    var loc=[v.city,v.state,v.country].filter(Boolean).join(", ")||"Unknown";
+    var t=v.time?new Date(v.time).toLocaleString("en-IN",{timeZone:"Asia/Kolkata",day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"}):"";
+    return "<div style='padding:8px 0;border-bottom:1px solid var(--border)'>"+
+      "<div style='font-size:0.82rem;font-weight:500'>"+flag+" "+loc+"</div>"+
+      "<div style='font-size:0.54rem;color:var(--text-s);margin-top:2px'>"+t+(v.ip?" · IP: "+v.ip:"")+(v.timezone?" · "+v.timezone:"")+"</div>"+
+      "</div>";
+  }).join("");
+
+  var mono="font-family:'DM Mono',monospace;";
+
+  body.innerHTML=
+    "<div style='display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px'>"+
+      "<div style='background:var(--warm);border-radius:var(--r);padding:12px;text-align:center'>"+
+        "<div style='"+mono+"font-size:1.6rem;font-weight:700;color:var(--clay)'>"+log.length+"</div>"+
+        "<div style='"+mono+"font-size:0.5rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-s)'>Total Visits</div></div>"+
+      "<div style='background:var(--warm);border-radius:var(--r);padding:12px;text-align:center'>"+
+        "<div style='"+mono+"font-size:1.6rem;font-weight:700;color:var(--moss)'>"+totalIndia+"</div>"+
+        "<div style='"+mono+"font-size:0.5rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-s)'>🇮🇳 India</div></div>"+
+      "<div style='background:var(--warm);border-radius:var(--r);padding:12px;text-align:center'>"+
+        "<div style='"+mono+"font-size:1.6rem;font-weight:700;color:var(--terr)'>"+totalIntl+"</div>"+
+        "<div style='"+mono+"font-size:0.5rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-s)'>International</div></div>"+
+    "</div>"+
+    "<div style='display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:16px'>"+
+      "<div><div style='"+mono+"font-size:0.54rem;text-transform:uppercase;letter-spacing:0.14em;color:var(--clay);margin-bottom:8px;padding-bottom:4px;border-bottom:2px solid var(--clay)'>Country</div>"+mkTable(byCountry,"var(--clay)")+"</div>"+
+      "<div><div style='"+mono+"font-size:0.54rem;text-transform:uppercase;letter-spacing:0.14em;color:var(--moss);margin-bottom:8px;padding-bottom:4px;border-bottom:2px solid var(--moss)'>State</div>"+mkTable(byState,"var(--moss)")+"</div>"+
+      "<div><div style='"+mono+"font-size:0.54rem;text-transform:uppercase;letter-spacing:0.14em;color:var(--terr);margin-bottom:8px;padding-bottom:4px;border-bottom:2px solid var(--terr)'>City / District</div>"+mkTable(byCity,"var(--terr)")+"</div>"+
+    "</div>"+
+    "<div style='"+mono+"font-size:0.54rem;text-transform:uppercase;letter-spacing:0.14em;color:var(--text-mid);margin-bottom:8px'>Recent 30 Visits</div>"+
+    recentRows+
+    "<div style='margin-top:14px;display:flex;gap:10px;align-items:center'>"+
+      "<button onclick='clearVisitorLog()' "+
+      "style='background:none;border:1px solid var(--border);padding:6px 14px;border-radius:100px;"+mono+"font-size:0.56rem;cursor:pointer;color:var(--text-s)'>🗑 Clear Log</button>"+
+      "<span style='"+mono+"font-size:0.5rem;color:var(--text-s)'>Stored on this device · Max 200 entries</span></div>";
+}
+
+
+function clearVisitorLog(){
+  if(confirm("Clear all visitor data?")){
+    localStorage.removeItem("sdm_visit_log");
+    renderHPVisitors();
+  }
 }
 
 function renderHPCalendar(container, confirmed){
@@ -2136,99 +2109,85 @@ function stepJump(p){
 }
 
 // ── VISITOR COUNTER ────────────────────────────────────────────
-// Uses countapi.xyz — free, no account needed
+// ── VISITOR COUNTER ─────────────────────────────────────────
+// Uses counterapi.dev (free, no account, countapi.xyz replacement)
 async function loadVisitorCount(){
-  // Visitor count
+  const el=document.getElementById('visitor-count');
   try{
-    const res=await fetch('https://api.countapi.xyz/hit/soudhamini-stay/visits');
+    // Try counterapi.dev first
+    const res=await fetch('https://api.counterapi.dev/v1/soudhamini-stay/visits/up');
     const data=await res.json();
-    const el=document.getElementById('visitor-count');
-    if(el&&data.value)el.textContent=Number(data.value).toLocaleString('en-IN');
-  } catch(e){
-    const el=document.getElementById('visitor-count');
-    if(el)el.textContent='—';
-  }
-  // Visitor geography using ipapi.co (free, no key)
-  try{
-    const geo=await fetch('https://ipapi.co/json/');
-    const d=await geo.json();
-    const geoEl=document.getElementById('visitor-geo');
-    if(geoEl&&d){
-      const flag=d.country_code?String.fromCodePoint(...[...d.country_code].map(c=>0x1F1E6+c.charCodeAt(0)-65)):'';
-      const parts=[flag+' '+d.country_name,d.region,d.city].filter(Boolean);
-      geoEl.textContent='📍 '+parts.join(', ');
-      // Log to Apps Script for analytics (optional)
-      if(CFG.APPS_SCRIPT_URL&&CFG.APPS_SCRIPT_URL!=='YOUR_APPS_SCRIPT_WEB_APP_URL_HERE'){
-        fetch(CFG.APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({action:'logVisit',country:d.country_name,region:d.region,city:d.city,ts:new Date().toISOString()})
-        }).catch(()=>{});
-      }
-    }
-  } catch(e){
-    const geoEl=document.getElementById('visitor-geo');
-    if(geoEl)geoEl.textContent='📍 —';
+    if(el&&data&&data.count!=null)el.textContent=Number(data.count).toLocaleString('en-IN');
+  } catch(e1){
+    // Fallback: count locally in localStorage
+    try{
+      let c=parseInt(localStorage.getItem('sdm_visit_total')||'0')+1;
+      localStorage.setItem('sdm_visit_total',c);
+      if(el)el.textContent=c.toLocaleString('en-IN')+' (local)';
+    }catch(e2){if(el)el.textContent='—';}
   }
 }
-loadVisitorCount();
 
-// Silently collect visitor location — stored for host, never shown to guest
+// ── VISITOR GEO — silent, for host panel only ────────────────
 let visitorGeo=null;
 async function loadVisitorGeo(){
   try{
-    const res=await fetch('https://ipapi.co/json/');
+    // freeipapi.com — free, HTTPS, no key needed
+    const res=await fetch('https://freeipapi.com/api/json');
     const d=await res.json();
-    if(d&&d.country_name){
+    if(d&&d.countryName){
       visitorGeo={
-        ip:d.ip||'',
-        city:d.city||'',
-        district:d.region_code||'',
-        state:d.region||'',
-        country:d.country_name||'',
-        countryCode:d.country_code||'',
-        timezone:d.timezone||'',
-        org:d.org||'',
-        lat:d.latitude||'',
-        lon:d.longitude||''
+        ip:       d.ipAddress||'',
+        city:     d.cityName||'',
+        district: d.cityName||'',          // district-level from freeipapi
+        state:    d.regionName||'',
+        country:  d.countryName||'',
+        countryCode: d.countryCode||'',
+        timezone: d.timeZone||'',
+        lat:      d.latitude||'',
+        lon:      d.longitude||''
       };
-      // Store in hidden element for host panel to read
+      // Store in hidden element (host panel reads it)
       const el=document.getElementById('visitor-geo');
-      if(el) el.textContent=JSON.stringify(visitorGeo);
-      // Append to localStorage visit log (last 100 visits)
+      if(el)el.textContent=JSON.stringify(visitorGeo);
+      // Append to visit log in localStorage
       try{
         const log=JSON.parse(localStorage.getItem('sdm_visit_log')||'[]');
         log.unshift({...visitorGeo, time:new Date().toISOString()});
-        if(log.length>100)log.length=100;
+        if(log.length>200)log.length=200;
         localStorage.setItem('sdm_visit_log',JSON.stringify(log));
       }catch(e){}
     }
-  }catch(e){}
+  }catch(e){
+    // Fallback: try ipapi.co
+    try{
+      const r2=await fetch('https://ipapi.co/json/');
+      const d2=await r2.json();
+      if(d2&&d2.country_name){
+        visitorGeo={
+          ip:d2.ip||'', city:d2.city||'', district:d2.city||'',
+          state:d2.region||'', country:d2.country_name||'',
+          countryCode:d2.country_code||'', timezone:d2.timezone||'',
+          lat:d2.latitude||'', lon:d2.longitude||'', org:d2.org||''
+        };
+        const el=document.getElementById('visitor-geo');
+        if(el)el.textContent=JSON.stringify(visitorGeo);
+        try{
+          const log=JSON.parse(localStorage.getItem('sdm_visit_log')||'[]');
+          log.unshift({...visitorGeo, time:new Date().toISOString()});
+          if(log.length>200)log.length=200;
+          localStorage.setItem('sdm_visit_log',JSON.stringify(log));
+        }catch(e2){}
+      }
+    }catch(e3){}
+  }
 }
+
+loadVisitorCount();
 loadVisitorGeo();
 
 
-
-
-// ── GALLERY PERSISTENCE ───────────────────────────────────
-function saveGallery(){
-  // Save only admin-uploaded items (not the hardcoded ones)
-  // We save the full galleryData so admin changes persist
-  try{
-    // Blob URLs don't survive reload - only save data: URLs and relative paths
-    const saveable=galleryData.filter(i=>i.src&&(i.src.startsWith('data:')||!i.src.startsWith('blob:')));
-    localStorage.setItem('sdm_gallery',JSON.stringify(saveable));
-  } catch(e){ console.warn('Gallery save failed (storage full?)',e); }
-}
-function loadSavedGallery(){
-  try{
-    const saved=JSON.parse(localStorage.getItem('sdm_gallery')||'null');
-    if(saved&&Array.isArray(saved)&&saved.length>0)return saved;
-  } catch(e){}
-  return null;
-}
-
 // ── INIT ────────────────────────────────────────────
-const savedGallery=loadSavedGallery();
-if(savedGallery)galleryData=savedGallery;
 renderGallery();
 renderCal();
 </script>
