@@ -440,7 +440,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 
 <!-- ADMIN BAR -->
 <div id="admin-bar">
-  <span>🔐 Admin Mode Active</span>
+  <span>🔐 Admin Mode · <span style="font-family:'DM Mono',monospace;font-size:0.58rem;opacity:0.8">HTML v15 · Apps Script v5</span></span>
   <div style="display:flex;gap:7px">
     <button class="admin-btn" onclick="openHostPanel()">📋 Host Panel</button>
     <button class="admin-btn" onclick="openAdminUpload()">＋ Add Photos / Videos</button>
@@ -738,7 +738,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
         </div>
         <div class="field">
           <label>Contact Number in India *</label>
-          <input type="tel" id="intl-contact-india" placeholder="Local SIM or WhatsApp number" oninput="checkDetails()">
+          <input type="tel" id="intl-contact-india" placeholder="Local SIM / Telegram / WhatsApp number" oninput="checkDetails()">
         </div>
         <div class="field">
           <label>Emergency Contact (home country)</label>
@@ -838,8 +838,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
     </div>
     <div class="pay-confirm-note" style="margin-top:18px">
       <p>✦ After paying, tap <strong>I Have Paid — Confirm Booking</strong> below.<br>
-      ✦ Host will verify your payment and send a WhatsApp confirmation within <strong>15–30 minutes</strong>.<br>
-      ✦ Your booking ref will be sent to your WhatsApp number.</p>
+      ✦ Host will verify your payment and confirm via <strong>Telegram or WhatsApp</strong> within <strong>15–30 minutes</strong>.</p>
     </div>
     <button class="btn-primary" id="btn-confirm-booking" onclick="submitBooking()" style="background:var(--moss)">✓ I Have Paid — Confirm Booking</button>
   </div>
@@ -933,8 +932,9 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 
 <script>
 // ── CONFIG ─────────────────────────────────────────────
+const APP_VERSION='v15';
 const CFG={
-  APPS_SCRIPT_URL:'https://script.google.com/macros/s/AKfycbxQ-2otqy904w_6tJ3aFIq7EkCQ8nBmgk4GSSUmv1k4eUO6ufkzMryd9UqGRx9NUCBtsA/exec',
+  APPS_SCRIPT_URL:'https://script.google.com/macros/s/AKfycbxoft8wzD9_AIfjewr-bo8ZV9QT38RTyi8nV375JYFLMaap3XLVnBVa62hehdm8DDseKw/exec',
   OWNER_WA:'919148212422',
   PROP:'Shanthi & Sangha @ Soudhamini',
   ADMIN_PW:'ss1213',
@@ -1249,8 +1249,17 @@ function fmtDate(d){
   return new Date(d+'T00:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
 }
 
+let isSubmitting=false;
 async function submitBooking(){
-  const ref='SDM-'+Math.random().toString(36).substr(2,6).toUpperCase();
+  if(isSubmitting)return;
+  isSubmitting=true;
+  const btn=document.getElementById('btn-confirm-booking');
+  if(btn){
+    btn.disabled=true;
+    btn.textContent='⏳ Sending… please wait';
+    btn.style.opacity='0.6';
+    btn.style.cursor='not-allowed';
+  }
   const ci=document.getElementById('checkin').value;
   const co=document.getElementById('checkout').value;
   const g1n=document.getElementById('g1-name').value.trim();
@@ -1258,15 +1267,40 @@ async function submitBooking(){
   const g2n=twoGuests?document.getElementById('g2-name').value.trim():'';
   const g2p=twoGuests?document.getElementById('g2-phone').value.trim():'';
   const roomLabel=selRoom==='attached'?'Shanthi':'Sangha';
+  // Ref = Guest name + checkin date (readable, no random codes)
+  const ciShort=ci.replace(/-/g,'').slice(2); // YYMMDD
+  const namePart=g1n.split(' ')[0].replace(/[^a-zA-Z]/g,'').toUpperCase().slice(0,10);
+  const ref=namePart+'-'+ciShort+'-'+roomLabel.toUpperCase();
   const isLong=nights>5;const stayType=isLong?'Long Stay':'Short Stay';
   const baseRate=prices[selRoom][isLong?'long':'short'];
   const rate=baseRate+(intlGuest?CFG.INTL_SURCHARGE:0);
   const g1Phone=g1p.replace(/\D/g,'');
   const g2Phone=g2p.replace(/\D/g,'');
 
-  // Google Sheets
+  // Read uploaded docs as base64 for email attachments
+  const readB64=(el)=>new Promise(res=>{
+    if(!el||!el.files||!el.files[0]){res(null);return;}
+    const fr=new FileReader();
+    fr.onload=e=>res({name:el.files[0].name,type:el.files[0].type,data:e.target.result.split(',')[1]});
+    fr.onerror=()=>res(null);
+    fr.readAsDataURL(el.files[0]);
+  });
+  const docFiles=await Promise.all([
+    readB64(document.getElementById('g1-id-file')),
+    readB64(document.getElementById('g2-id-file')),
+    readB64(document.getElementById('teacher-id-g1-file')),
+    readB64(document.getElementById('teacher-id-g2-file')),
+    readB64(document.getElementById('intl-photo-file')),
+    readB64(document.getElementById('intl-passport-id-file')),
+  ]);
+  const docs=docFiles.filter(Boolean).map((d,i)=>({
+    ...d,
+    label:['ID_'+g1n,'ID_'+g2n,'TeacherID_'+g1n,'TeacherID_'+g2n,'PassportPhoto','PassportID'][i]
+  }));
+
+  // Google Sheets + email with attachments
   if(CFG.APPS_SCRIPT_URL&&CFG.APPS_SCRIPT_URL!=='YOUR_APPS_SCRIPT_WEB_APP_URL_HERE'){
-    try{ await fetch(CFG.APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({ref,g1n,g1p,g2n,g2p,room:roomLabel,stayType,checkin:ci,checkout:co,nights,rate,totalRoomCost,advance:advanceAmt,deposit:DEPOSIT,grandTotal,twoGuests,intlGuest,status:'PENDING',teacherG1:document.getElementById('teacher-chk-g1')?document.getElementById('teacher-chk-g1').checked:false,teacherG2:twoGuests&&document.getElementById('teacher-chk-g2')?document.getElementById('teacher-chk-g2').checked:false,submittedAt:new Date().toISOString()})}); }
+    try{ await fetch(CFG.APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({ref,g1n,g1p,g2n,g2p,room:roomLabel,stayType,checkin:ci,checkout:co,nights,rate,totalRoomCost,advance:advanceAmt,deposit:DEPOSIT,grandTotal,twoGuests,intlGuest,status:'PENDING',teacherG1:document.getElementById('teacher-chk-g1')?document.getElementById('teacher-chk-g1').checked:false,teacherG2:twoGuests&&document.getElementById('teacher-chk-g2')?document.getElementById('teacher-chk-g2').checked:false,docs,submittedAt:new Date().toISOString()})}); }
     catch(e){console.warn(e);}
   }
 
@@ -1282,7 +1316,9 @@ async function submitBooking(){
 🎓 TEACHER DISCOUNT APPLIED
    ${t1own?'✓ '+g1n+' (Guest 1) — 25% off their share':''}${t1own&&t2own?'\n   ':''}${t2own?'✓ '+g2n+' (Guest 2) — 25% off their share':''}
    Total after discount: ₹${totalRoomCost.toLocaleString('en-IN')}`:'';
-  const ownerMsg=`🏠 *New Booking — ${CFG.PROP}*
+  const ownerMsg=`🙏 *Jai Guru Dev*
+
+🏠 *New Booking — ${CFG.PROP}*
 
 📋 Ref: ${ref}${intlNote}${teacherNote2}
 💰 Paid: ₹${grandTotal.toLocaleString('en-IN')} (advance + deposit)
@@ -1296,9 +1332,13 @@ async function submitBooking(){
 💳 Room total: ₹${totalRoomCost.toLocaleString('en-IN')}
 💳 Balance at checkout: ₹${(totalRoomCost-advanceAmt).toLocaleString('en-IN')}
 
-_Verify payment in UPI app & confirm to guest._`;
+_Verify payment in UPI app & confirm to guest._
 
-  const g1Confirm=`🌿 *Booking Received — ${CFG.PROP}*
+🙏 *Jai Guru Dev*`;
+
+  const g1Confirm=`🙏 *Jai Guru Dev*
+
+🌿 *Booking Received — ${CFG.PROP}*
 
 Namaste ${g1n}! 🙏${intlNote}
 
@@ -1322,7 +1362,9 @@ Namaste ${g1n}! 🙏${intlNote}
 ✦ Hot water geyser available (not on DG)
 ✦ Portico open for morning Sadhana
 
-Host confirms within 30 min. 🌱`;
+Host confirms within 30 min. 🌱
+
+🙏 *Jai Guru Dev*`;
 
   const g1Reminder=`🌅 *Check-in Reminder — ${CFG.PROP}*
 
@@ -1339,7 +1381,9 @@ Tomorrow is check-in day — *${fmtDate(ci)}*
 💧 RO water + kettle in room
 💰 Balance due at checkout: ₹${(totalRoomCost-advanceAmt).toLocaleString('en-IN')}
 
-See you tomorrow! 🌿`;
+See you tomorrow! 🌿
+
+🙏 *Jai Guru Dev*`;
 
   const g1Checkout=`🌄 *Checkout Day — ${CFG.PROP}*
 
@@ -1358,7 +1402,9 @@ Today is checkout — *${fmtDate(co)}*
 🟡 Yellow — sanitary items
 🔑 Return key to reception
 
-Thank you for your stay! Please do leave us a review 🌿`;
+Thank you for your stay! Please do leave us a review 🌿
+
+🙏 *Jai Guru Dev*`;
 
   // Build success screen
   // booking ref not displayed to guest
@@ -1387,23 +1433,33 @@ Thank you for your stay! Please do leave us a review 🌿`;
   const waMk2=(phone,msg,emoji,label)=>{
     return `<a href="https://wa.me/${phone}?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener" class="wa-btn wa-terr" title="Send via WhatsApp" style="font-size:0.54rem;padding:6px 11px">${emoji} WhatsApp</a>`;
   };
+  // Build reminder panel with clear send buttons
+  const mkReminderRow=(phone,name,reminderMsg,checkoutMsg)=>{
+    if(!phone||phone.length<10)return '';
+    const ph=phone.replace(/\D/g,'');
+    const tgBase='https://t.me/+'+ph.replace(/^0+/,'').replace(/^91/,'91');
+    const waBase='https://wa.me/91'+ph.replace(/^0+/,'').replace(/^91/,'');
+    const tgCI=`<a href="${tgBase}" target="_blank" rel="noopener" class="reminder-btn tg-btn">
+      <span class="rbtn-icon">✈️</span><span class="rbtn-text"><strong>Telegram</strong><br>Check-in Reminder</span></a>`;
+    const waCI=`<a href="${waBase}?text=${encodeURIComponent(reminderMsg)}" target="_blank" rel="noopener" class="reminder-btn wa-btn2">
+      <span class="rbtn-icon">💬</span><span class="rbtn-text"><strong>WhatsApp</strong><br>Check-in Reminder</span></a>`;
+    const tgCO=`<a href="${tgBase}" target="_blank" rel="noopener" class="reminder-btn tg-btn">
+      <span class="rbtn-icon">✈️</span><span class="rbtn-text"><strong>Telegram</strong><br>Checkout Reminder</span></a>`;
+    const waCO=`<a href="${waBase}?text=${encodeURIComponent(checkoutMsg)}" target="_blank" rel="noopener" class="reminder-btn wa-btn2">
+      <span class="rbtn-icon">💬</span><span class="rbtn-text"><strong>WhatsApp</strong><br>Checkout Reminder</span></a>`;
+    return `<div class="reminder-guest-block">
+      <div class="reminder-guest-name">👤 ${name}</div>
+      <div class="reminder-row-label">🌅 Day before check-in</div>
+      <div class="reminder-btn-row">${tgCI}${waCI}</div>
+      <div class="reminder-row-label" style="margin-top:8px">🌄 On checkout day</div>
+      <div class="reminder-btn-row">${tgCO}${waCO}</div>
+    </div>`;
+  };
   document.getElementById('wa-panel-success').innerHTML=`
-    <div class="wa-panel-title" style="margin-bottom:4px">📲 Reminders — Auto-sent by system on the day</div>
-    <div style="font-family:'DM Mono',monospace;font-size:0.58rem;color:var(--moss);margin-bottom:10px;letter-spacing:0.07em">✦ Check-in reminder auto-sent to host the day before · Checkout reminder sent on departure day via Telegram.<br>Use buttons below only if you need to send manually.</div>
-    <div class="wa-panel-title">Guest 1 — ${g1n}</div>
-    <div class="wa-btn-row" style="align-items:center">
-      ${h1?tgMk(g1Phone,g1Reminder,'🌅','Check-in Reminder','wa-clay'):''}
-      ${h1?waMk2(g1Phone,g1Reminder,'🌅','Check-in'):''}
-      ${h1?tgMk(g1Phone,g1Checkout,'🌄','Checkout Reminder','wa-terr'):''}
-      ${h1?waMk2(g1Phone,g1Checkout,'🌄','Checkout'):''}
-    </div>
-    ${h2?`<div class="wa-panel-title" style="margin-top:11px">Guest 2 — ${g2n}</div>
-    <div class="wa-btn-row" style="align-items:center">
-      ${tgMk(g2Phone,g1Reminder.replace(g1n,g2n),'🌅','Check-in Reminder','wa-clay')}
-      ${waMk2(g2Phone,g1Reminder.replace(g1n,g2n),'🌅','Check-in')}
-      ${tgMk(g2Phone,g1Checkout.replace(g1n,g2n),'🌄','Checkout Reminder','wa-terr')}
-      ${waMk2(g2Phone,g1Checkout.replace(g1n,g2n),'🌄','Checkout')}
-    </div>`:''}
+    <div class="reminder-section-title">📲 Send Reminders to Guest</div>
+    <div class="reminder-note">Tap Telegram or WhatsApp to open a pre-filled message. Send on the right day.</div>
+    ${h1?mkReminderRow(g1Phone,g1n,g1Reminder,g1Checkout):''}
+    ${h2?mkReminderRow(g2Phone,g2n,g1Reminder.replace(g1n,g2n),g1Checkout.replace(g1n,g2n)):''}
   `;
 
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -1417,6 +1473,7 @@ function goHome(){
 }
 
 function resetBooking(){
+  isSubmitting=false;
   selRoom=null;nights=0;totalRoomCost=0;advanceAmt=0;grandTotal=0;
   twoGuests=false;intlGuest=false;teacherDiscount=false;
   document.getElementById('success-card').classList.remove('visible');
@@ -1514,7 +1571,7 @@ function renderGallery(){
     grid.appendChild(div);
   });
 }
-function delGallery(i){if(confirm('Remove this item?')){ galleryData.splice(i,1);renderGallery(); }}
+function delGallery(i){if(confirm('Remove this item?')){ galleryData.splice(i,1);renderGallery();saveGallery(); }}
 function doAdminUpload(){
   const cap=document.getElementById('adm-caption').value.trim()||'Shanthi & Sangha @ Soudhamini';
   const cat=document.getElementById('adm-cat').value;
@@ -1529,42 +1586,42 @@ function doAdminUpload(){
 
   let processed=0;
   const total=files.length;
-  const done=()=>{processed++;if(processed>=total)renderGallery();};
+  const done=()=>{processed++;if(processed>=total){renderGallery();saveGallery();}};
 
   files.forEach(f=>{
     const isV=f.type.startsWith('video/');
     if(isV){
-      const videoUrl=URL.createObjectURL(f);
-      const video=document.createElement('video');
-      video.crossOrigin='anonymous';
-      video.muted=true;
-      video.playsInline=true;
-      video.preload='metadata';
-      // Must attach to DOM for some browsers to load metadata
-      video.style.cssText='position:fixed;opacity:0;pointer-events:none;width:1px;height:1px;';
-      document.body.appendChild(video);
-      video.onloadedmetadata=()=>{video.currentTime=Math.min(1,video.duration*0.1);};
-      video.onseeked=()=>{
-        try{
-          const canvas=document.createElement('canvas');
-          canvas.width=320;canvas.height=180;
-          canvas.getContext('2d').drawImage(video,0,0,320,180);
-          const thumb=canvas.toDataURL('image/jpeg',0.75);
-          const dur=video.duration?formatDur(video.duration):'—';
-          galleryData.unshift({type:'video',cat,src:videoUrl,thumb,label:cap,duration:dur,aspect:'16/9'});
-        }catch(e){
-          galleryData.unshift({type:'video',cat,src:videoUrl,thumb:'',label:cap,duration:'—',aspect:'16/9'});
-        }
-        document.body.removeChild(video);
-        done();
+      const vr=new FileReader();
+      vr.onload=ev=>{
+        const videoDataUrl=ev.target.result;
+        const video=document.createElement('video');
+        video.muted=true;video.playsInline=true;video.preload='metadata';
+        video.style.cssText='position:fixed;opacity:0;pointer-events:none;width:1px;height:1px;';
+        document.body.appendChild(video);
+        video.onloadedmetadata=()=>{video.currentTime=Math.min(1,video.duration*0.1);};
+        video.onseeked=()=>{
+          try{
+            const canvas=document.createElement('canvas');
+            canvas.width=320;canvas.height=180;
+            canvas.getContext('2d').drawImage(video,0,0,320,180);
+            const thumb=canvas.toDataURL('image/jpeg',0.75);
+            const dur=video.duration?formatDur(video.duration):'—';
+            galleryData.unshift({type:'video',cat,src:videoDataUrl,thumb,label:cap,duration:dur,aspect:'16/9'});
+          }catch(e){
+            galleryData.unshift({type:'video',cat,src:videoDataUrl,thumb:'',label:cap,duration:'—',aspect:'16/9'});
+          }
+          document.body.removeChild(video);
+          done();
+        };
+        video.onerror=()=>{
+          galleryData.unshift({type:'video',cat,src:videoDataUrl,thumb:'',label:cap,duration:'—',aspect:'16/9'});
+          try{document.body.removeChild(video);}catch(e){}
+          done();
+        };
+        video.src=videoDataUrl;
+        video.load();
       };
-      video.onerror=()=>{
-        galleryData.unshift({type:'video',cat,src:videoUrl,thumb:'',label:cap,duration:'—',aspect:'16/9'});
-        try{document.body.removeChild(video);}catch(e){}
-        done();
-      };
-      video.src=videoUrl;
-      video.load();
+      vr.readAsDataURL(f);
     } else {
       const r=new FileReader();
       r.onload=ev=>{
@@ -1579,6 +1636,51 @@ function doAdminUpload(){
 function formatDur(s){
   const m=Math.floor(s/60),sec=Math.round(s%60);
   return m+':'+String(sec).padStart(2,'0');
+}
+
+function saveGallery(){
+  // Save locally first (instant)
+  try{
+    const saveable=galleryData.filter(i=>i.src&&i.src.startsWith('data:'));
+    localStorage.setItem('sdm_gallery',JSON.stringify(saveable));
+  }catch(e){console.warn('Gallery local save failed',e);}
+  // Also push to Apps Script for global persistence across all devices
+  if(CFG.APPS_SCRIPT_URL&&CFG.APPS_SCRIPT_URL!=='YOUR_APPS_SCRIPT_WEB_APP_URL_HERE'){
+    try{
+      const saveable=galleryData.filter(i=>i.src&&i.src.startsWith('data:'));
+      fetch(CFG.APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({action:'saveGallery',gallery:JSON.stringify(saveable)})
+      });
+    }catch(e){console.warn('Gallery global save failed',e);}
+  }
+}
+function loadSavedGallery(){
+  // Load from localStorage (fast, works offline)
+  try{
+    const saved=JSON.parse(localStorage.getItem('sdm_gallery')||'null');
+    if(saved&&Array.isArray(saved)&&saved.length){
+      const existSrcs=new Set(galleryData.map(i=>i.src));
+      saved.forEach(i=>{if(!existSrcs.has(i.src))galleryData.push(i);});
+    }
+  }catch(e){}
+}
+async function loadGlobalGallery(){
+  // Pull global gallery from Apps Script (for cross-device sync)
+  if(!CFG.APPS_SCRIPT_URL||CFG.APPS_SCRIPT_URL==='YOUR_APPS_SCRIPT_WEB_APP_URL_HERE')return;
+  try{
+    const res=await fetch(CFG.APPS_SCRIPT_URL+'?action=getGallery');
+    const data=await res.json();
+    if(data&&data.gallery){
+      const remote=JSON.parse(data.gallery);
+      if(Array.isArray(remote)&&remote.length){
+        localStorage.setItem('sdm_gallery',data.gallery);
+        const existSrcs=new Set(galleryData.map(i=>i.src));
+        remote.forEach(i=>{if(!existSrcs.has(i.src))galleryData.push(i);});
+        renderGallery();
+      }
+    }
+  }catch(e){/* silently fallback to local */}
 }
 
 // ── LIGHTBOX ────────────────────────────────────────────
