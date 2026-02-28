@@ -440,7 +440,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 
 <!-- ADMIN BAR -->
 <div id="admin-bar">
-  <span>🔐 Admin Mode · <span style="font-family:'DM Mono',monospace;font-size:0.58rem;opacity:0.8">HTML v27 · Apps Script v9</span></span>
+  <span>🔐 Admin Mode · <span style="font-family:'DM Mono',monospace;font-size:0.58rem;opacity:0.8">HTML v28 · Apps Script v9</span></span>
   <div style="display:flex;gap:7px">
     <button class="admin-btn" onclick="openHostPanel()">📋 Host Panel</button>
     <button class="admin-btn" onclick="openAdminUpload()">＋ Add Photos / Videos</button>
@@ -931,7 +931,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 
 <script>
 // ── CONFIG ─────────────────────────────────────────────
-const APP_VERSION='v27';
+const APP_VERSION='v28';
 const CFG={
   APPS_SCRIPT_URL:'https://script.google.com/macros/s/AKfycbyzjC0zGg2HNPdhCLBi4I1W6Cj5L_8I6wFyRGvbi6naJwfTc1ZwKsxE-bgUZcIwltWKig/exec',
   OWNER_WA:'919148212422',
@@ -1594,7 +1594,18 @@ async function doAdminUpload(){
           console.log('[SDM] Raw response:',rawText.slice(0,300));
           let upData;
           try{upData=JSON.parse(rawText);}catch(je){console.error('[SDM] JSON parse error:',je.message);}
-          if(upData&&upData.url){src=upData.url;console.log('[SDM] Got Drive URL:',src);}
+          if(upData&&upData.url){
+            src=upData.url;
+            // Fix URL format regardless of what Apps Script version returned
+            const idMatch=src.match(/[?&]id=([^&]+)/);
+            if(idMatch){
+              const fid=idMatch[1];
+              src=isV
+                ? 'https://drive.google.com/file/d/'+fid+'/preview'
+                : 'https://drive.google.com/thumbnail?id='+fid+'&sz=w1600';
+            }
+            console.log('[SDM] Final src:',src);
+          }
           else{console.error('[SDM] No URL in response:',upData);}
         }catch(e){console.error('[SDM] Upload fetch failed:',e.message);}
       }
