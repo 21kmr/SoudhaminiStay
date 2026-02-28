@@ -440,7 +440,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 
 <!-- ADMIN BAR -->
 <div id="admin-bar">
-  <span>🔐 Admin Mode · <span style="font-family:'DM Mono',monospace;font-size:0.58rem;opacity:0.8">HTML v21 · Apps Script v5</span></span>
+  <span>🔐 Admin Mode · <span style="font-family:'DM Mono',monospace;font-size:0.58rem;opacity:0.8">HTML v23 · Apps Script v6</span></span>
   <div style="display:flex;gap:7px">
     <button class="admin-btn" onclick="openHostPanel()">📋 Host Panel</button>
     <button class="admin-btn" onclick="openAdminUpload()">＋ Add Photos / Videos</button>
@@ -931,7 +931,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 
 <script>
 // ── CONFIG ─────────────────────────────────────────────
-const APP_VERSION='v21';
+const APP_VERSION='v23';
 const CFG={
   APPS_SCRIPT_URL:'https://script.google.com/macros/s/AKfycbxoft8wzD9_AIfjewr-bo8ZV9QT38RTyi8nV375JYFLMaap3XLVnBVa62hehdm8DDseKw/exec',
   OWNER_WA:'919148212422',
@@ -1582,19 +1582,28 @@ async function doAdminUpload(){
       const b64=await readB64(f);
       let src=null;
 
-      // Try uploading to Google Drive via Apps Script
+      // Upload to Apps Script via no-cors (fire and forget — CORS blocks response reading)
+      // Apps Script saves to Drive + updates Gallery sheet server-side
       if(CFG.APPS_SCRIPT_URL&&CFG.APPS_SCRIPT_URL!=='YOUR_APPS_SCRIPT_WEB_APP_URL_HERE'){
         try{
-          const res=await fetch(CFG.APPS_SCRIPT_URL,{
+          await fetch(CFG.APPS_SCRIPT_URL,{
             method:'POST',
-            headers:{'Content-Type':'application/json'},
-            body:JSON.stringify({action:'uploadMedia',fileName:b64.name,mimeType:b64.type,
-              data:b64.data,caption:cap,category:cat})
+            mode:'no-cors',  // required — Apps Script cannot send CORS headers
+            body:JSON.stringify({action:'uploadMedia',
+              fileName:b64.name,mimeType:b64.type,data:b64.data,caption:cap,category:cat})
           });
-          const result=await res.json();
-          if(result.url) src=result.url;
-          console.log('Drive upload result:',result);
-        }catch(e){console.warn('Drive upload failed:',e);}
+          // no-cors means we can't read the response — wait then GET gallery
+          // GET requests don't trigger CORS preflight so we CAN read the response
+          await new Promise(r=>setTimeout(r,3000));
+          const gr=await fetch(CFG.APPS_SCRIPT_URL+'?action=getGallery');
+          const gd=await gr.json();
+          if(gd&&gd.gallery){
+            const items=JSON.parse(gd.gallery);
+            // newest item is first — use its src
+            if(items&&items.length&&items[0].src) src=items[0].src;
+          }
+          console.log('Upload complete, Drive src:', src);
+        }catch(e){console.warn('Drive upload error:',e.message);}
       }
 
       // Fallback to base64 if Drive upload failed or not configured
@@ -1651,8 +1660,9 @@ function saveGallery(){
     try{
       const saveable=galleryData.filter(i=>i.src&&(i.src.startsWith('data:')||i.src.startsWith('http')));
       // no-cors fire-and-forget — keeps gallery in sync across devices
-      fetch(CFG.APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',
-        headers:{'Content-Type':'application/json'},
+      fetch(CFG.APPS_SCRIPT_URL,{
+        method:'POST',
+        mode:'no-cors',
         body:JSON.stringify({action:'saveGallery',gallery:JSON.stringify(saveable)})
       }).catch(()=>{});
     }catch(e){console.warn('Gallery global save failed',e);}
@@ -2249,25 +2259,24 @@ async function loadVisitorCount(){
 let visitorGeo=null;
 async function loadVisitorGeo(){
   try{
-    // freeipapi.com — free, HTTPS, no key needed
-    const res=await fetch('https://freeipapi.com/api/json');
+    // ipinfo.io — allows CORS from any origin, free up to 50k/month
+    const res=await fetch('https://ipinfo.io/json');
     const d=await res.json();
-    if(d&&d.countryName){
+    if(d&&d.country){
+      const [lat,lon]=(d.loc||',').split(',');
       visitorGeo={
-        ip:       d.ipAddress||'',
-        city:     d.cityName||'',
-        district: d.cityName||'',          // district-level from freeipapi
-        state:    d.regionName||'',
-        country:  d.countryName||'',
-        countryCode: d.countryCode||'',
-        timezone: d.timeZone||'',
-        lat:      d.latitude||'',
-        lon:      d.longitude||''
+        ip:          d.ip||'',
+        city:        d.city||'',
+        district:    d.city||'',
+        state:       d.region||'',
+        country:     d.country||'',
+        countryCode: d.country||'',
+        timezone:    d.timezone||'',
+        lat:         lat||'',
+        lon:         lon||''
       };
-      // Store in hidden element (host panel reads it)
       const el=document.getElementById('visitor-geo');
       if(el)el.textContent=JSON.stringify(visitorGeo);
-      // Append to visit log in localStorage
       try{
         const log=JSON.parse(localStorage.getItem('sdm_visit_log')||'[]');
         log.unshift({...visitorGeo, time:new Date().toISOString()});
@@ -2276,9 +2285,9 @@ async function loadVisitorGeo(){
       }catch(e){}
     }
   }catch(e){
-    // Fallback: try ipapi.co
+    // Fallback: cloudflare trace (always works, no CORS issues)
     try{
-      const r2=await fetch('https://ipapi.co/json/');
+      const r2=await fetch('https://cloudflare.com/cdn-cgi/trace');
       const d2=await r2.json();
       if(d2&&d2.country_name){
         visitorGeo={
