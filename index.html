@@ -424,14 +424,15 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
   <span>🔐 Admin Mode · <span style="font-family:'DM Mono',monospace;font-size:0.58rem;opacity:0.8">HTML v20 · Apps Script v7</span></span>
   <div style="display:flex;gap:7px">
     <button class="admin-btn" onclick="openHostPanel()">📋 Host Panel</button>
-    <button class="admin-btn" onclick="openAdminUpload()">＋ Add Photos / Videos</button>
     <button class="admin-btn" onclick="adminLogout()">Logout</button>
   </div>
 </div>
 
 <header style="position:relative">
-  <button class="home-btn" onclick="goHome()" title="Start over / go to home">🏠 Home</button>
-  <button class="home-btn" onclick="openRoomsModal()" title="View room photos & videos" style="margin-left:6px">📷 View Rooms</button>
+  <div style="position:absolute;top:10px;right:12px;display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+    <button class="home-btn" onclick="goHome()" title="Start over / go to home" style="font-size:1.5rem;padding:8px 14px;line-height:1">🏠</button>
+    <button class="home-btn" onclick="openRoomsModal()" title="View room photos & videos" style="font-size:0.65rem;padding:6px 12px;letter-spacing:0.05em">📷 View Rooms</button>
+  </div>
   <span class="leaf-div">❧ ❧ ❧</span>
   <h1 onclick="goHome()" style="cursor:pointer;user-select:none"><em>Shanthi &amp; Sangha</em> @ Soudhamini</h1>
   <p class="tagline">Sattvic Living · Peaceful Stays · Simple Being</p>
@@ -850,7 +851,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
   👁 Visitors: <span id="visitor-count">—</span>
 </div>
 <span id="visitor-geo" style="display:none"></span>
-<footer id="site-footer">Shanthi &amp; Sangha @ Soudhamini · Peaceful Simple Living · Waste Segregated with Ashram Care</footer>
+<footer id="site-footer">Shanthi &amp; Sangha @ Soudhamini · Peaceful Simple Living · Waste Segregated with Ashram Care<span style="font-family:'DM Mono',monospace;font-size:0.45rem;opacity:0.45;margin-left:12px;letter-spacing:0.08em">v22</span></footer>
 
 <!-- MODALS -->
 <!-- Admin Login -->
@@ -900,7 +901,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 
 <script>
 // ── CONFIG ─────────────────────────────────────────────
-const APP_VERSION='v20';
+const APP_VERSION='v22';
 const CFG={
   APPS_SCRIPT_URL:'https://script.google.com/macros/s/AKfycbzrzBGUChJvK88w3iRmMwdRdUdrhF6Ysgnfemxax3V_JPr_bQh4agHfBPpn9S8pVmm3Sw/exec',
   OWNER_WA:'919148212422',
@@ -2086,7 +2087,7 @@ function logVisitToServer(fingerprint, geo, isAdmin, isTestBooking){
 // ══════════════════════════════════════════════════════════
 // ROOMS MEDIA
 // ══════════════════════════════════════════════════════════
-let roomsData={shanthi:[],sangha:[]};
+let roomsData={shanthi:[],sangha:[],kitchen:[],service:[],portico:[],foyer:[]};
 let currentRoomTab='shanthi';
 
 function openRoomsModal(){
@@ -2189,8 +2190,10 @@ async function handleRoomUpload(input){
     }catch(e){console.error('Room upload error:',e);}
   }
   input.value='';
+  if(btn){btn.textContent='Reloading...';}
+  // Reload from server to confirm cross-device sync
+  await loadRoomsFromServer();
   if(btn){btn.disabled=false;btn.textContent='+ Upload Photo / Video';}
-  renderRoomsGrid();
 }
 function deleteRoomMedia(room,idx){
   if(!confirm('Remove this item?'))return;
@@ -2208,12 +2211,16 @@ async function loadRoomsFromServer(){
   if(!CFG.APPS_SCRIPT_URL||CFG.APPS_SCRIPT_URL.includes('YOUR_APPS'))return;
   try{
     var res=await fetch(CFG.APPS_SCRIPT_URL+'?action=getRoomsData');
-    var data=await res.json();
+    var rawText=await res.text();
+    console.log('[SDM] getRoomsData:',rawText.slice(0,120));
+    var data=JSON.parse(rawText);
     if(data&&data.rooms){
       var remote=JSON.parse(data.rooms);
       if(remote&&typeof remote==='object'){
-        ['shanthi','sangha'].forEach(function(room){
-          if(remote[room])remote[room].forEach(function(item){
+        var allRooms=['shanthi','sangha','kitchen','service','portico','foyer'];
+        allRooms.forEach(function(room){
+          if(!remote[room])remote[room]=[];
+          remote[room].forEach(function(item){
             if(item.src&&item.src.includes('uc?export=view')){
               var m=item.src.match(/[?&]id=([^&]+)/);
               if(m)item.src=item.type==='video'
@@ -2223,16 +2230,13 @@ async function loadRoomsFromServer(){
           });
         });
         roomsData=remote;
+        console.log('[SDM] Rooms loaded from server');
         renderRoomsGrid();
       }
     }
-  }catch(e){console.warn('[SDM] loadRoomsFromServer:',e.message);}
+  }catch(e){console.error('[SDM] loadRoomsFromServer:',e.message);}
 }
 
-// ── INIT ──────────────────────────────────────────────
-renderCal();
-goTo(1);
-loadVisitorGeo();
 </script>
 <!-- HOST PANEL -->
 <div class="host-panel" id="host-panel">
@@ -2255,7 +2259,6 @@ loadVisitorGeo();
       <button class="hp-tab" id="hptab-visitors" onclick="switchHPTab('visitors',this)">🌍 Visitors</button>
     </div>
     <div id="hp-list"></div>
-  <div style="text-align:center;padding:10px 0 2px;font-family:'DM Mono',monospace;font-size:0.48rem;color:var(--text-s);letter-spacing:0.1em;border-top:1px solid var(--border);margin-top:16px">HTML v20 · AS v7</div>
   </div>
 </div>
 
@@ -2269,6 +2272,10 @@ loadVisitorGeo();
     <div class="rooms-tabs">
       <button class="rooms-tab active" id="rtab-shanthi" onclick="switchRoomTab('shanthi',this)">Shanthi Room</button>
       <button class="rooms-tab" id="rtab-sangha" onclick="switchRoomTab('sangha',this)">Sangha Room</button>
+      <button class="rooms-tab" id="rtab-kitchen" onclick="switchRoomTab('kitchen',this)">Kitchen</button>
+      <button class="rooms-tab" id="rtab-service" onclick="switchRoomTab('service',this)">Service Area</button>
+      <button class="rooms-tab" id="rtab-portico" onclick="switchRoomTab('portico',this)">Portico</button>
+      <button class="rooms-tab" id="rtab-foyer" onclick="switchRoomTab('foyer',this)">Foyer &amp; Hall</button>
     </div>
     <div id="rooms-media-grid" class="rooms-media-grid"></div>
     <div id="rooms-admin-upload" style="display:none">
