@@ -440,7 +440,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 
 <!-- ADMIN BAR -->
 <div id="admin-bar">
-  <span>🔐 Admin Mode · <span style="font-family:'DM Mono',monospace;font-size:0.58rem;opacity:0.8">HTML v28 · Apps Script v9</span></span>
+  <span>🔐 Admin Mode · <span style="font-family:'DM Mono',monospace;font-size:0.58rem;opacity:0.8">HTML v29 · Apps Script v9</span></span>
   <div style="display:flex;gap:7px">
     <button class="admin-btn" onclick="openHostPanel()">📋 Host Panel</button>
     <button class="admin-btn" onclick="openAdminUpload()">＋ Add Photos / Videos</button>
@@ -931,9 +931,9 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 
 <script>
 // ── CONFIG ─────────────────────────────────────────────
-const APP_VERSION='v28';
+const APP_VERSION='v29';
 const CFG={
-  APPS_SCRIPT_URL:'https://script.google.com/macros/s/AKfycbyzjC0zGg2HNPdhCLBi4I1W6Cj5L_8I6wFyRGvbi6naJwfTc1ZwKsxE-bgUZcIwltWKig/exec',
+  APPS_SCRIPT_URL:'https://script.google.com/macros/s/AKfycbwmRyBzULi1g4SW65kwwZQmXptp3dfA9zge_bkQMBhIUey6RnYzo5kN_E2h4iUFBDlgRQ/exec',
   OWNER_WA:'919148212422',
   PROP:'Shanthi & Sangha @ Soudhamini',
   ADMIN_PW:'1213',
@@ -1691,15 +1691,21 @@ async function loadGlobalGallery(){
     if(data&&data.gallery){
       const remote=JSON.parse(data.gallery);
       if(Array.isArray(remote)&&remote.length){
-        // Fix old video URLs: uc?export=view → /file/d/ID/preview
+        // Fix any old uc?export=view URLs — normalise all Drive URLs on load
         remote.forEach(item=>{
-          if(item.type==='video'&&item.src&&item.src.includes('uc?export=view')){
-            const m=item.src.match(/[?&]id=([^&]+)/);
-            if(m) item.src='https://drive.google.com/file/d/'+m[1]+'/preview';
+          const idM=item.src&&item.src.match(/[?&]id=([^&]+)/);
+          const fid=idM?idM[1]:null;
+          if(fid&&item.src.includes('uc?export=view')){
+            item.src=item.type==='video'
+              ? 'https://drive.google.com/file/d/'+fid+'/preview'
+              : 'https://drive.google.com/thumbnail?id='+fid+'&sz=w1600';
           }
-          if(item.type==='video'&&item.driveUrl&&item.driveUrl.includes('uc?export=view')){
-            const m=item.driveUrl.match(/[?&]id=([^&]+)/);
-            if(m) item.src='https://drive.google.com/file/d/'+m[1]+'/preview';
+          // Also fix driveUrl items with no src set
+          if(!item.src&&item.driveUrl){
+            const idM2=item.driveUrl.match(/[?&]id=([^&]+)/);
+            if(idM2) item.src=item.type==='video'
+              ? 'https://drive.google.com/file/d/'+idM2[1]+'/preview'
+              : 'https://drive.google.com/thumbnail?id='+idM2[1]+'&sz=w1600';
           }
         });
         // Server is authoritative — replace local gallery entries with server ones
