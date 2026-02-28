@@ -440,7 +440,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 
 <!-- ADMIN BAR -->
 <div id="admin-bar">
-  <span>🔐 Admin Mode · <span style="font-family:'DM Mono',monospace;font-size:0.58rem;opacity:0.8">HTML v17 · Apps Script v5</span></span>
+  <span>🔐 Admin Mode · <span style="font-family:'DM Mono',monospace;font-size:0.58rem;opacity:0.8">HTML v18 · Apps Script v5</span></span>
   <div style="display:flex;gap:7px">
     <button class="admin-btn" onclick="openHostPanel()">📋 Host Panel</button>
     <button class="admin-btn" onclick="openAdminUpload()">＋ Add Photos / Videos</button>
@@ -931,7 +931,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 
 <script>
 // ── CONFIG ─────────────────────────────────────────────
-const APP_VERSION='v17';
+const APP_VERSION='v18';
 const CFG={
   APPS_SCRIPT_URL:'https://script.google.com/macros/s/AKfycbxoft8wzD9_AIfjewr-bo8ZV9QT38RTyi8nV375JYFLMaap3XLVnBVa62hehdm8DDseKw/exec',
   OWNER_WA:'919148212422',
@@ -1543,15 +1543,30 @@ function renderGallery(){
     const imgHtml=isDriveVid&&!thumbSrc
       ? `<div style="aspect-ratio:${item.aspect};background:linear-gradient(135deg,#2a1f10,#4a3520);display:flex;align-items:center;justify-content:center;border-radius:6px"><span style="font-size:2.5rem;opacity:0.7">▶</span></div>`
       : `<img src="${thumbSrc}" alt="${item.label}" loading="lazy" style="aspect-ratio:${item.aspect};object-fit:cover">`;
+    const gdIdx=galleryData.indexOf(item);
     div.innerHTML=imgHtml+
       `${isVid?`<div class="video-badge">▶ ${item.duration||'video'}</div><div class="play-icon">▶</div>`:''}
       <div class="item-overlay"><span class="item-label">${item.label}</span></div>
-      ${adminMode?`<button class="admin-delete" onclick="event.stopPropagation();delGallery(${galleryData.indexOf(item)})">✕</button>`:''}`;
+      ${adminMode?`<button class="admin-delete" onclick="event.stopPropagation();delGallery(${gdIdx})">✕</button>`:''}`;
     div.onclick=()=>openLB(idx);
     grid.appendChild(div);
   });
 }
-function delGallery(i){if(confirm('Remove this item?')){ galleryData.splice(i,1);renderGallery();saveGallery(); }}
+function delGallery(i){
+  if(i<0||i>=galleryData.length)return;
+  if(!confirm('Remove this item from gallery?'))return;
+  const item=galleryData[i];
+  galleryData.splice(i,1);
+  renderGallery();
+  saveGallery(); // saveGallery pushes updated list to Apps Script Sheet
+  // If Drive file, also tell Apps Script to delete from Drive
+  if(item.fileId&&CFG.APPS_SCRIPT_URL&&CFG.APPS_SCRIPT_URL!=='YOUR_APPS_SCRIPT_WEB_APP_URL_HERE'){
+    fetch(CFG.APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'deleteMedia',fileId:item.fileId})
+    }).catch(()=>{});
+  }
+}
 async function doAdminUpload(){
   const cap=document.getElementById('adm-caption').value.trim()||'Shanthi & Sangha @ Soudhamini';
   const cat=document.getElementById('adm-cat').value;
