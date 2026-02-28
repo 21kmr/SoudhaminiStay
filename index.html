@@ -440,7 +440,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 
 <!-- ADMIN BAR -->
 <div id="admin-bar">
-  <span>🔐 Admin Mode · <span style="font-family:'DM Mono',monospace;font-size:0.58rem;opacity:0.8">HTML v23 · Apps Script v6</span></span>
+  <span>🔐 Admin Mode · <span style="font-family:'DM Mono',monospace;font-size:0.58rem;opacity:0.8">HTML v24 · Apps Script v7</span></span>
   <div style="display:flex;gap:7px">
     <button class="admin-btn" onclick="openHostPanel()">📋 Host Panel</button>
     <button class="admin-btn" onclick="openAdminUpload()">＋ Add Photos / Videos</button>
@@ -931,9 +931,9 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 
 <script>
 // ── CONFIG ─────────────────────────────────────────────
-const APP_VERSION='v23';
+const APP_VERSION='v24';
 const CFG={
-  APPS_SCRIPT_URL:'https://script.google.com/macros/s/AKfycbyvoTRAvW00s5ao3R54LvKUcgYMW0yL285BJxN1zSmFUlL_eJeawwZZhPa5cSKQlvzJOA/exec',
+  APPS_SCRIPT_URL:'https://script.google.com/macros/s/AKfycbxpaRbu0TY_P8d_8yMKECPfs652DlhfAQjMjtTGJKyx8ZNjb28DX4BvsnCoLG7pdDcWkg/exec',
   OWNER_WA:'919148212422',
   PROP:'Shanthi & Sangha @ Soudhamini',
   ADMIN_PW:'ss1213',
@@ -1594,7 +1594,7 @@ async function doAdminUpload(){
           });
           // no-cors means we can't read the response — wait then GET gallery
           // GET requests don't trigger CORS preflight so we CAN read the response
-          await new Promise(r=>setTimeout(r,3000));
+          await new Promise(r=>setTimeout(r,4000));
           const gr=await fetch(CFG.APPS_SCRIPT_URL+'?action=getGallery');
           const gd=await gr.json();
           if(gd&&gd.gallery){
