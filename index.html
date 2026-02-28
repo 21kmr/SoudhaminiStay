@@ -932,7 +932,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 
 <script>
 // ── CONFIG ─────────────────────────────────────────────
-const APP_VERSION='v15';
+const APP_VERSION='v15.2';
 const CFG={
   APPS_SCRIPT_URL:'https://script.google.com/macros/s/AKfycbxoft8wzD9_AIfjewr-bo8ZV9QT38RTyi8nV375JYFLMaap3XLVnBVa62hehdm8DDseKw/exec',
   OWNER_WA:'919148212422',
@@ -1249,6 +1249,32 @@ function fmtDate(d){
   return new Date(d+'T00:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
 }
 
+// ── REMINDER BUTTON BUILDER ─────────────────────────────────────────
+function mkReminderRow(phone,name,reminderMsg,checkoutMsg){
+  if(!phone||phone.replace(/\D/g,'').length<10)return '';
+  const ph=phone.replace(/\D/g,'');
+  const phClean=ph.replace(/^0+/,'');
+  const tgUrl='https://t.me/+91'+phClean.replace(/^91/,'');
+  const waUrl='https://wa.me/91'+phClean.replace(/^91/,'');
+  return '<div class="reminder-guest-block">'+
+    '<div class="reminder-guest-name">👤 '+name+'</div>'+
+    '<div class="reminder-row-label">🌅 Day before check-in</div>'+
+    '<div class="reminder-btn-row">'+
+      '<a href="'+tgUrl+'" target="_blank" rel="noopener" class="reminder-btn tg-btn">'+
+        '<span class="rbtn-icon">✈️</span><span class="rbtn-text"><strong>Telegram</strong><br>Check-in Reminder</span></a>'+
+      '<a href="'+waUrl+'?text='+encodeURIComponent(reminderMsg)+'" target="_blank" rel="noopener" class="reminder-btn wa-btn2">'+
+        '<span class="rbtn-icon">💬</span><span class="rbtn-text"><strong>WhatsApp</strong><br>Check-in Reminder</span></a>'+
+    '</div>'+
+    '<div class="reminder-row-label" style="margin-top:8px">🌄 On checkout day</div>'+
+    '<div class="reminder-btn-row">'+
+      '<a href="'+tgUrl+'" target="_blank" rel="noopener" class="reminder-btn tg-btn">'+
+        '<span class="rbtn-icon">✈️</span><span class="rbtn-text"><strong>Telegram</strong><br>Checkout Reminder</span></a>'+
+      '<a href="'+waUrl+'?text='+encodeURIComponent(checkoutMsg)+'" target="_blank" rel="noopener" class="reminder-btn wa-btn2">'+
+        '<span class="rbtn-icon">💬</span><span class="rbtn-text"><strong>WhatsApp</strong><br>Checkout Reminder</span></a>'+
+    '</div>'+
+  '</div>';
+}
+
 let isSubmitting=false;
 async function submitBooking(){
   if(isSubmitting)return;
@@ -1433,28 +1459,6 @@ Thank you for your stay! Please do leave us a review 🌿
   const waMk2=(phone,msg,emoji,label)=>{
     return `<a href="https://wa.me/${phone}?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener" class="wa-btn wa-terr" title="Send via WhatsApp" style="font-size:0.54rem;padding:6px 11px">${emoji} WhatsApp</a>`;
   };
-  // Build reminder panel with clear send buttons
-  const mkReminderRow=(phone,name,reminderMsg,checkoutMsg)=>{
-    if(!phone||phone.length<10)return '';
-    const ph=phone.replace(/\D/g,'');
-    const tgBase='https://t.me/+'+ph.replace(/^0+/,'').replace(/^91/,'91');
-    const waBase='https://wa.me/91'+ph.replace(/^0+/,'').replace(/^91/,'');
-    const tgCI=`<a href="${tgBase}" target="_blank" rel="noopener" class="reminder-btn tg-btn">
-      <span class="rbtn-icon">✈️</span><span class="rbtn-text"><strong>Telegram</strong><br>Check-in Reminder</span></a>`;
-    const waCI=`<a href="${waBase}?text=${encodeURIComponent(reminderMsg)}" target="_blank" rel="noopener" class="reminder-btn wa-btn2">
-      <span class="rbtn-icon">💬</span><span class="rbtn-text"><strong>WhatsApp</strong><br>Check-in Reminder</span></a>`;
-    const tgCO=`<a href="${tgBase}" target="_blank" rel="noopener" class="reminder-btn tg-btn">
-      <span class="rbtn-icon">✈️</span><span class="rbtn-text"><strong>Telegram</strong><br>Checkout Reminder</span></a>`;
-    const waCO=`<a href="${waBase}?text=${encodeURIComponent(checkoutMsg)}" target="_blank" rel="noopener" class="reminder-btn wa-btn2">
-      <span class="rbtn-icon">💬</span><span class="rbtn-text"><strong>WhatsApp</strong><br>Checkout Reminder</span></a>`;
-    return `<div class="reminder-guest-block">
-      <div class="reminder-guest-name">👤 ${name}</div>
-      <div class="reminder-row-label">🌅 Day before check-in</div>
-      <div class="reminder-btn-row">${tgCI}${waCI}</div>
-      <div class="reminder-row-label" style="margin-top:8px">🌄 On checkout day</div>
-      <div class="reminder-btn-row">${tgCO}${waCO}</div>
-    </div>`;
-  };
   document.getElementById('wa-panel-success').innerHTML=`
     <div class="reminder-section-title">📲 Send Reminders to Guest</div>
     <div class="reminder-note">Tap Telegram or WhatsApp to open a pre-filled message. Send on the right day.</div>
@@ -1562,9 +1566,14 @@ function renderGallery(){
   filtered.forEach((item,idx)=>{
     const div=document.createElement('div');div.className='gallery-item';
     const isVid=item.type==='video';
+    const isDriveVid=isVid&&item.src&&item.src.includes('drive.google.com');
     const thumbSrc=isVid?item.thumb:item.src;
-    div.innerHTML=`<img src="${thumbSrc}" alt="${item.label}" loading="lazy" style="aspect-ratio:${item.aspect};object-fit:cover">
-      ${isVid?`<div class="video-badge">▶ ${item.duration}</div><div class="play-icon">▶</div>`:''}
+    // Drive videos: show a dark placeholder with play icon (no thumbnail available)
+    const imgHtml=isDriveVid&&!thumbSrc
+      ? `<div style="aspect-ratio:${item.aspect};background:linear-gradient(135deg,#2a1f10,#4a3520);display:flex;align-items:center;justify-content:center;border-radius:6px"><span style="font-size:2.5rem;opacity:0.7">▶</span></div>`
+      : `<img src="${thumbSrc}" alt="${item.label}" loading="lazy" style="aspect-ratio:${item.aspect};object-fit:cover">`;
+    div.innerHTML=imgHtml+
+      `${isVid?`<div class="video-badge">▶ ${item.duration||'video'}</div><div class="play-icon">▶</div>`:''}
       <div class="item-overlay"><span class="item-label">${item.label}</span></div>
       ${adminMode?`<button class="admin-delete" onclick="event.stopPropagation();delGallery(${galleryData.indexOf(item)})">✕</button>`:''}`;
     div.onclick=()=>openLB(idx);
@@ -1572,65 +1581,83 @@ function renderGallery(){
   });
 }
 function delGallery(i){if(confirm('Remove this item?')){ galleryData.splice(i,1);renderGallery();saveGallery(); }}
-function doAdminUpload(){
+async function doAdminUpload(){
   const cap=document.getElementById('adm-caption').value.trim()||'Shanthi & Sangha @ Soudhamini';
   const cat=document.getElementById('adm-cat').value;
   const files=[...pFiles.adm];
   if(files.length===0)return;
-  // Close modal immediately so user sees gallery updating
-  closeModal('admin-upload-modal');
+
+  // Show upload progress
+  const btn=document.getElementById('btn-adm-upload');
+  if(btn){btn.disabled=true;btn.textContent='⏳ Uploading…';}
+  const prevEl=document.getElementById('adm-previews');
+
   pFiles.adm=[];
-  document.getElementById('adm-previews').innerHTML='';
   document.getElementById('adm-caption').value='';
-  document.getElementById('btn-adm-upload').disabled=true;
 
-  let processed=0;
-  const total=files.length;
-  const done=()=>{processed++;if(processed>=total){renderGallery();saveGallery();}};
-
-  files.forEach(f=>{
-    const isV=f.type.startsWith('video/');
-    if(isV){
-      const vr=new FileReader();
-      vr.onload=ev=>{
-        const videoDataUrl=ev.target.result;
-        const video=document.createElement('video');
-        video.muted=true;video.playsInline=true;video.preload='metadata';
-        video.style.cssText='position:fixed;opacity:0;pointer-events:none;width:1px;height:1px;';
-        document.body.appendChild(video);
-        video.onloadedmetadata=()=>{video.currentTime=Math.min(1,video.duration*0.1);};
-        video.onseeked=()=>{
-          try{
-            const canvas=document.createElement('canvas');
-            canvas.width=320;canvas.height=180;
-            canvas.getContext('2d').drawImage(video,0,0,320,180);
-            const thumb=canvas.toDataURL('image/jpeg',0.75);
-            const dur=video.duration?formatDur(video.duration):'—';
-            galleryData.unshift({type:'video',cat,src:videoDataUrl,thumb,label:cap,duration:dur,aspect:'16/9'});
-          }catch(e){
-            galleryData.unshift({type:'video',cat,src:videoDataUrl,thumb:'',label:cap,duration:'—',aspect:'16/9'});
-          }
-          document.body.removeChild(video);
-          done();
-        };
-        video.onerror=()=>{
-          galleryData.unshift({type:'video',cat,src:videoDataUrl,thumb:'',label:cap,duration:'—',aspect:'16/9'});
-          try{document.body.removeChild(video);}catch(e){}
-          done();
-        };
-        video.src=videoDataUrl;
-        video.load();
-      };
-      vr.readAsDataURL(f);
-    } else {
-      const r=new FileReader();
-      r.onload=ev=>{
-        galleryData.unshift({type:'image',cat,src:ev.target.result,label:cap,aspect:'4/3'});
-        done();
-      };
-      r.readAsDataURL(f);
-    }
+  const readB64=(file)=>new Promise((res,rej)=>{
+    const fr=new FileReader();
+    fr.onload=e=>res({name:file.name,type:file.type,data:e.target.result.split(',')[1],size:file.size});
+    fr.onerror=rej;
+    fr.readAsDataURL(file);
   });
+
+  for(const f of files){
+    const isV=f.type.startsWith('video/');
+    const label=cap+' ('+cat+')';
+    try{
+      // Read as base64
+      const b64=await readB64(f);
+      // Upload to Google Drive via Apps Script
+      let driveUrl=null;
+      let thumbUrl=null;
+      if(CFG.APPS_SCRIPT_URL&&CFG.APPS_SCRIPT_URL!=='YOUR_APPS_SCRIPT_WEB_APP_URL_HERE'){
+        try{
+          const res=await fetch(CFG.APPS_SCRIPT_URL,{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({action:'uploadMedia',fileName:b64.name,mimeType:b64.type,data:b64.data,caption:label,category:cat})
+          });
+          const result=await res.json();
+          if(result.url) driveUrl=result.url;
+          if(result.thumbUrl) thumbUrl=result.thumbUrl;
+        }catch(e){console.warn('Drive upload failed, using local',e);}
+      }
+      // Use Drive URL if available, else fall back to base64 (local only)
+      const src=driveUrl||('data:'+b64.type+';base64,'+b64.data);
+      if(isV){
+        // Generate thumbnail from video locally for preview
+        let thumb=thumbUrl||'';
+        if(!thumb){
+          try{
+            const blobUrl=URL.createObjectURL(f);
+            thumb=await new Promise(res=>{
+              const vid=document.createElement('video');
+              vid.muted=true;vid.playsInline=true;vid.preload='metadata';
+              vid.style.cssText='position:fixed;opacity:0;pointer-events:none;width:1px;height:1px;';
+              document.body.appendChild(vid);
+              vid.onloadedmetadata=()=>{vid.currentTime=Math.min(1,vid.duration*0.1);};
+              vid.onseeked=()=>{
+                try{const c=document.createElement('canvas');c.width=320;c.height=180;c.getContext('2d').drawImage(vid,0,0,320,180);res(c.toDataURL('image/jpeg',0.75));}catch(e){res('');}
+                document.body.removeChild(vid);URL.revokeObjectURL(blobUrl);
+              };
+              vid.onerror=()=>{try{document.body.removeChild(vid);}catch(e){}URL.revokeObjectURL(blobUrl);res('');};
+              vid.src=blobUrl;vid.load();
+            });
+          }catch(e){thumb='';}
+        }
+        galleryData.unshift({type:'video',cat,src,thumb,label:cap,duration:'—',aspect:'16/9',driveUrl});
+      } else {
+        galleryData.unshift({type:'image',cat,src,label:cap,aspect:'4/3',driveUrl});
+      }
+    }catch(e){console.error('Upload error',e);}
+  }
+
+  closeModal('admin-upload-modal');
+  if(prevEl)prevEl.innerHTML='';
+  if(btn){btn.disabled=false;btn.textContent='Upload';}
+  renderGallery();
+  saveGallery();
 }
 
 function formatDur(s){
@@ -1641,17 +1668,18 @@ function formatDur(s){
 function saveGallery(){
   // Save locally first (instant)
   try{
-    const saveable=galleryData.filter(i=>i.src&&i.src.startsWith('data:'));
+    const saveable=galleryData.filter(i=>i.src&&(i.src.startsWith('data:')||i.src.startsWith('http')));
     localStorage.setItem('sdm_gallery',JSON.stringify(saveable));
   }catch(e){console.warn('Gallery local save failed',e);}
   // Also push to Apps Script for global persistence across all devices
   if(CFG.APPS_SCRIPT_URL&&CFG.APPS_SCRIPT_URL!=='YOUR_APPS_SCRIPT_WEB_APP_URL_HERE'){
     try{
-      const saveable=galleryData.filter(i=>i.src&&i.src.startsWith('data:'));
+      const saveable=galleryData.filter(i=>i.src&&(i.src.startsWith('data:')||i.src.startsWith('http')));
+      // no-cors fire-and-forget — keeps gallery in sync across devices
       fetch(CFG.APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',
         headers:{'Content-Type':'application/json'},
         body:JSON.stringify({action:'saveGallery',gallery:JSON.stringify(saveable)})
-      });
+      }).catch(()=>{});
     }catch(e){console.warn('Gallery global save failed',e);}
   }
 }
@@ -1666,7 +1694,7 @@ function loadSavedGallery(){
   }catch(e){}
 }
 async function loadGlobalGallery(){
-  // Pull global gallery from Apps Script (for cross-device sync)
+  // Pull gallery from Apps Script — this is the source of truth for ALL visitors
   if(!CFG.APPS_SCRIPT_URL||CFG.APPS_SCRIPT_URL==='YOUR_APPS_SCRIPT_WEB_APP_URL_HERE')return;
   try{
     const res=await fetch(CFG.APPS_SCRIPT_URL+'?action=getGallery');
@@ -1674,9 +1702,13 @@ async function loadGlobalGallery(){
     if(data&&data.gallery){
       const remote=JSON.parse(data.gallery);
       if(Array.isArray(remote)&&remote.length){
+        // Server is authoritative — replace local gallery entries with server ones
+        // Keep only hardcoded items (no driveUrl), add all server items
+        const hardcoded=galleryData.filter(i=>!i.driveUrl&&!i.src.startsWith('data:'));
+        galleryData.length=0;
+        hardcoded.forEach(i=>galleryData.push(i));
+        remote.forEach(i=>galleryData.push(i));
         localStorage.setItem('sdm_gallery',data.gallery);
-        const existSrcs=new Set(galleryData.map(i=>i.src));
-        remote.forEach(i=>{if(!existSrcs.has(i.src))galleryData.push(i);});
         renderGallery();
       }
     }
@@ -1690,7 +1722,15 @@ function lbNav(d){lbIdx=(lbIdx+d+lbItems.length)%lbItems.length;showLB();}
 function showLB(){
   const it=lbItems[lbIdx];
   if(it.type==='video'&&it.src){
-    document.getElementById('lb-content').innerHTML=`<video controls autoplay style="max-width:100%;max-height:78vh;border-radius:6px;display:block;margin:0 auto"><source src="${it.src}" type="video/mp4"></video>`;
+    const isDrive=it.src.includes('drive.google.com');
+    if(isDrive){
+      // Drive videos need iframe embed
+      document.getElementById('lb-content').innerHTML=
+        `<iframe src="${it.src}" style="width:min(640px,92vw);aspect-ratio:16/9;border:none;border-radius:6px;display:block;margin:0 auto" allowfullscreen></iframe>`;
+    } else {
+      document.getElementById('lb-content').innerHTML=
+        `<video controls autoplay style="max-width:100%;max-height:78vh;border-radius:6px;display:block;margin:0 auto"><source src="${it.src}" type="video/mp4"></video>`;
+    }
   } else if(it.type==='video'&&!it.src){
     document.getElementById('lb-content').innerHTML=`<div style="width:min(560px,90vw);aspect-ratio:16/9;background:#111;display:flex;align-items:center;justify-content:center;border-radius:6px;flex-direction:column;gap:9px"><div style="font-size:2rem">🎬</div><p style="font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.4)">${it.label}</p></div>`;
   } else {
@@ -2290,8 +2330,11 @@ loadVisitorGeo();
 
 
 // ── INIT ────────────────────────────────────────────
+loadSavedGallery();
 renderGallery();
 renderCal();
+goTo(1);
+loadGlobalGallery();
 </script>
 <!-- HOST PANEL -->
 <div class="host-panel" id="host-panel">
