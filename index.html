@@ -238,32 +238,6 @@ main{max-width:860px;margin:0 auto;padding:0 20px 60px;}
 .wa-green{background:#25D366;}.wa-clay{background:var(--clay);}.wa-moss{background:var(--moss);}.wa-terr{background:var(--terr);}
 .wa-hint{font-family:'DM Mono',monospace;font-size:0.54rem;letter-spacing:0.06em;color:var(--text-s);line-height:1.6;margin-top:3px;}
 
-/* GALLERY */
-.gallery-section{max-width:860px;margin:0 auto;padding:0 20px 42px;}
-.gallery-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:11px;margin-bottom:16px;padding-top:30px;border-top:1px solid var(--border);}
-.gallery-header h2{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:400;font-style:italic;}
-.gallery-header p{font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--clay);margin-top:2px;}
-.gallery-tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;}
-.gallery-tab{font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;padding:5px 12px;border-radius:100px;border:1px solid var(--border);background:transparent;color:var(--clay);cursor:pointer;transition:all 0.2s;}
-.gallery-tab:hover{border-color:var(--clay);}
-.gallery-tab.active{background:var(--text);color:#fff;border-color:var(--text);}
-.gallery-grid{columns:3;column-gap:8px;}
-@media(max-width:600px){.gallery-grid{columns:2;}}
-@media(max-width:360px){.gallery-grid{columns:1;}}
-.gallery-item{break-inside:avoid;margin-bottom:8px;position:relative;border-radius:6px;overflow:hidden;cursor:pointer;}
-.gallery-item img,.gallery-item video{width:100%;display:block;border-radius:6px;transition:transform 0.32s;background:var(--warm);object-fit:cover;}
-.gallery-item:hover img{transform:scale(1.04);}
-.gallery-item .item-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(44,31,15,0.65) 0%,transparent 55%);opacity:0;transition:opacity 0.28s;display:flex;align-items:flex-end;padding:8px;border-radius:6px;}
-.gallery-item:hover .item-overlay{opacity:1;}
-.item-label{font-family:'DM Mono',monospace;font-size:0.54rem;letter-spacing:0.1em;text-transform:uppercase;color:#fff;}
-.video-badge{position:absolute;top:7px;left:7px;background:rgba(44,31,15,0.72);color:#fff;font-family:'DM Mono',monospace;font-size:0.48rem;letter-spacing:0.08em;text-transform:uppercase;padding:2px 7px;border-radius:100px;}
-.play-icon{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:38px;height:38px;background:rgba(255,255,255,0.9);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.9rem;padding-left:3px;box-shadow:0 3px 11px rgba(0,0,0,0.2);transition:transform 0.18s;}
-.gallery-item:hover .play-icon{transform:translate(-50%,-50%) scale(1.1);}
-.admin-delete{position:absolute;top:5px;right:5px;background:rgba(139,74,42,0.85);color:#fff;border:none;border-radius:50%;width:21px;height:21px;font-size:0.65rem;cursor:pointer;display:none;align-items:center;justify-content:center;z-index:5;}
-.admin-mode .admin-delete{display:flex;}
-
-
-
 /* REVIEWS */
 
 
@@ -322,125 +296,13 @@ main{max-width:860px;margin:0 auto;padding:0 20px 60px;}
 .preview-strip{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px;}
 .preview-thumb{width:56px;height:56px;object-fit:cover;border-radius:4px;border:1px solid var(--border);}
 .preview-vid{width:56px;height:56px;border-radius:4px;border:1px solid var(--border);background:var(--text);display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:#fff;}
-
-/* LIGHTBOX */
-.lightbox{position:fixed;inset:0;background:rgba(10,5,2,0.95);z-index:2000;display:none;align-items:center;justify-content:center;flex-direction:column;padding:12px;}
-.lightbox.open{display:flex;}
-.lb-close{position:fixed;top:13px;right:17px;background:none;border:none;color:#fff;font-size:1.55rem;cursor:pointer;z-index:10;opacity:0.7;transition:opacity 0.2s;}
-.lb-close:hover{opacity:1;}
-.lb-nav{position:fixed;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:1.3rem;width:38px;height:38px;border-radius:50%;cursor:pointer;z-index:10;transition:background 0.2s;display:flex;align-items:center;justify-content:center;}
-.lb-nav:hover{background:rgba(255,255,255,0.2);}
-.lb-nav.prev{left:9px;}.lb-nav.next{right:9px;}
-.lb-content{max-width:min(820px,94vw);max-height:80vh;}
-.lb-content img,.lb-content video{max-width:100%;max-height:78vh;border-radius:6px;object-fit:contain;display:block;margin:0 auto;}
-.lb-caption{margin-top:9px;font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.13em;text-transform:uppercase;color:rgba(245,240,232,0.5);text-align:center;}
-.lb-counter{font-family:'DM Mono',monospace;font-size:0.54rem;color:rgba(245,240,232,0.3);margin-top:3px;text-align:center;}
-
-
-
-/* ── BOOKING CALENDAR ────────────────────────────────────── */
-.bk-cal-wrap{background:var(--bg);border-radius:var(--r);overflow:hidden;margin-bottom:4px;}
-.bk-cal-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--warm);}
-.bk-cal-nav{background:none;border:1px solid var(--border);border-radius:6px;width:32px;height:32px;font-size:1.2rem;cursor:pointer;color:var(--clay);transition:all 0.18s;display:flex;align-items:center;justify-content:center;}
-.bk-cal-nav:hover{background:var(--clay);color:#fff;}
-.bk-cal-month{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:400;color:var(--text);}
-.bk-cal-legend{display:flex;gap:12px;padding:8px 16px;flex-wrap:wrap;border-bottom:1px solid var(--border);}
-.bk-cal-legend span{font-family:'DM Mono',monospace;font-size:0.54rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-mid);display:flex;align-items:center;gap:5px;}
-.bk-dot{width:10px;height:10px;border-radius:50%;display:inline-block;}
-.bk-dot.available{background:var(--sage-lt);border:1px solid var(--sage);}
-.bk-dot.booked-s{background:#fde8da;border:1px solid var(--terr);}
-.bk-dot.selected-s{background:var(--moss);border:1px solid var(--moss);}
-.bk-dot.today-s{background:var(--clay);border:1px solid var(--clay);}
-.bk-cal-days-header{display:grid;grid-template-columns:repeat(7,1fr);padding:8px 8px 4px;gap:3px;}
-.bk-cal-days-header span{font-family:'DM Mono',monospace;font-size:0.52rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-s);text-align:center;}
-.bk-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;padding:0 8px 10px;}
-.bk-day{min-height:38px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--text-mid);position:relative;transition:all 0.15s;cursor:pointer;user-select:none;}
-.bk-day.empty{cursor:default;}
-.bk-day.past{color:var(--text-s);cursor:not-allowed;opacity:0.4;}
-.bk-day.today-day{font-weight:700;color:var(--clay);background:rgba(168,108,70,0.1);}
-.bk-day.booked-day{background:#fde8da;color:var(--terr);cursor:not-allowed;position:relative;}
-.bk-day.booked-day::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(-45deg,transparent,transparent 3px,rgba(139,74,42,0.08) 3px,rgba(139,74,42,0.08) 6px);border-radius:6px;}
-.bk-day.avail-day{background:var(--surface);}
-.bk-day.avail-day:hover{background:var(--sage-lt);color:var(--moss);transform:scale(1.06);}
-.bk-day.sel-start{background:var(--moss);color:#fff;border-radius:6px 0 0 6px;}
-.bk-day.sel-end{background:var(--moss);color:#fff;border-radius:0 6px 6px 0;}
-.bk-day.sel-start.sel-end{border-radius:6px;}
-.bk-day.sel-range{background:rgba(93,120,84,0.18);color:var(--moss);}
-.bk-day.sel-start,.bk-day.sel-end{z-index:1;}
-.bk-cal-selection{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--sage-lt);border-top:1px solid var(--sage);font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.08em;color:var(--moss);}
-.bk-clear-btn{background:none;border:1px solid var(--sage);color:var(--moss);padding:3px 10px;border-radius:100px;font-family:'DM Mono',monospace;font-size:0.54rem;cursor:pointer;transition:all 0.18s;}
-.bk-clear-btn:hover{background:var(--moss);color:#fff;}
-
-/* ── HOST PANEL ──────────────────────────────────────────── */
-.host-panel{display:none;position:fixed;inset:0;background:var(--bg);z-index:3000;overflow-y:auto;flex-direction:column;}
-.host-panel.open{display:flex;}
-.hp-header{background:var(--terr);color:#fff;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;box-shadow:0 2px 12px rgba(0,0,0,0.2);}
-.hp-header h2{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:400;font-style:italic;}
-.hp-header-meta{font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;opacity:0.8;margin-top:2px;}
-.hp-close{background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);color:#fff;padding:6px 14px;border-radius:100px;font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:background 0.2s;}
-.hp-close:hover{background:rgba(255,255,255,0.35);}
-.hp-body{max-width:900px;margin:0 auto;padding:24px 20px 60px;width:100%;}
-.hp-tabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap;}
-.hp-tab{font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.14em;text-transform:uppercase;padding:7px 16px;border-radius:100px;border:1px solid var(--border);background:transparent;color:var(--clay);cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:5px;}
-.hp-tab:hover{border-color:var(--clay);}
-.hp-tab.active{background:var(--terr);color:#fff;border-color:var(--terr);}
-.hp-badge{background:rgba(255,255,255,0.3);color:#fff;font-size:0.5rem;padding:1px 6px;border-radius:100px;font-family:'DM Mono',monospace;}
-.hp-tab:not(.active) .hp-badge{background:var(--terr);color:#fff;}
-.hp-empty{text-align:center;padding:50px 20px;font-family:'DM Mono',monospace;font-size:0.66rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-s);}
-.hp-empty-icon{font-size:2.5rem;margin-bottom:10px;}
-.booking-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;margin-bottom:12px;box-shadow:0 2px 10px var(--shadow);transition:box-shadow 0.2s;}
-.booking-card:hover{box-shadow:0 4px 18px var(--shadow);}
-.bc-top{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px;}
-.bc-ref{font-family:'DM Mono',monospace;font-size:0.68rem;letter-spacing:0.18em;color:var(--terr);font-weight:700;}
-.bc-status{font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.1em;text-transform:uppercase;padding:3px 10px;border-radius:100px;}
-.bc-status.pending{background:#fff3cd;color:#856404;border:1px solid #ffc107;}
-.bc-status.confirmed{background:var(--sage-lt);color:var(--moss);border:1px solid var(--sage);}
-.bc-status.cancelled{background:#fdeaea;color:#c0392b;border:1px solid #e07070;}
-.bc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin-bottom:14px;}
-.bc-field{background:var(--bg);padding:8px 10px;border-radius:5px;}
-.bc-field label{font-family:'DM Mono',monospace;font-size:0.5rem;letter-spacing:0.13em;text-transform:uppercase;color:var(--clay);display:block;margin-bottom:2px;}
-.bc-field span{font-size:0.84rem;color:var(--text);font-weight:500;}
-.bc-field span.amount{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--terr);}
-.bc-actions{display:flex;flex-wrap:wrap;gap:7px;border-top:1px solid var(--border);padding-top:13px;}
-.bc-btn{display:inline-flex;align-items:center;gap:5px;padding:8px 15px;border-radius:6px;font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;border:none;transition:all 0.2s;white-space:nowrap;}
-.bc-btn:hover{opacity:0.85;transform:translateY(-1px);}
-.bc-btn.confirm{background:var(--moss);color:#fff;}
-.bc-btn.wa-owner{background:#25D366;color:#fff;}
-.bc-btn.wa-guest{background:var(--sage);color:#fff;}
-.bc-btn.cancel{background:transparent;color:#c0392b;border:1px solid #e07070;}
-.bc-btn.cancel:hover{background:#fdeaea;}
-.bc-btn:disabled{opacity:0.35;cursor:not-allowed;transform:none;}
-.hp-refresh{display:flex;align-items:center;gap:8px;margin-bottom:16px;}
-.hp-refresh-btn{padding:6px 14px;background:transparent;border:1px solid var(--clay);color:var(--clay);border-radius:6px;font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;}
-.hp-refresh-btn:hover{background:var(--clay);color:#fff;}
-.hp-last-refresh{font-family:'DM Mono',monospace;font-size:0.56rem;color:var(--text-s);letter-spacing:0.08em;}
-.hp-calendar{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:16px;box-shadow:0 2px 10px var(--shadow);}
-.hp-calendar h3{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:400;font-style:italic;margin-bottom:14px;}
-.cal-legend{display:flex;gap:14px;margin-bottom:12px;flex-wrap:wrap;}
-.cal-dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:4px;}
-.cal-dot.attached{background:var(--terr);}
-.cal-dot.common{background:var(--sage);}
-.cal-dot.both{background:var(--gold);}
-.cal-legend span{font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-mid);display:flex;align-items:center;}
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
-.cal-day-header{font-family:'DM Mono',monospace;font-size:0.5rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-s);text-align:center;padding:4px 0;}
-.cal-day{min-height:36px;border-radius:4px;padding:3px 4px;font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--text-mid);position:relative;background:var(--bg);}
-.cal-day.other-month{opacity:0.3;}
-.cal-day.today{border:1.5px solid var(--clay);}
-.cal-day.booked-attached{background:#fde8da;color:var(--terr);}
-.cal-day.booked-common{background:var(--sage-lt);color:var(--moss);}
-.cal-day.booked-both{background:#fef3cd;color:#856404;}
-.cal-day-num{display:block;font-size:0.62rem;}
-.cal-day-tag{font-size:0.42rem;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-
-footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-s);border-top:1px solid var(--border);}
 </style>
 </head>
 <body>
 
 <!-- ADMIN BAR -->
 <div id="admin-bar">
-  <span>🔐 Admin Mode · <span style="font-family:'DM Mono',monospace;font-size:0.58rem;opacity:0.8">HTML v29 · Apps Script v9</span></span>
+  <span>🔐 Admin Mode · <span style="font-family:'DM Mono',monospace;font-size:0.58rem;opacity:0.8">HTML v19 · Apps Script v6</span></span>
   <div style="display:flex;gap:7px">
     <button class="admin-btn" onclick="openHostPanel()">📋 Host Panel</button>
     <button class="admin-btn" onclick="openAdminUpload()">＋ Add Photos / Videos</button>
@@ -863,19 +725,6 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 
 </main>
 
-<!-- GALLERY -->
-<section class="gallery-section" id="gallery-section">
-  <div class="gallery-header">
-    <div><h2><em>Shanthi &amp; Sangha @ Soudhamini</em> — A Glance</h2><p>A glimpse of your home away from home</p></div>
-  </div>
-  <div class="gallery-tabs">
-    <button class="gallery-tab active" onclick="filterGallery('all',this)">All</button>
-    <button class="gallery-tab" onclick="filterGallery('room',this)">Rooms</button>
-    <button class="gallery-tab" onclick="filterGallery('common',this)">Common Areas</button>
-
-  </div>
-  <div class="gallery-grid" id="gallery-grid"></div>
-</section>
 
 <div style="text-align:center;padding:8px;font-family:'DM Mono',monospace;font-size:0.54rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-s)">
   👁 Visitors: <span id="visitor-count">—</span>
@@ -931,9 +780,9 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 
 <script>
 // ── CONFIG ─────────────────────────────────────────────
-const APP_VERSION='v29';
+const APP_VERSION='v19';
 const CFG={
-  APPS_SCRIPT_URL:'https://script.google.com/macros/s/AKfycbwmRyBzULi1g4SW65kwwZQmXptp3dfA9zge_bkQMBhIUey6RnYzo5kN_E2h4iUFBDlgRQ/exec',
+  APPS_SCRIPT_URL:'https://script.google.com/macros/s/AKfycbzrzBGUChJvK88w3iRmMwdRdUdrhF6Ysgnfemxax3V_JPr_bQh4agHfBPpn9S8pVmm3Sw/exec',
   OWNER_WA:'919148212422',
   PROP:'Shanthi & Sangha @ Soudhamini',
   ADMIN_PW:'1213',
@@ -985,15 +834,11 @@ confirmedBookings=loadConfirmed();
 // ── STATE ───────────────────────────────────────────────
 let selRoom=null,nights=0,totalRoomCost=0,advanceAmt=0,grandTotal=0;
 let twoGuests=false,intlGuest=false,teacherDiscount=false,adminMode=false;
+let visitorSession={fingerprint:null,isAdmin:false,isTestBooking:false,geoLogged:false};
 const prices={attached:{short:2000,long:1500},common:{short:1500,long:1000}};
 const DEPOSIT=1000,SECOND_MULT=1.5;
 const pFiles={adm:[]};
 const avatarColors=['#8b4a2a','#4a6741','#7a9e72','#b8962a','#b07c50','#4a6fa5','#7a5c8a'];
-
-// Gallery — real uploaded content
-let galleryData=[
-];
-let curFilter='all',lbItems=[],lbIdx=0;
 
 // Reviews
 
@@ -1249,6 +1094,9 @@ let isSubmitting=false;
 async function submitBooking(){
   if(isSubmitting)return;
   isSubmitting=true;
+  // Flag test booking if submitted in admin mode
+  if(adminMode && visitorSession.fingerprint && visitorSession.geo)
+    logVisitToServer(visitorSession.fingerprint, visitorSession.geo, true, true);
   const btn=document.getElementById('btn-confirm-booking');
   if(btn){
     btn.disabled=true;
@@ -1472,6 +1320,9 @@ function adminLogin(){
   const pw=document.getElementById('admin-pw').value;
   if(pw===CFG.ADMIN_PW){
     adminMode=true;document.getElementById('admin-bar').classList.add('visible');
+    visitorSession.isAdmin=true;
+    if(visitorSession.fingerprint && visitorSession.geo)
+      logVisitToServer(visitorSession.fingerprint, visitorSession.geo, true, false);
     document.body.classList.add('admin-mode');closeModal('admin-login-modal');
     document.getElementById('admin-pw').value='';document.getElementById('admin-err').style.display='none';
     renderGallery();
@@ -1517,238 +1368,7 @@ function doFiles(files,who){
 }
 
 // ── GALLERY ─────────────────────────────────────────────
-function filterGallery(cat,btn){
-  curFilter=cat;
-  document.querySelectorAll('.gallery-tab').forEach(t=>t.classList.remove('active'));
-  btn.classList.add('active');renderGallery();
-}
-function renderGallery(){
-  const filtered=curFilter==='all'?galleryData:galleryData.filter(i=>i.cat===curFilter);
-  lbItems=filtered;
-  const grid=document.getElementById('gallery-grid');grid.innerHTML='';
-  filtered.forEach((item,idx)=>{
-    const div=document.createElement('div');div.className='gallery-item';
-    const isVid=item.type==='video';
-    const isDriveVid=isVid&&item.src&&item.src.includes('drive.google.com');
-    const thumbSrc=isVid?item.thumb:item.src;
-    // Drive videos: show a dark placeholder with play icon (no thumbnail available)
-    const imgHtml=isDriveVid&&!thumbSrc
-      ? '<div style="aspect-ratio:'+item.aspect+';background:linear-gradient(135deg,#2a1f10,#4a3520);display:flex;align-items:center;justify-content:center;border-radius:6px"><span style="font-size:2.5rem;opacity:0.7">▶</span></div>'
-      : '<img src="'+thumbSrc+'" alt="'+item.label+'" loading="lazy" style="aspect-ratio:'+item.aspect+';object-fit:cover">';
-    const gdIdx=galleryData.indexOf(item);
-    const vidBadge=isVid?'<div class="video-badge">▶ '+(item.duration||'video')+'</div><div class="play-icon">▶</div>':'';
-    const delBtn=adminMode?'<button class="admin-delete" onclick="event.stopPropagation();delGallery('+gdIdx+')">✕</button>':'';
-    div.innerHTML=imgHtml+vidBadge+'<div class="item-overlay"><span class="item-label">'+item.label+'</span></div>'+delBtn;
-    div.onclick=()=>openLB(idx);
-    grid.appendChild(div);
-  });
-}
-function delGallery(i){
-  if(i<0||i>=galleryData.length)return;
-  if(!confirm('Remove this item from gallery?'))return;
-  const item=galleryData[i];
-  galleryData.splice(i,1);
-  renderGallery();
-  saveGallery(); // saveGallery pushes updated list to Apps Script Sheet
-  // If Drive file, also tell Apps Script to delete from Drive
-  if(item.fileId&&CFG.APPS_SCRIPT_URL&&CFG.APPS_SCRIPT_URL!=='YOUR_APPS_SCRIPT_WEB_APP_URL_HERE'){
-    fetch(CFG.APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({action:'deleteMedia',fileId:item.fileId})
-    }).catch(()=>{});
-  }
-}
-async function doAdminUpload(){
-  const cap=document.getElementById('adm-caption').value.trim()||'Shanthi & Sangha @ Soudhamini';
-  const cat=document.getElementById('adm-cat').value;
-  const files=[...pFiles.adm];
-  if(files.length===0)return;
-
-  const btn=document.getElementById('btn-adm-upload');
-  if(btn){btn.disabled=true;btn.textContent='⏳ Uploading…';}
-  pFiles.adm=[];
-  document.getElementById('adm-caption').value='';
-
-  const readB64=(file)=>new Promise((res,rej)=>{
-    const fr=new FileReader();
-    fr.onload=e=>res({name:file.name,type:file.type,data:e.target.result.split(',')[1]});
-    fr.onerror=rej;
-    fr.readAsDataURL(file);
-  });
-
-  for(const f of files){
-    const isV=f.type.startsWith('video/');
-    try{
-      const b64=await readB64(f);
-      let src=null;
-
-      // Upload via fetch — no Content-Type = text/plain = no CORS preflight
-      if(CFG.APPS_SCRIPT_URL&&CFG.APPS_SCRIPT_URL!=='YOUR_APPS_SCRIPT_WEB_APP_URL_HERE'){
-        try{
-          const payload=JSON.stringify({action:'uploadMedia',
-            fileName:b64.name,mimeType:b64.type,data:b64.data,caption:cap,category:cat});
-          console.log('[SDM] Uploading',b64.name,'size',Math.round(payload.length/1024)+'KB');
-          const upRes=await fetch(CFG.APPS_SCRIPT_URL,{method:'POST',body:payload});
-          console.log('[SDM] Response status:',upRes.status,'type:',upRes.type);
-          const rawText=await upRes.text();
-          console.log('[SDM] Raw response:',rawText.slice(0,300));
-          let upData;
-          try{upData=JSON.parse(rawText);}catch(je){console.error('[SDM] JSON parse error:',je.message);}
-          if(upData&&upData.url){
-            src=upData.url;
-            // Fix URL format regardless of what Apps Script version returned
-            const idMatch=src.match(/[?&]id=([^&]+)/);
-            if(idMatch){
-              const fid=idMatch[1];
-              src=isV
-                ? 'https://drive.google.com/file/d/'+fid+'/preview'
-                : 'https://drive.google.com/thumbnail?id='+fid+'&sz=w1600';
-            }
-            console.log('[SDM] Final src:',src);
-          }
-          else{console.error('[SDM] No URL in response:',upData);}
-        }catch(e){console.error('[SDM] Upload fetch failed:',e.message);}
-      }
-
-      // Fallback to base64 if Drive upload failed or not configured
-      if(!src) src='data:'+b64.type+';base64,'+b64.data;
-      const isDrive=src.startsWith('http');
-
-      if(isV){
-        let thumb='';
-        try{
-          const blobUrl=URL.createObjectURL(f);
-          thumb=await new Promise(res=>{
-            const vid=document.createElement('video');
-            vid.muted=true;vid.playsInline=true;vid.preload='metadata';
-            vid.style.cssText='position:fixed;opacity:0;pointer-events:none;width:1px;height:1px;';
-            document.body.appendChild(vid);
-            vid.onloadedmetadata=()=>{vid.currentTime=Math.min(1,vid.duration*0.1);};
-            vid.onseeked=()=>{
-              try{const c=document.createElement('canvas');c.width=320;c.height=180;
-                c.getContext('2d').drawImage(vid,0,0,320,180);res(c.toDataURL('image/jpeg',0.7));}
-              catch(e){res('');}
-              document.body.removeChild(vid);URL.revokeObjectURL(blobUrl);
-            };
-            vid.onerror=()=>{try{document.body.removeChild(vid);}catch(e){}URL.revokeObjectURL(blobUrl);res('');};
-            vid.src=blobUrl;vid.load();
-          });
-        }catch(e){thumb='';}
-        galleryData.unshift({type:'video',cat,src,thumb,label:cap,duration:'—',aspect:'16/9',driveUrl:isDrive});
-      } else {
-        galleryData.unshift({type:'image',cat,src,label:cap,aspect:'4/3',driveUrl:isDrive});
-      }
-    }catch(e){console.error('Upload error:',e);}
-  }
-
-  closeModal('admin-upload-modal');
-  document.getElementById('adm-previews').innerHTML='';
-  if(btn){btn.disabled=false;btn.textContent='Upload';}
-  renderGallery();
-  saveGallery();
-}
-
-function formatDur(s){
-  const m=Math.floor(s/60),sec=Math.round(s%60);
-  return m+':'+String(sec).padStart(2,'0');
-}
-
-function saveGallery(){
-  // Save locally first (instant)
-  try{
-    const saveable=galleryData.filter(i=>i.src&&(i.src.startsWith('data:')||i.src.startsWith('http')));
-    localStorage.setItem('sdm_gallery',JSON.stringify(saveable));
-  }catch(e){console.warn('Gallery local save failed',e);}
-  // Also push to Apps Script for global persistence across all devices
-  if(CFG.APPS_SCRIPT_URL&&CFG.APPS_SCRIPT_URL!=='YOUR_APPS_SCRIPT_WEB_APP_URL_HERE'){
-    try{
-      const saveable=galleryData.filter(i=>i.src&&(i.src.startsWith('data:')||i.src.startsWith('http')));
-      // no-cors fire-and-forget — keeps gallery in sync across devices
-      fetch(CFG.APPS_SCRIPT_URL,{
-        method:'POST',
-        mode:'no-cors',
-        body:JSON.stringify({action:'saveGallery',gallery:JSON.stringify(saveable)})
-      }).catch(()=>{});
-    }catch(e){console.warn('Gallery global save failed',e);}
-  }
-}
-function loadSavedGallery(){
-  // Load from localStorage (fast, works offline)
-  try{
-    const saved=JSON.parse(localStorage.getItem('sdm_gallery')||'null');
-    if(saved&&Array.isArray(saved)&&saved.length){
-      const existSrcs=new Set(galleryData.map(i=>i.src));
-      saved.forEach(i=>{if(!existSrcs.has(i.src))galleryData.push(i);});
-    }
-  }catch(e){}
-}
-async function loadGlobalGallery(){
-  // Pull gallery from Apps Script — this is the source of truth for ALL visitors
-  if(!CFG.APPS_SCRIPT_URL||CFG.APPS_SCRIPT_URL==='YOUR_APPS_SCRIPT_WEB_APP_URL_HERE')return;
-  try{
-    const res=await fetch(CFG.APPS_SCRIPT_URL+'?action=getGallery');
-    const data=await res.json();
-    if(data&&data.gallery){
-      const remote=JSON.parse(data.gallery);
-      if(Array.isArray(remote)&&remote.length){
-        // Fix any old uc?export=view URLs — normalise all Drive URLs on load
-        remote.forEach(item=>{
-          const idM=item.src&&item.src.match(/[?&]id=([^&]+)/);
-          const fid=idM?idM[1]:null;
-          if(fid&&item.src.includes('uc?export=view')){
-            item.src=item.type==='video'
-              ? 'https://drive.google.com/file/d/'+fid+'/preview'
-              : 'https://drive.google.com/thumbnail?id='+fid+'&sz=w1600';
-          }
-          // Also fix driveUrl items with no src set
-          if(!item.src&&item.driveUrl){
-            const idM2=item.driveUrl.match(/[?&]id=([^&]+)/);
-            if(idM2) item.src=item.type==='video'
-              ? 'https://drive.google.com/file/d/'+idM2[1]+'/preview'
-              : 'https://drive.google.com/thumbnail?id='+idM2[1]+'&sz=w1600';
-          }
-        });
-        // Server is authoritative — replace local gallery entries with server ones
-        // Keep only hardcoded items (no driveUrl), add all server items
-        const hardcoded=galleryData.filter(i=>!i.driveUrl&&!i.src.startsWith('data:'));
-        galleryData.length=0;
-        hardcoded.forEach(i=>galleryData.push(i));
-        remote.forEach(i=>galleryData.push(i));
-        localStorage.setItem('sdm_gallery',data.gallery);
-        renderGallery();
-      }
-    }
-  }catch(e){/* silently fallback to local */}
-}
-
 // ── LIGHTBOX ────────────────────────────────────────────
-function openLB(i){lbIdx=i;showLB();document.getElementById('lightbox').classList.add('open');document.body.style.overflow='hidden';}
-function closeLB(){document.getElementById('lightbox').classList.remove('open');document.body.style.overflow='';document.getElementById('lb-content').innerHTML='';}
-function lbNav(d){lbIdx=(lbIdx+d+lbItems.length)%lbItems.length;showLB();}
-function showLB(){
-  const it=lbItems[lbIdx];
-  if(it.type==='video'&&it.src){
-    const isDrive=it.src.includes('drive.google.com');
-    if(isDrive){
-      // Drive videos need iframe embed
-      document.getElementById('lb-content').innerHTML=
-        `<iframe src="${it.src}" style="width:min(640px,92vw);aspect-ratio:16/9;border:none;border-radius:6px;display:block;margin:0 auto" allowfullscreen></iframe>`;
-    } else {
-      document.getElementById('lb-content').innerHTML=
-        `<video controls autoplay style="max-width:100%;max-height:78vh;border-radius:6px;display:block;margin:0 auto"><source src="${it.src}" type="video/mp4"></video>`;
-    }
-  } else if(it.type==='video'&&!it.src){
-    document.getElementById('lb-content').innerHTML=`<div style="width:min(560px,90vw);aspect-ratio:16/9;background:#111;display:flex;align-items:center;justify-content:center;border-radius:6px;flex-direction:column;gap:9px"><div style="font-size:2rem">🎬</div><p style="font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.4)">${it.label}</p></div>`;
-  } else {
-    document.getElementById('lb-content').innerHTML=`<img src="${it.src||it.thumb}" alt="${it.label}" style="max-width:100%;max-height:78vh;border-radius:6px;object-fit:contain;display:block;margin:0 auto">`;
-  }
-  document.getElementById('lb-caption').textContent=it.label;
-  document.getElementById('lb-counter').textContent=`${lbIdx+1} / ${lbItems.length}`;
-}
-document.addEventListener('keydown',e=>{if(!document.getElementById('lightbox').classList.contains('open'))return;if(e.key==='ArrowLeft')lbNav(-1);if(e.key==='ArrowRight')lbNav(1);if(e.key==='Escape')closeLB();});
-
-
-
 // ── HOST PANEL ───────────────────────────────────────────
 let hpCurrentTab='pending';
 let hpAdminMode=false;
@@ -1947,87 +1567,104 @@ function renderHP(){
 
 
 // ── HOST PANEL: VISITOR GEOGRAPHY ───────────────────────────────────
-function renderHPVisitors(){
-  const body=document.getElementById("hp-list");
-  if(!body)return;
-  let log=[];
-  try{log=JSON.parse(localStorage.getItem("sdm_visit_log")||"[]");}catch(e){}
+async function renderHPVisitors(){
+  const body = document.getElementById('hp-list');
+  if(!body) return;
+  body.innerHTML = "<div style='text-align:center;padding:30px;color:var(--text-s)'>⏳ Loading visitor data…</div>";
 
-  if(!log.length){
-    body.innerHTML="<div style='text-align:center;padding:40px 20px;color:var(--text-s);font-size:0.8rem;line-height:2'><div style='font-size:2rem'>🌍</div>No visitor data yet.<br><small>Data collected as guests browse — host panel only</small></div>";
+  if(!CFG.APPS_SCRIPT_URL || CFG.APPS_SCRIPT_URL.includes('YOUR_APPS')){
+    body.innerHTML = "<div style='text-align:center;padding:30px;color:var(--text-s)'>Apps Script URL not configured</div>";
     return;
   }
 
-  const byCountry={},byState={},byCity={};
-  log.forEach(function(v){
-    var c=v.country||"Unknown";
-    var s=(v.state||c);
-    var ci=(v.city||s);
-    byCountry[c]=(byCountry[c]||0)+1;
-    var sk=s+(s!==c?" · "+c:"");
-    byState[sk]=(byState[sk]||0)+1;
-    var ck=ci+(ci!==s?" · "+s:"");
-    byCity[ck]=(byCity[ck]||0)+1;
-  });
-
-  function mkTable(obj,col,limit){
-    limit=limit||20;
-    var rows=Object.entries(obj).sort(function(a,b){return b[1]-a[1];}).slice(0,limit);
-    if(!rows.length)return "<div style='color:#999;font-size:0.75rem'>—</div>";
-    return rows.map(function(r){
-      return "<div style='display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:0.78rem'><span>"+r[0]+"</span><strong style='color:"+col+"'>"+r[1]+"</strong></div>";
-    }).join("");
+  let stats;
+  try{
+    const res  = await fetch(CFG.APPS_SCRIPT_URL + '?action=getVisitorStats');
+    stats = await res.json();
+  }catch(e){
+    body.innerHTML = "<div style='text-align:center;padding:30px;color:var(--text-s)'>Failed to load: " + e.message + "</div>";
+    return;
   }
 
-  var totalIndia=log.filter(function(v){return v.countryCode==="IN"||v.country==="India";}).length;
-  var totalIntl=log.length-totalIndia;
+  const mono = "font-family:'DM Mono',monospace;";
+  const u = stats.unique     || 0;
+  const r = stats.repeat     || 0;
+  const a = stats.admin      || 0;
+  const t = stats.testBook   || 0;
+  const uniqueList   = stats.uniqueList   || [];
+  const repeatList   = stats.repeatList   || [];
+  const byCountry    = stats.byCountry    || {};
+  const byState      = stats.byState      || {};
+  const byCity       = stats.byCity       || {};
 
-  var recentRows=log.slice(0,30).map(function(v){
-    var cc=(v.countryCode||"").toUpperCase();
-    var flag="🌐";
-    try{if(cc.length===2)flag=String.fromCodePoint(127397+cc.charCodeAt(0),127397+cc.charCodeAt(1));}catch(e){}
-    var loc=[v.city,v.state,v.country].filter(Boolean).join(", ")||"Unknown";
-    var t=v.time?new Date(v.time).toLocaleString("en-IN",{timeZone:"Asia/Kolkata",day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"}):"";
-    return "<div style='padding:8px 0;border-bottom:1px solid var(--border)'>"+
-      "<div style='font-size:0.82rem;font-weight:500'>"+flag+" "+loc+"</div>"+
-      "<div style='font-size:0.54rem;color:var(--text-s);margin-top:2px'>"+t+(v.ip?" · IP: "+v.ip:"")+(v.timezone?" · "+v.timezone:"")+"</div>"+
-      "</div>";
-  }).join("");
+  function mkStat(val, label, color){
+    return "<div style='background:var(--warm);border-radius:var(--r);padding:12px;text-align:center'>" +
+      "<div style='" + mono + "font-size:1.6rem;font-weight:700;color:" + color + "'>" + val + "</div>" +
+      "<div style='" + mono + "font-size:0.5rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-s)'>" + label + "</div></div>";
+  }
 
-  var mono="font-family:'DM Mono',monospace;";
+  function mkTable(obj, color){
+    const rows = Object.entries(obj).sort((a,b)=>b[1]-a[1]).slice(0,15);
+    if(!rows.length) return "<div style='color:#999;font-size:0.75rem'>—</div>";
+    return rows.map(r =>
+      "<div style='display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:0.78rem'>" +
+      "<span>" + r[0] + "</span><strong style='color:" + color + "'>" + r[1] + "</strong></div>"
+    ).join('');
+  }
 
-  body.innerHTML=
-    "<div style='display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px'>"+
-      "<div style='background:var(--warm);border-radius:var(--r);padding:12px;text-align:center'>"+
-        "<div style='"+mono+"font-size:1.6rem;font-weight:700;color:var(--clay)'>"+log.length+"</div>"+
-        "<div style='"+mono+"font-size:0.5rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-s)'>Total Visits</div></div>"+
-      "<div style='background:var(--warm);border-radius:var(--r);padding:12px;text-align:center'>"+
-        "<div style='"+mono+"font-size:1.6rem;font-weight:700;color:var(--moss)'>"+totalIndia+"</div>"+
-        "<div style='"+mono+"font-size:0.5rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-s)'>🇮🇳 India</div></div>"+
-      "<div style='background:var(--warm);border-radius:var(--r);padding:12px;text-align:center'>"+
-        "<div style='"+mono+"font-size:1.6rem;font-weight:700;color:var(--terr)'>"+totalIntl+"</div>"+
-        "<div style='"+mono+"font-size:0.5rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-s)'>International</div></div>"+
-    "</div>"+
-    "<div style='display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:16px'>"+
-      "<div><div style='"+mono+"font-size:0.54rem;text-transform:uppercase;letter-spacing:0.14em;color:var(--clay);margin-bottom:8px;padding-bottom:4px;border-bottom:2px solid var(--clay)'>Country</div>"+mkTable(byCountry,"var(--clay)")+"</div>"+
-      "<div><div style='"+mono+"font-size:0.54rem;text-transform:uppercase;letter-spacing:0.14em;color:var(--moss);margin-bottom:8px;padding-bottom:4px;border-bottom:2px solid var(--moss)'>State</div>"+mkTable(byState,"var(--moss)")+"</div>"+
-      "<div><div style='"+mono+"font-size:0.54rem;text-transform:uppercase;letter-spacing:0.14em;color:var(--terr);margin-bottom:8px;padding-bottom:4px;border-bottom:2px solid var(--terr)'>City / District</div>"+mkTable(byCity,"var(--terr)")+"</div>"+
-    "</div>"+
-    "<div style='"+mono+"font-size:0.54rem;text-transform:uppercase;letter-spacing:0.14em;color:var(--text-mid);margin-bottom:8px'>Recent 30 Visits</div>"+
-    recentRows+
-    "<div style='margin-top:14px;display:flex;gap:10px;align-items:center'>"+
-      "<button onclick='clearVisitorLog()' "+
-      "style='background:none;border:1px solid var(--border);padding:6px 14px;border-radius:100px;"+mono+"font-size:0.56rem;cursor:pointer;color:var(--text-s)'>🗑 Clear Log</button>"+
-      "<span style='"+mono+"font-size:0.5rem;color:var(--text-s)'>Stored on this device · Max 200 entries</span></div>";
+  function mkVisitorRow(v){
+    const cc  = (v.countryCode||'').toUpperCase();
+    let flag  = '🌐';
+    try{ if(cc.length===2) flag=String.fromCodePoint(127397+cc.charCodeAt(0),127397+cc.charCodeAt(1)); }catch(e){}
+    const loc = [v.city,v.state,v.country].filter(Boolean).join(', ') || 'Unknown';
+    const t   = v.lastSeen ? new Date(v.lastSeen).toLocaleString('en-IN',{timeZone:'Asia/Kolkata',
+                  day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : '';
+    const visits = v.visitCount > 1 ? " · " + v.visitCount + " visits" : '';
+    return "<div style='padding:8px 0;border-bottom:1px solid var(--border)'>" +
+      "<div style='font-size:0.82rem;font-weight:500'>" + flag + ' ' + loc + visits + "</div>" +
+      "<div style='font-size:0.65rem;color:var(--text-s);margin-top:2px'>" + t + (v.timezone?' · '+v.timezone:'') + "</div></div>";
+  }
+
+  const india  = uniqueList.filter(v=>v.countryCode==='IN').length;
+  const intl   = uniqueList.filter(v=>v.countryCode&&v.countryCode!=='IN').length;
+
+  body.innerHTML =
+    // ── Summary stats ──
+    "<div style='display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px'>" +
+      mkStat(u, 'Unique Visitors', 'var(--clay)') +
+      mkStat(r, 'Repeat Visitors', 'var(--moss)') +
+      mkStat(a, 'Admin Sessions',  'var(--terr)') +
+      mkStat(t, 'Test Bookings',   '#888') +
+    "</div>" +
+
+    // ── India / Intl split ──
+    "<div style='display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px'>" +
+      mkStat(india, '🇮🇳 India Visitors', 'var(--moss)') +
+      mkStat(intl,  '✈️ International',   'var(--clay)') +
+    "</div>" +
+
+    // ── Geo breakdown ──
+    "<div style='display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:20px'>" +
+      "<div><div style='" + mono + "font-size:0.54rem;text-transform:uppercase;letter-spacing:0.14em;color:var(--clay);margin-bottom:8px;border-bottom:2px solid var(--clay);padding-bottom:4px'>Country</div>" + mkTable(byCountry,'var(--clay)') + "</div>" +
+      "<div><div style='" + mono + "font-size:0.54rem;text-transform:uppercase;letter-spacing:0.14em;color:var(--moss);margin-bottom:8px;border-bottom:2px solid var(--moss);padding-bottom:4px'>State</div>" + mkTable(byState,'var(--moss)') + "</div>" +
+      "<div><div style='" + mono + "font-size:0.54rem;text-transform:uppercase;letter-spacing:0.14em;color:var(--terr);margin-bottom:8px;border-bottom:2px solid var(--terr);padding-bottom:4px'>City</div>" + mkTable(byCity,'var(--terr)') + "</div>" +
+    "</div>" +
+
+    // ── Unique visitors list ──
+    (uniqueList.length ? "<div style='" + mono + "font-size:0.54rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-mid);margin-bottom:8px'>Unique Visitors (" + uniqueList.length + ")</div>" +
+      uniqueList.slice(0,30).map(mkVisitorRow).join('') : '') +
+
+    // ── Repeat visitors ──
+    (repeatList.length ? "<div style='" + mono + "font-size:0.54rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-mid);margin-top:20px;margin-bottom:8px'>Repeat Visitors (" + repeatList.length + ")</div>" +
+      repeatList.map(mkVisitorRow).join('') : '') +
+
+    // ── Refresh button ──
+    "<div style='margin-top:16px'>" +
+      "<button onclick='renderHPVisitors()' style='background:none;border:1px solid var(--border);padding:6px 16px;border-radius:100px;" + mono + "font-size:0.56rem;cursor:pointer;color:var(--text-s)'>↻ Refresh</button>" +
+      "<span style='" + mono + "font-size:0.5rem;color:var(--text-s);margin-left:10px'>Last 30 days · Excludes admin & test bookings</span></div>";
 }
 
 
-function clearVisitorLog(){
-  if(confirm("Clear all visitor data?")){
-    localStorage.removeItem("sdm_visit_log");
-    renderHPVisitors();
-  }
-}
 
 function renderHPCalendar(container, confirmed){
   const today=new Date();
@@ -2279,67 +1916,49 @@ async function loadVisitorCount(){
 // ── VISITOR GEO — silent, for host panel only ────────────────
 let visitorGeo=null;
 async function loadVisitorGeo(){
+  // Generate persistent fingerprint ID
+  let fid = localStorage.getItem('sdm_vid');
+  if(!fid){ fid='v'+Date.now().toString(36)+Math.random().toString(36).slice(2,7); localStorage.setItem('sdm_vid',fid); }
+  visitorSession.fingerprint = fid;
+
+  // Get geo from ipinfo.io (CORS-friendly)
+  let geo = {};
   try{
-    // ipinfo.io — allows CORS from any origin, free up to 50k/month
-    const res=await fetch('https://ipinfo.io/json');
-    const d=await res.json();
-    if(d&&d.country){
-      const [lat,lon]=(d.loc||',').split(',');
-      visitorGeo={
-        ip:          d.ip||'',
-        city:        d.city||'',
-        district:    d.city||'',
-        state:       d.region||'',
-        country:     d.country||'',
-        countryCode: d.country||'',
-        timezone:    d.timezone||'',
-        lat:         lat||'',
-        lon:         lon||''
-      };
-      const el=document.getElementById('visitor-geo');
-      if(el)el.textContent=JSON.stringify(visitorGeo);
-      try{
-        const log=JSON.parse(localStorage.getItem('sdm_visit_log')||'[]');
-        log.unshift({...visitorGeo, time:new Date().toISOString()});
-        if(log.length>200)log.length=200;
-        localStorage.setItem('sdm_visit_log',JSON.stringify(log));
-      }catch(e){}
+    const r = await fetch('https://ipinfo.io/json');
+    const d = await r.json();
+    if(d && d.ip){
+      const [lat,lon] = (d.loc||',').split(',');
+      geo = {ip:d.ip, city:d.city||'', state:d.region||'', country:d.country||'',
+             countryCode:d.country||'', timezone:d.timezone||'', lat, lon};
     }
-  }catch(e){
-    // Fallback: cloudflare trace (always works, no CORS issues)
-    try{
-      const r2=await fetch('https://cloudflare.com/cdn-cgi/trace');
-      const d2=await r2.json();
-      if(d2&&d2.country_name){
-        visitorGeo={
-          ip:d2.ip||'', city:d2.city||'', district:d2.city||'',
-          state:d2.region||'', country:d2.country_name||'',
-          countryCode:d2.country_code||'', timezone:d2.timezone||'',
-          lat:d2.latitude||'', lon:d2.longitude||'', org:d2.org||''
-        };
-        const el=document.getElementById('visitor-geo');
-        if(el)el.textContent=JSON.stringify(visitorGeo);
-        try{
-          const log=JSON.parse(localStorage.getItem('sdm_visit_log')||'[]');
-          log.unshift({...visitorGeo, time:new Date().toISOString()});
-          if(log.length>200)log.length=200;
-          localStorage.setItem('sdm_visit_log',JSON.stringify(log));
-        }catch(e2){}
-      }
-    }catch(e3){}
-  }
+  }catch(e){ console.warn('[SDM] Geo fetch failed:', e.message); }
+
+  // Store geo on session for admin panel use
+  visitorSession.geo = geo;
+  const el = document.getElementById('visitor-geo');
+  if(el) el.textContent = JSON.stringify(geo);
+
+  // Send logVisit to Apps Script
+  logVisitToServer(fid, geo, false, false);
 }
 
-loadVisitorCount();
-loadVisitorGeo();
+function logVisitToServer(fingerprint, geo, isAdmin, isTestBooking){
+  if(!CFG.APPS_SCRIPT_URL || CFG.APPS_SCRIPT_URL.includes('YOUR_APPS')) return;
+  const payload = JSON.stringify({
+    action: 'logVisit',
+    fingerprint, isAdmin, isTestBooking,
+    ip:          geo.ip          || '',
+    city:        geo.city        || '',
+    state:       geo.state       || '',
+    country:     geo.country     || '',
+    countryCode: geo.countryCode || '',
+    timezone:    geo.timezone    || '',
+    time:        new Date().toISOString()
+  });
+  fetch(CFG.APPS_SCRIPT_URL, {method:'POST', body:payload}).catch(()=>{});
+}
 
 
-// ── INIT ────────────────────────────────────────────
-loadSavedGallery();
-renderGallery();
-renderCal();
-goTo(1);
-loadGlobalGallery();
 </script>
 <!-- HOST PANEL -->
 <div class="host-panel" id="host-panel">
