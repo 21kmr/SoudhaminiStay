@@ -440,7 +440,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 
 <!-- ADMIN BAR -->
 <div id="admin-bar">
-  <span>🔐 Admin Mode · <span style="font-family:'DM Mono',monospace;font-size:0.58rem;opacity:0.8">HTML v24 · Apps Script v7</span></span>
+  <span>🔐 Admin Mode · <span style="font-family:'DM Mono',monospace;font-size:0.58rem;opacity:0.8">HTML v25 · Apps Script v8</span></span>
   <div style="display:flex;gap:7px">
     <button class="admin-btn" onclick="openHostPanel()">📋 Host Panel</button>
     <button class="admin-btn" onclick="openAdminUpload()">＋ Add Photos / Videos</button>
@@ -931,9 +931,9 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 
 <script>
 // ── CONFIG ─────────────────────────────────────────────
-const APP_VERSION='v24';
+const APP_VERSION='v25';
 const CFG={
-  APPS_SCRIPT_URL:'https://script.google.com/macros/s/AKfycbxpaRbu0TY_P8d_8yMKECPfs652DlhfAQjMjtTGJKyx8ZNjb28DX4BvsnCoLG7pdDcWkg/exec',
+  APPS_SCRIPT_URL:'https://script.google.com/macros/s/AKfycbyBl2fbhImF4ZdqJ98lQMkO0IRRy8iErH8M-akVHGYqMw76yDxYU5FQ3U1zaknS6jlgEg/exec',
   OWNER_WA:'919148212422',
   PROP:'Shanthi & Sangha @ Soudhamini',
   ADMIN_PW:'ss1213',
@@ -1687,6 +1687,17 @@ async function loadGlobalGallery(){
     if(data&&data.gallery){
       const remote=JSON.parse(data.gallery);
       if(Array.isArray(remote)&&remote.length){
+        // Fix old video URLs: uc?export=view → /file/d/ID/preview
+        remote.forEach(item=>{
+          if(item.type==='video'&&item.src&&item.src.includes('uc?export=view')){
+            const m=item.src.match(/[?&]id=([^&]+)/);
+            if(m) item.src='https://drive.google.com/file/d/'+m[1]+'/preview';
+          }
+          if(item.type==='video'&&item.driveUrl&&item.driveUrl.includes('uc?export=view')){
+            const m=item.driveUrl.match(/[?&]id=([^&]+)/);
+            if(m) item.src='https://drive.google.com/file/d/'+m[1]+'/preview';
+          }
+        });
         // Server is authoritative — replace local gallery entries with server ones
         // Keep only hardcoded items (no driveUrl), add all server items
         const hardcoded=galleryData.filter(i=>!i.driveUrl&&!i.src.startsWith('data:'));
