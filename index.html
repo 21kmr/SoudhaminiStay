@@ -440,7 +440,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 
 <!-- ADMIN BAR -->
 <div id="admin-bar">
-  <span>🔐 Admin Mode · <span style="font-family:'DM Mono',monospace;font-size:0.58rem;opacity:0.8">HTML v15 · Apps Script v5</span></span>
+  <span>🔐 Admin Mode · <span style="font-family:'DM Mono',monospace;font-size:0.58rem;opacity:0.8">HTML v16 · Apps Script v5</span></span>
   <div style="display:flex;gap:7px">
     <button class="admin-btn" onclick="openHostPanel()">📋 Host Panel</button>
     <button class="admin-btn" onclick="openAdminUpload()">＋ Add Photos / Videos</button>
@@ -858,7 +858,6 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
     ✦ ₹1,000 deposit refunded at checkout minus any deductions<br>
     ✦ Balance room charges payable at checkout
   </div>
-  <div id="wa-panel-success" class="wa-panel" style="text-align:left;margin-top:13px"></div>
   <button class="btn-secondary" style="margin-top:11px" onclick="resetBooking()">Make Another Booking</button>
 </div>
 
@@ -932,7 +931,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 
 <script>
 // ── CONFIG ─────────────────────────────────────────────
-const APP_VERSION='v15.2';
+const APP_VERSION='v16';
 const CFG={
   APPS_SCRIPT_URL:'https://script.google.com/macros/s/AKfycbxoft8wzD9_AIfjewr-bo8ZV9QT38RTyi8nV375JYFLMaap3XLVnBVa62hehdm8DDseKw/exec',
   OWNER_WA:'919148212422',
@@ -1249,32 +1248,6 @@ function fmtDate(d){
   return new Date(d+'T00:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
 }
 
-// ── REMINDER BUTTON BUILDER ─────────────────────────────────────────
-function mkReminderRow(phone,name,reminderMsg,checkoutMsg){
-  if(!phone||phone.replace(/\D/g,'').length<10)return '';
-  const ph=phone.replace(/\D/g,'');
-  const phClean=ph.replace(/^0+/,'');
-  const tgUrl='https://t.me/+91'+phClean.replace(/^91/,'');
-  const waUrl='https://wa.me/91'+phClean.replace(/^91/,'');
-  return '<div class="reminder-guest-block">'+
-    '<div class="reminder-guest-name">👤 '+name+'</div>'+
-    '<div class="reminder-row-label">🌅 Day before check-in</div>'+
-    '<div class="reminder-btn-row">'+
-      '<a href="'+tgUrl+'" target="_blank" rel="noopener" class="reminder-btn tg-btn">'+
-        '<span class="rbtn-icon">✈️</span><span class="rbtn-text"><strong>Telegram</strong><br>Check-in Reminder</span></a>'+
-      '<a href="'+waUrl+'?text='+encodeURIComponent(reminderMsg)+'" target="_blank" rel="noopener" class="reminder-btn wa-btn2">'+
-        '<span class="rbtn-icon">💬</span><span class="rbtn-text"><strong>WhatsApp</strong><br>Check-in Reminder</span></a>'+
-    '</div>'+
-    '<div class="reminder-row-label" style="margin-top:8px">🌄 On checkout day</div>'+
-    '<div class="reminder-btn-row">'+
-      '<a href="'+tgUrl+'" target="_blank" rel="noopener" class="reminder-btn tg-btn">'+
-        '<span class="rbtn-icon">✈️</span><span class="rbtn-text"><strong>Telegram</strong><br>Checkout Reminder</span></a>'+
-      '<a href="'+waUrl+'?text='+encodeURIComponent(checkoutMsg)+'" target="_blank" rel="noopener" class="reminder-btn wa-btn2">'+
-        '<span class="rbtn-icon">💬</span><span class="rbtn-text"><strong>WhatsApp</strong><br>Checkout Reminder</span></a>'+
-    '</div>'+
-  '</div>';
-}
-
 let isSubmitting=false;
 async function submitBooking(){
   if(isSubmitting)return;
@@ -1459,13 +1432,6 @@ Thank you for your stay! Please do leave us a review 🌿
   const waMk2=(phone,msg,emoji,label)=>{
     return `<a href="https://wa.me/${phone}?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener" class="wa-btn wa-terr" title="Send via WhatsApp" style="font-size:0.54rem;padding:6px 11px">${emoji} WhatsApp</a>`;
   };
-  document.getElementById('wa-panel-success').innerHTML=`
-    <div class="reminder-section-title">📲 Send Reminders to Guest</div>
-    <div class="reminder-note">Tap Telegram or WhatsApp to open a pre-filled message. Send on the right day.</div>
-    ${h1?mkReminderRow(g1Phone,g1n,g1Reminder,g1Checkout):''}
-    ${h2?mkReminderRow(g2Phone,g2n,g1Reminder.replace(g1n,g2n),g1Checkout.replace(g1n,g2n)):''}
-  `;
-
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('success-card').classList.add('visible');
   document.getElementById('stepper').style.display='none';
