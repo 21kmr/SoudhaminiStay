@@ -440,7 +440,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 
 <!-- ADMIN BAR -->
 <div id="admin-bar">
-  <span>🔐 Admin Mode · <span style="font-family:'DM Mono',monospace;font-size:0.58rem;opacity:0.8">HTML v25 · Apps Script v8</span></span>
+  <span>🔐 Admin Mode · <span style="font-family:'DM Mono',monospace;font-size:0.58rem;opacity:0.8">HTML v26 · Apps Script v9</span></span>
   <div style="display:flex;gap:7px">
     <button class="admin-btn" onclick="openHostPanel()">📋 Host Panel</button>
     <button class="admin-btn" onclick="openAdminUpload()">＋ Add Photos / Videos</button>
@@ -931,13 +931,13 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 
 <script>
 // ── CONFIG ─────────────────────────────────────────────
-const APP_VERSION='v25';
+const APP_VERSION='v26';
 const CFG={
-  APPS_SCRIPT_URL:'https://script.google.com/macros/s/AKfycbyBl2fbhImF4ZdqJ98lQMkO0IRRy8iErH8M-akVHGYqMw76yDxYU5FQ3U1zaknS6jlgEg/exec',
+  APPS_SCRIPT_URL:'https://script.google.com/macros/s/AKfycbyCW6Kg_1qzGa17Za7HXRayyJK_4zFhAYy5gn1ZuV1OVbcaXXXvIMwUJvj2k-IAYacxJA/exec',
   OWNER_WA:'919148212422',
   PROP:'Shanthi & Sangha @ Soudhamini',
-  ADMIN_PW:'ss1213',
-  HOST_PW:'ss1213',  // Change this! Password for host panel
+  ADMIN_PW:'1213',
+  HOST_PW:'1213',  // Change this! Password for host panel
   UPI_ID:'shruthips@sbi',
   REVIEW_URL:window.location.href.split('?')[0]+'?reviews=1',
   INTL_SURCHARGE:500,
@@ -1582,27 +1582,17 @@ async function doAdminUpload(){
       const b64=await readB64(f);
       let src=null;
 
-      // Upload to Apps Script via no-cors (fire and forget — CORS blocks response reading)
-      // Apps Script saves to Drive + updates Gallery sheet server-side
+      // Upload via fetch without Content-Type header
+      // text/plain (default) does NOT trigger CORS preflight — Apps Script receives the body
       if(CFG.APPS_SCRIPT_URL&&CFG.APPS_SCRIPT_URL!=='YOUR_APPS_SCRIPT_WEB_APP_URL_HERE'){
         try{
-          await fetch(CFG.APPS_SCRIPT_URL,{
-            method:'POST',
-            mode:'no-cors',  // required — Apps Script cannot send CORS headers
-            body:JSON.stringify({action:'uploadMedia',
-              fileName:b64.name,mimeType:b64.type,data:b64.data,caption:cap,category:cat})
-          });
-          // no-cors means we can't read the response — wait then GET gallery
-          // GET requests don't trigger CORS preflight so we CAN read the response
-          await new Promise(r=>setTimeout(r,4000));
-          const gr=await fetch(CFG.APPS_SCRIPT_URL+'?action=getGallery');
-          const gd=await gr.json();
-          if(gd&&gd.gallery){
-            const items=JSON.parse(gd.gallery);
-            // newest item is first — use its src
-            if(items&&items.length&&items[0].src) src=items[0].src;
-          }
-          console.log('Upload complete, Drive src:', src);
+          const payload=JSON.stringify({action:'uploadMedia',
+            fileName:b64.name,mimeType:b64.type,data:b64.data,caption:cap,category:cat});
+          // No Content-Type = browser sends as text/plain = no preflight = Apps Script gets body
+          const upRes=await fetch(CFG.APPS_SCRIPT_URL,{method:'POST',body:payload});
+          const upData=await upRes.json();
+          if(upData&&upData.url) src=upData.url;
+          console.log('Upload result:',upData);
         }catch(e){console.warn('Drive upload error:',e.message);}
       }
 
