@@ -424,14 +424,15 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
   <span>🔐 Admin Mode · <span style="font-family:'DM Mono',monospace;font-size:0.58rem;opacity:0.8">HTML v20 · Apps Script v7</span></span>
   <div style="display:flex;gap:7px">
     <button class="admin-btn" onclick="openHostPanel()">📋 Host Panel</button>
+    <button class="admin-btn" onclick="openAdminUpload()">＋ Upload Media</button>
     <button class="admin-btn" onclick="adminLogout()">Logout</button>
   </div>
 </div>
 
 <header style="position:relative">
-  <div style="position:absolute;top:10px;right:12px;display:flex;flex-direction:column;gap:6px;align-items:flex-end">
-    <button class="home-btn" onclick="goHome()" title="Start over / go to home" style="font-size:1.5rem;padding:8px 14px;line-height:1">🏠</button>
-    <button class="home-btn" onclick="openRoomsModal()" title="View room photos & videos" style="font-size:0.65rem;padding:6px 12px;letter-spacing:0.05em">📷 View Rooms</button>
+  <div style="position:absolute;top:10px;right:12px;display:flex;flex-direction:column;gap:6px;align-items:flex-end;z-index:10">
+    <button onclick="goHome()" title="Start over" style="background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.35);border-radius:50%;width:44px;height:44px;font-size:1.4rem;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1">🏠</button>
+    <button onclick="openRoomsModal()" title="View room photos &amp; videos" style="background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.35);border-radius:100px;padding:5px 11px;font-family:'DM Mono',monospace;font-size:0.6rem;cursor:pointer;letter-spacing:0.05em;color:var(--text)">📷 View Rooms</button>
   </div>
   <span class="leaf-div">❧ ❧ ❧</span>
   <h1 onclick="goHome()" style="cursor:pointer;user-select:none"><em>Shanthi &amp; Sangha</em> @ Soudhamini</h1>
@@ -851,7 +852,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
   👁 Visitors: <span id="visitor-count">—</span>
 </div>
 <span id="visitor-geo" style="display:none"></span>
-<footer id="site-footer">Shanthi &amp; Sangha @ Soudhamini · Peaceful Simple Living · Waste Segregated with Ashram Care<span style="font-family:'DM Mono',monospace;font-size:0.45rem;opacity:0.45;margin-left:12px;letter-spacing:0.08em">v22</span></footer>
+<footer id="site-footer">Shanthi &amp; Sangha @ Soudhamini · Peaceful Simple Living · Waste Segregated with Ashram Care<span style="font-family:'DM Mono',monospace;font-size:0.55rem;opacity:0.55;margin-left:14px;letter-spacing:0.06em">HTML v23 · AS v7</span></footer>
 
 <!-- MODALS -->
 <!-- Admin Login -->
@@ -875,17 +876,23 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 <div class="modal-overlay" id="admin-upload-modal">
   <div class="modal" onclick="event.stopPropagation()">
     <button class="modal-close" onclick="closeModal('admin-upload-modal')">✕</button>
-    <h3>Add Photos / Videos</h3>
+    <h3>Upload to Room</h3>
+    <p style="font-size:0.78rem;color:var(--text-s);margin-bottom:12px">Select the room section and upload photos or videos. They will be visible to all visitors.</p>
+    <span class="m-label">Room Section</span>
+    <select id="adm-room-select" style="width:100%;margin-bottom:12px;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:0.85rem;background:var(--surface)">
+      <option value="shanthi">Shanthi Room</option>
+      <option value="sangha">Sangha Room</option>
+      <option value="kitchen">Kitchen</option>
+      <option value="service">Service Area</option>
+      <option value="portico">Portico</option>
+      <option value="foyer">Foyer &amp; Hall</option>
+    </select>
     <div class="drop-zone" id="adm-drop" onclick="document.getElementById('adm-file').click()" ondragover="doDrag(event,'adm-drop')" ondragleave="noDrag('adm-drop')" ondrop="onDrop(event,'adm')">
       <div class="drop-icon">🏞️</div><p>Drop files or click to browse</p><small>JPG, PNG, MP4 · Max 50MB</small>
     </div>
-    <input type="file" id="adm-file" class="hidden" multiple accept="image/*,video/*" onchange="onFiles(event,'adm')">
+    <input type="file" id="adm-file" class="hidden" multiple accept="image/*,video/*" onchange="onAdmFiles(event)">
     <div class="preview-strip" id="adm-previews"></div>
-    <span class="m-label">Caption</span>
-    <input type="text" id="adm-caption" placeholder="e.g. Portico morning view">
-    <span class="m-label">Category</span>
-    <select id="adm-cat"><option value="room">Shanthi</option><option value="common">Sangha / Common</option></select>
-    <button class="btn-primary" id="btn-adm-upload" disabled onclick="doAdminUpload()">Upload ✦</button>
+    <button class="btn-primary" id="btn-adm-upload" disabled onclick="doRoomUploadFromAdmin()">Upload ✦</button>
   </div>
 </div>
 
@@ -901,7 +908,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 
 <script>
 // ── CONFIG ─────────────────────────────────────────────
-const APP_VERSION='v22';
+const APP_VERSION='v23';
 const CFG={
   APPS_SCRIPT_URL:'https://script.google.com/macros/s/AKfycbzrzBGUChJvK88w3iRmMwdRdUdrhF6Ysgnfemxax3V_JPr_bQh4agHfBPpn9S8pVmm3Sw/exec',
   OWNER_WA:'919148212422',
@@ -1462,7 +1469,78 @@ function hostLogin(){
   } else { document.getElementById('admin-err').style.display='block'; }
 }
 function adminLogout(){ adminMode=false;document.getElementById('admin-bar').classList.remove('visible');document.body.classList.remove('admin-mode');renderGallery(); }
-function openAdminUpload(){ document.getElementById('admin-upload-modal').classList.add('open'); }
+function openAdminUpload(){
+  document.getElementById('admin-upload-modal').classList.add('open');
+}
+
+function onAdmFiles(evt){
+  var files=[...evt.target.files];
+  pFiles.adm=files;
+  var strip=document.getElementById('adm-previews');
+  strip.innerHTML='';
+  files.forEach(function(f){
+    var div=document.createElement('div');
+    div.className='preview-item';
+    if(f.type.startsWith('video/')){
+      div.innerHTML='<div style="width:60px;height:60px;background:#2a1f10;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:1.5rem">▶</div>';
+    } else {
+      var img=document.createElement('img');
+      img.style.cssText='width:60px;height:60px;object-fit:cover;border-radius:6px';
+      var fr=new FileReader();
+      fr.onload=function(e){img.src=e.target.result;};
+      fr.readAsDataURL(f);
+      div.appendChild(img);
+    }
+    strip.appendChild(div);
+  });
+  document.getElementById('btn-adm-upload').disabled=files.length===0;
+}
+
+async function doRoomUploadFromAdmin(){
+  var files=pFiles.adm||[];
+  if(!files.length)return;
+  var room=document.getElementById('adm-room-select').value;
+  var btn=document.getElementById('btn-adm-upload');
+  if(btn){btn.disabled=true;btn.textContent='Uploading...';}
+
+  for(var i=0;i<files.length;i++){
+    var f=files[i];
+    var isV=f.type.startsWith('video/');
+    var cap=f.name.replace(/\.[^.]+$/,'').replace(/[-_]/g,' ');
+    var src=null; var fileId=null;
+    try{
+      var b64=await new Promise(function(res,rej){
+        var fr=new FileReader();
+        fr.onload=function(e){res({name:f.name,type:f.type,data:e.target.result.split(',')[1]});};
+        fr.onerror=rej; fr.readAsDataURL(f);
+      });
+      if(CFG.APPS_SCRIPT_URL&&!CFG.APPS_SCRIPT_URL.includes('YOUR_APPS')){
+        var res=await fetch(CFG.APPS_SCRIPT_URL,{method:'POST',
+          body:JSON.stringify({action:'uploadRoomMedia',fileName:b64.name,
+            mimeType:b64.type,data:b64.data,room:room,caption:cap})});
+        var result=await res.json();
+        console.log('[SDM] uploadRoomMedia:',JSON.stringify(result).slice(0,120));
+        if(result.url){
+          var m=result.url.match(/[?&]id=([^&]+)/);
+          var fid=m?m[1]:null;
+          src=fid?(isV?'https://drive.google.com/file/d/'+fid+'/preview'
+            :'https://drive.google.com/thumbnail?id='+fid+'&sz=w1600'):result.url;
+          fileId=result.fileId||fid;
+        }
+      }
+      if(!src)src='data:'+b64.type+';base64,'+b64.data;
+      if(!roomsData[room])roomsData[room]=[];
+      roomsData[room].push({type:isV?'video':'image',src:src,label:cap,fileId:fileId});
+    }catch(e){console.error('Admin room upload error:',e);}
+  }
+
+  pFiles.adm=[];
+  document.getElementById('adm-previews').innerHTML='';
+  if(btn){btn.disabled=false;btn.textContent='Upload ❆';}
+  closeModal('admin-upload-modal');
+  // Refresh from server to confirm save
+  await loadRoomsFromServer();
+}
 // Triple-click footer = admin login
 document.getElementById('site-footer').addEventListener('click',(function(){let c=0,t;return function(){c++;clearTimeout(t);t=setTimeout(()=>c=0,600);if(c>=3){document.getElementById('admin-login-modal').classList.add('open');c=0;}};})());
 
