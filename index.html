@@ -561,12 +561,14 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
       <span id="stay-note-text"></span>
     </div>
     <div class="deposit-box" id="deposit-box">
-      <h4>💰 Payment Breakdown</h4>
-      <div class="dep-row"><span>Room charges total</span><span id="dep-room">—</span></div>
+      <h4>💰 Price Breakdown</h4>
+      <div class="dep-row"><span>Base rate</span><span id="dep-base-rate">—</span></div>
+      <div class="dep-row" id="dep-intl-row" style="display:none"><span>🌏 International surcharge</span><span id="dep-intl" style="color:var(--terr)">—</span></div>
+      <div class="dep-row" id="dep-long-row" style="display:none"><span>📅 Long stay discount (&gt;5 nights)</span><span id="dep-long" style="color:var(--moss)">—</span></div>
+      <div class="dep-row" id="dep-two-row" style="display:none"><span>👥 Second guest (×1.5)</span><span id="dep-two">—</span></div>
+      <div class="dep-row" id="dep-teacher-row" style="display:none"><span>🪷 Teacher discount</span><span id="dep-teacher" style="color:var(--moss)">—</span></div>
+      <div class="dep-row" style="border-top:1px solid var(--border);margin-top:6px;padding-top:8px;font-weight:600"><span>Room charges total</span><span id="dep-room">—</span></div>
       <div class="dep-row"><span>Refundable security deposit</span><span>₹1,000</span></div>
-      <div class="dep-row total"><span>Pay now (50% advance + deposit)</span><span id="dep-total">—</span></div>
-      <p class="dep-note">✦ ₹500 returned if key handed back safely<br>✦ ₹500 returned if room not severely soiled<br>✦ Remaining 50% room charges payable at checkout</p>
-    </div>
     <div class="timing-note" style="margin-top:11px">Check-in 2:00 PM · Check-out 11:30 AM</div>
     <button class="btn-primary" id="btn-to-guests" disabled onclick="goTo(3)">Guest Details →</button>
     <button class="btn-secondary" onclick="goTo(1)">← Back</button>
@@ -852,7 +854,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
   👁 Visitors: <span id="visitor-count">—</span>
 </div>
 <span id="visitor-geo" style="display:none"></span>
-<footer id="site-footer">Shanthi &amp; Sangha @ Soudhamini · Peaceful Simple Living · Waste Segregated with Ashram Care<span style="font-family:'DM Mono',monospace;font-size:0.55rem;opacity:0.55;margin-left:14px;letter-spacing:0.06em">HTML v23 · AS v7</span></footer>
+<footer id="site-footer">Shanthi &amp; Sangha @ Soudhamini · Peaceful Simple Living · Waste Segregated with Ashram Care<span style="font-family:'DM Mono',monospace;font-size:0.55rem;opacity:0.55;margin-left:14px;letter-spacing:0.06em">HTML v24 · AS v7</span></footer>
 
 <!-- MODALS -->
 <!-- Admin Login -->
@@ -908,7 +910,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 
 <script>
 // ── CONFIG ─────────────────────────────────────────────
-const APP_VERSION='v23';
+const APP_VERSION='v24';
 const CFG={
   APPS_SCRIPT_URL:'https://script.google.com/macros/s/AKfycbzrzBGUChJvK88w3iRmMwdRdUdrhF6Ysgnfemxax3V_JPr_bQh4agHfBPpn9S8pVmm3Sw/exec',
   OWNER_WA:'919148212422',
@@ -1120,9 +1122,28 @@ function calcStay(){
   document.getElementById('stay-desc').textContent=`${nights} night${nights>1?'s':''} · ${isLong?'Long Stay':'Short Stay'} · ₹${rate.toLocaleString('en-IN')}/day${intlNote}${gMult}${teacherNote}`;
   document.getElementById('stay-price-display').textContent=`₹${totalRoomCost.toLocaleString('en-IN')} total`;
   document.getElementById('stay-note-text').textContent=isLong?'✦ Long stay rate applied (> 5 days)':'✦ Standard short stay rate (≤ 5 days)';
+  const baseR=prices[selRoom][isLong?'long':'short'];
+  const shortR=prices[selRoom]['short'];
+  const g1c=document.getElementById('teacher-chk-g1');
+  const g2c=document.getElementById('teacher-chk-g2');
+  const tA=g1c?g1c.checked:false;
+  const tB=g2c&&twoGuests?g2c.checked:false;
+  document.getElementById('dep-base-rate').textContent='₹'+baseR.toLocaleString('en-IN')+'/night × '+nights+' night'+(nights>1?'s':'');
+  const iRow=document.getElementById('dep-intl-row');
+  if(intlGuest){iRow.style.display='flex';document.getElementById('dep-intl').textContent='+₹'+(CFG.INTL_SURCHARGE*nights).toLocaleString('en-IN')+' (₹'+CFG.INTL_SURCHARGE+' × '+nights+')';}
+  else iRow.style.display='none';
+  const lRow=document.getElementById('dep-long-row');
+  if(isLong){lRow.style.display='flex';document.getElementById('dep-long').textContent='−₹'+((shortR-baseR)*nights).toLocaleString('en-IN')+' saved';}
+  else lRow.style.display='none';
+  const tRow=document.getElementById('dep-two-row');
+  if(twoGuests){tRow.style.display='flex';}
+  else tRow.style.display='none';
+  const tcRow=document.getElementById('dep-teacher-row');
+  if(tA||tB){tcRow.style.display='flex';document.getElementById('dep-teacher').textContent=tA&&tB?'−25% both guests':tA?'−25% Guest 1':'−25% Guest 2';}
+  else tcRow.style.display='none';
   document.getElementById('deposit-box').classList.add('vis');
   document.getElementById('dep-room').textContent='₹'+totalRoomCost.toLocaleString('en-IN');
-  document.getElementById('dep-total').textContent='₹'+grandTotal.toLocaleString('en-IN')+' (₹'+advanceAmt.toLocaleString('en-IN')+' + ₹1,000)';
+  document.getElementById('dep-total').textContent='₹'+grandTotal.toLocaleString('en-IN')+' (₹'+advanceAmt.toLocaleString('en-IN')+' advance + ₹1,000 deposit)';
   document.getElementById('btn-to-guests').disabled=false;
 }
 
@@ -1731,7 +1752,7 @@ function renderHP(){
 
   list.innerHTML=items.map(bk=>{
     const isPending=bk.status==='pending';
-    const g1Phone=(bk.g1p||'').replace(/\D/g,'');
+    const g1Phone=String(bk.g1p||'').replace(/\D/g,'');
     const waMsg=encodeURIComponent(buildWAConfirmMsg(bk));
     const balance=((bk.totalRoomCost||0)-(bk.advance||0));
     return `<div class="booking-card">
@@ -2172,6 +2193,9 @@ function openRoomsModal(){
   document.getElementById('rooms-modal').classList.add('open');
   document.body.style.overflow='hidden';
   document.getElementById('rooms-admin-upload').style.display=adminMode?'block':'none';
+  try{var c=JSON.parse(localStorage.getItem('sdm_rooms_data')||'null');
+    if(c&&typeof c==='object'){['shanthi','sangha','kitchen','service','portico','foyer'].forEach(function(r){if(!c[r])c[r]=[];});roomsData=c;renderRoomsGrid();}
+  }catch(e){}
   loadRoomsFromServer();
 }
 function closeRoomsModal(){
@@ -2269,7 +2293,7 @@ async function handleRoomUpload(input){
   }
   input.value='';
   if(btn){btn.textContent='Reloading...';}
-  // Reload from server to confirm cross-device sync
+  try{localStorage.setItem('sdm_rooms_data',JSON.stringify(roomsData));}catch(e){}
   await loadRoomsFromServer();
   if(btn){btn.disabled=false;btn.textContent='+ Upload Photo / Video';}
 }
@@ -2308,7 +2332,7 @@ async function loadRoomsFromServer(){
           });
         });
         roomsData=remote;
-        console.log('[SDM] Rooms loaded from server');
+        try{localStorage.setItem('sdm_rooms_data',JSON.stringify(remote));}catch(e){}
         renderRoomsGrid();
       }
     }
