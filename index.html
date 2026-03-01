@@ -421,7 +421,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 
 <!-- ADMIN BAR -->
 <div id="admin-bar">
-  <span>🔐 Admin Mode · <span style="font-family:'DM Mono',monospace;font-size:0.58rem;opacity:0.8">HTML v20 · Apps Script v9</span></span>
+  <span>🔐 Admin Mode · <span id="admin-ver-display" style="font-family:'DM Mono',monospace;font-size:0.58rem;opacity:0.8"></span></span>
   <div style="display:flex;gap:7px">
     <button class="admin-btn" onclick="openHostPanel()">📋 Host Panel</button>
     <button class="admin-btn" onclick="openAdminUpload()">＋ Upload Media</button>
@@ -854,7 +854,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
   👁 Visitors: <span id="visitor-count">—</span>
 </div>
 <span id="visitor-geo" style="display:none"></span>
-<footer id="site-footer">Shanthi &amp; Sangha @ Soudhamini · Peaceful Simple Living · Waste Segregated with Ashram Care<span style="font-family:'DM Mono',monospace;font-size:0.55rem;opacity:0.55;margin-left:14px;letter-spacing:0.06em">HTML v28 · AS v9</span></footer>
+<footer id="site-footer">Shanthi &amp; Sangha @ Soudhamini · Peaceful Simple Living · Waste Segregated with Ashram Care<span style="font-family:'DM Mono',monospace;font-size:0.55rem;opacity:0.55;margin-left:14px;letter-spacing:0.06em">HTML v29 · AS v9</span></footer>
 
 <!-- MODALS -->
 <!-- Admin Login -->
@@ -910,7 +910,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 
 <script>
 // ── CONFIG ─────────────────────────────────────────────
-const APP_VERSION='v28';
+const APP_VERSION='v29';
 const CFG={
   APPS_SCRIPT_URL:'https://script.google.com/macros/s/AKfycbzrzBGUChJvK88w3iRmMwdRdUdrhF6Ysgnfemxax3V_JPr_bQh4agHfBPpn9S8pVmm3Sw/exec',
   OWNER_WA:'919148212422',
@@ -1469,7 +1469,9 @@ document.getElementById('checkin').addEventListener('change',function(){document
 function adminLogin(){
   const pw=document.getElementById('admin-pw').value;
   if(pw===CFG.ADMIN_PW){
-    adminMode=true;document.getElementById('admin-bar').classList.add('visible');
+    adminMode=true;
+  var vd=document.getElementById('admin-ver-display');
+  if(vd)vd.textContent='HTML '+APP_VERSION+' · AS v9';document.getElementById('admin-bar').classList.add('visible');
     visitorSession.isAdmin=true;
     if(visitorSession.fingerprint && visitorSession.geo)
       logVisitToServer(visitorSession.fingerprint, visitorSession.geo, true, false);
@@ -1609,7 +1611,8 @@ function recalcEdit(ref){
   var isT1=t1?t1.checked:false; var isT2=t2?t2.checked:false;
   var nights=parseInt(bk.nights)||1;
   var isLong=nights>5;
-  var room=bk.room==='attached'?'attached':'common';
+  var roomSel=document.getElementById('ed-room-'+ref);
+  var room=roomSel?roomSel.value:(bk.room==='attached'?'attached':'common');
   var baseRate=prices[room][isLong?'long':'short'];
   var rate=baseRate+(isIntl?CFG.INTL_SURCHARGE:0);
   var total;
@@ -1642,6 +1645,8 @@ async function applyEdit(ref){
   var two=document.getElementById('ed-two-'+ref);
   var t1=document.getElementById('ed-t1-'+ref);
   var t2=document.getElementById('ed-t2-'+ref);
+  var roomSel2=document.getElementById('ed-room-'+ref);
+  if(roomSel2){bk.room=roomSel2.value;bk.roomLabel=roomSel2.value==='attached'?'Shanthi':'Sangha';}
   bk.intlGuest=intl?intl.checked:bk.intlGuest;
   bk.twoGuests=two?two.checked:bk.twoGuests;
   bk.teacherG1=t1?t1.checked:bk.teacherG1;
@@ -1649,7 +1654,8 @@ async function applyEdit(ref){
   // Recalculate amounts
   var nights=parseInt(bk.nights)||1;
   var isLong=nights>5;
-  var room=bk.room==='attached'?'attached':'common';
+  var roomSel=document.getElementById('ed-room-'+ref);
+  var room=roomSel?roomSel.value:(bk.room==='attached'?'attached':'common');
   var baseRate=prices[room][isLong?'long':'short'];
   var rate=baseRate+(bk.intlGuest?CFG.INTL_SURCHARGE:0);
   var total;
@@ -1666,6 +1672,7 @@ async function applyEdit(ref){
     try{
       await fetch(CFG.APPS_SCRIPT_URL,{method:'POST',
         body:JSON.stringify({action:'updateBooking',ref:bk.ref,
+          room:bk.roomLabel,
           intlGuest:bk.intlGuest,twoGuests:bk.twoGuests,
           teacherG1:bk.teacherG1,teacherG2:bk.teacherG2,
           rate:bk.rate,totalRoomCost:bk.totalRoomCost,
@@ -1887,7 +1894,13 @@ function renderHP(){
       '</div>'+
       // Edit panel
       '<div id="edit-'+bk.ref+'" style="display:none;background:var(--warm);border:1px solid var(--border);border-radius:8px;padding:12px;margin-top:8px">'+
-        '<div style="font-family:\'DM Mono\',monospace;font-size:0.58rem;color:var(--clay);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.08em">✏ Edit Booking Flags</div>'+
+        '<div style="font-family:\'DM Mono\',monospace;font-size:0.58rem;color:var(--clay);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.08em">✏ Edit Booking</div>'+
+        '<div style="margin-bottom:10px">'+
+        '<label style="display:block;font-family:\'DM Mono\',monospace;font-size:0.55rem;color:var(--text-s);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:4px">Room</label>'+
+        '<select id="ed-room-'+bk.ref+'" onchange="recalcEdit(this.closest(\'[id^=edit-]\').id.slice(5))" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:0.82rem;background:var(--surface)">'+
+        '<option value="attached" '+(bk.room==='attached'?'selected':'')+'>🏡 Shanthi Room (Attached Bath)</option>'+
+        '<option value="common" '+(bk.room!=='attached'?'selected':'')+'>🌿 Sangha Room (Common Bath)</option>'+
+        '</select></div>'+
         '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">'+
           '<label style="display:flex;align-items:center;gap:6px;font-size:0.78rem;cursor:pointer">'+
             '<input type="checkbox" id="ed-intl-'+bk.ref+'" '+(bk.intlGuest?'checked':'')+' onchange="recalcEdit(\''+bk.ref+'\')"> 🌏 International</label>'+
@@ -1934,7 +1947,8 @@ function recalcEdit(ref){
   var isT1=t1?t1.checked:false; var isT2=t2?t2.checked:false;
   var nights=parseInt(bk.nights)||1;
   var isLong=nights>5;
-  var room=bk.room==='attached'?'attached':'common';
+  var roomSel=document.getElementById('ed-room-'+ref);
+  var room=roomSel?roomSel.value:(bk.room==='attached'?'attached':'common');
   var baseRate=prices[room][isLong?'long':'short'];
   var rate=baseRate+(isIntl?CFG.INTL_SURCHARGE:0);
   var total;
@@ -1967,6 +1981,8 @@ async function applyEdit(ref){
   var two=document.getElementById('ed-two-'+ref);
   var t1=document.getElementById('ed-t1-'+ref);
   var t2=document.getElementById('ed-t2-'+ref);
+  var roomSel2=document.getElementById('ed-room-'+ref);
+  if(roomSel2){bk.room=roomSel2.value;bk.roomLabel=roomSel2.value==='attached'?'Shanthi':'Sangha';}
   bk.intlGuest=intl?intl.checked:bk.intlGuest;
   bk.twoGuests=two?two.checked:bk.twoGuests;
   bk.teacherG1=t1?t1.checked:bk.teacherG1;
@@ -1974,7 +1990,8 @@ async function applyEdit(ref){
   // Recalculate amounts
   var nights=parseInt(bk.nights)||1;
   var isLong=nights>5;
-  var room=bk.room==='attached'?'attached':'common';
+  var roomSel=document.getElementById('ed-room-'+ref);
+  var room=roomSel?roomSel.value:(bk.room==='attached'?'attached':'common');
   var baseRate=prices[room][isLong?'long':'short'];
   var rate=baseRate+(bk.intlGuest?CFG.INTL_SURCHARGE:0);
   var total;
@@ -1991,6 +2008,7 @@ async function applyEdit(ref){
     try{
       await fetch(CFG.APPS_SCRIPT_URL,{method:'POST',
         body:JSON.stringify({action:'updateBooking',ref:bk.ref,
+          room:bk.roomLabel,
           intlGuest:bk.intlGuest,twoGuests:bk.twoGuests,
           teacherG1:bk.teacherG1,teacherG2:bk.teacherG2,
           rate:bk.rate,totalRoomCost:bk.totalRoomCost,
