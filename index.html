@@ -854,7 +854,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
   👁 Visitors: <span id="visitor-count">—</span>
 </div>
 <span id="visitor-geo" style="display:none"></span>
-<footer id="site-footer">Shanthi &amp; Sangha @ Soudhamini · Peaceful Simple Living · Waste Segregated with Ashram Care<span style="font-family:'DM Mono',monospace;font-size:0.55rem;opacity:0.55;margin-left:14px;letter-spacing:0.06em">HTML v25 · AS v8</span></footer>
+<footer id="site-footer">Shanthi &amp; Sangha @ Soudhamini · Peaceful Simple Living · Waste Segregated with Ashram Care<span style="font-family:'DM Mono',monospace;font-size:0.55rem;opacity:0.55;margin-left:14px;letter-spacing:0.06em">HTML v27 · AS v8</span></footer>
 
 <!-- MODALS -->
 <!-- Admin Login -->
@@ -910,13 +910,13 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 
 <script>
 // ── CONFIG ─────────────────────────────────────────────
-const APP_VERSION='v25';
+const APP_VERSION='v27';
 const CFG={
   APPS_SCRIPT_URL:'https://script.google.com/macros/s/AKfycbzrzBGUChJvK88w3iRmMwdRdUdrhF6Ysgnfemxax3V_JPr_bQh4agHfBPpn9S8pVmm3Sw/exec',
   OWNER_WA:'919148212422',
   PROP:'Shanthi & Sangha @ Soudhamini',
-  ADMIN_PW:'1213',
-  HOST_PW:'1213',  // Change this! Password for host panel
+  ADMIN_PW:'QWE',
+  HOST_PW:'QWE',  // Change this! Password for host panel
   UPI_ID:'shruthips@sbi',
   REVIEW_URL:window.location.href.split('?')[0]+'?reviews=1',
   INTL_SURCHARGE:500,
@@ -1118,7 +1118,7 @@ function calcStay(){
   const g2chk=document.getElementById('teacher-chk-g2');
   const t1=g1chk?g1chk.checked:false;
   const t2=g2chk&&twoGuests?g2chk.checked:false;
-  const teacherNote=t1&&t2?' − 25% off both guests':t1?' − 25% off Guest 1':t2?' − 25% off Guest 2':'';
+  const teacherNote=t1&&t2?' − 25% off both full time teachers':t1?' − 25% off Guest 1':t2?' − 25% off Guest 2':'';
   document.getElementById('stay-desc').textContent=`${nights} night${nights>1?'s':''} · ${isLong?'Long Stay':'Short Stay'} · ₹${rate.toLocaleString('en-IN')}/day${intlNote}${gMult}${teacherNote}`;
   document.getElementById('stay-price-display').textContent=`₹${totalRoomCost.toLocaleString('en-IN')} total`;
   document.getElementById('stay-note-text').textContent=isLong?'✦ Long stay rate applied (> 5 days)':'✦ Standard short stay rate (≤ 5 days)';
@@ -1139,7 +1139,7 @@ function calcStay(){
   if(twoGuests){tRow.style.display='flex';}
   else tRow.style.display='none';
   const tcRow=document.getElementById('dep-teacher-row');
-  if(tA||tB){tcRow.style.display='flex';document.getElementById('dep-teacher').textContent=tA&&tB?'−25% both guests':tA?'−25% Guest 1':'−25% Guest 2';}
+  if(tA||tB){tcRow.style.display='flex';document.getElementById('dep-teacher').textContent=tA&&tB?'−25% both full time teachers':tA?'−25% full time teacher G1':'−25% full time teacher G2';}
   else tcRow.style.display='none';
   document.getElementById('deposit-box').classList.add('vis');
   document.getElementById('dep-room').textContent='₹'+totalRoomCost.toLocaleString('en-IN');
@@ -1298,7 +1298,8 @@ async function submitBooking(){
   }
 
   // Add to pending bookings list (for host panel)
-  const newBooking={ref,room:selRoom,roomLabel,g1n,g1p,g2n,g2p,checkin:ci,checkout:co,nights,stayType,rate,totalRoomCost,advance:advanceAmt,grandTotal,twoGuests,intlGuest,status:'pending',submittedAt:new Date().toISOString()};
+  const _t1=document.getElementById('teacher-chk-g1');const _t2=document.getElementById('teacher-chk-g2');
+  const newBooking={ref,room:selRoom,roomLabel,g1n,g1p,g2n,g2p,checkin:ci,checkout:co,nights,stayType,rate,totalRoomCost,advance:advanceAmt,grandTotal,twoGuests,intlGuest,teacherG1:_t1?_t1.checked:false,teacherG2:twoGuests&&_t2?_t2.checked:false,status:'pending',submittedAt:new Date().toISOString()};
   pendingBookings.push(newBooking);
 
   // Messages
@@ -1626,8 +1627,8 @@ function recalcEdit(ref){
   if(isLong) lines.push('long stay rate');
   if(isTwo)  lines.push('×1.5 (2 guests)');
   if(isT1&&isT2) lines.push('−25% both');
-  else if(isT1) lines.push('−25% G1');
-  else if(isT2) lines.push('−25% G2');
+  else if(isT1) lines.push('−25% full time teacher G1');
+  else if(isT2) lines.push('−25% full time teacher G2');
   lines.push('Total: ₹'+total.toLocaleString('en-IN'));
   lines.push('Advance: ₹'+advance.toLocaleString('en-IN'));
   var pr=document.getElementById('ed-price-'+ref);
@@ -1721,9 +1722,14 @@ async function loadBookingsFromSheet(){
           confirmedBookings.push({
             ref:sb.ref,room:sb.room==='Shanthi'?'attached':'common',
             roomLabel:sb.room,g1n:sb.g1n||sb.guestName,g1p:sb.g1p||sb.phone,
+            g2n:sb.g2n||'',g2p:sb.g2p||'',
             checkin:sb.checkin,checkout:sb.checkout,nights:sb.nights,
             stayType:sb.stayType,rate:sb.rate,totalRoomCost:sb.totalRoomCost||sb.total,
-            advance:sb.advance,grandTotal:sb.grandTotal,status:'confirmed'
+            advance:sb.advance,grandTotal:sb.grandTotal,status:'confirmed',
+            twoGuests:sb.twoGuests===true||sb.twoGuests==='TRUE'||sb.twoGuests==='true',
+            intlGuest:sb.intlGuest===true||sb.intlGuest==='TRUE'||sb.intlGuest==='true',
+            teacherG1:sb.teacherG1===true||sb.teacherG1==='TRUE'||sb.teacherG1==='true',
+            teacherG2:sb.teacherG2===true||sb.teacherG2==='TRUE'||sb.teacherG2==='true'
           });
         }
       });
@@ -1739,7 +1745,10 @@ async function loadBookingsFromSheet(){
             stayType:sb.stayType,rate:sb.rate,
             totalRoomCost:sb.totalRoomCost||sb.total,
             advance:sb.advance,grandTotal:sb.grandTotal,
-            twoGuests:sb.twoGuests,intlGuest:sb.intlGuest,
+            twoGuests:sb.twoGuests===true||sb.twoGuests==='TRUE'||sb.twoGuests==='true',
+            intlGuest:sb.intlGuest===true||sb.intlGuest==='TRUE'||sb.intlGuest==='true',
+            teacherG1:sb.teacherG1===true||sb.teacherG1==='TRUE'||sb.teacherG1==='true',
+            teacherG2:sb.teacherG2===true||sb.teacherG2==='TRUE'||sb.teacherG2==='true',
             status:'pending',submittedAt:sb.submittedAt
           });
         }
@@ -1844,9 +1853,9 @@ function renderHP(){
     const flags=[];
     if(bk.intlGuest) flags.push('🌏 International');
     if(bk.twoGuests) flags.push('👥 2 Guests');
-    if(bk.teacherG1&&bk.teacherG2) flags.push('🪷 Both Teachers');
-    else if(bk.teacherG1) flags.push('🪷 Teacher G1');
-    else if(bk.teacherG2) flags.push('🪷 Teacher G2');
+    if(bk.teacherG1&&bk.teacherG2) flags.push('🪷 Both Full Time Teachers');
+    else if(bk.teacherG1) flags.push('🪷 Full Time Teacher G1');
+    else if(bk.teacherG2) flags.push('🪷 Full Time Teacher G2');
     if((bk.stayType||'').toLowerCase().includes('long')) flags.push('📅 Long Stay');
     const flagsHtml=flags.length
       ? '<div style="display:flex;flex-wrap:wrap;gap:4px;margin:6px 0">'+
@@ -1885,9 +1894,9 @@ function renderHP(){
           '<label style="display:flex;align-items:center;gap:6px;font-size:0.78rem;cursor:pointer">'+
             '<input type="checkbox" id="ed-two-'+bk.ref+'" '+(bk.twoGuests?'checked':'')+' onchange="recalcEdit(\''+bk.ref+'\')"> 👥 Two Guests</label>'+
           '<label style="display:flex;align-items:center;gap:6px;font-size:0.78rem;cursor:pointer">'+
-            '<input type="checkbox" id="ed-t1-'+bk.ref+'" '+(bk.teacherG1?'checked':'')+' onchange="recalcEdit(\''+bk.ref+'\')"> 🪷 Teacher — Guest 1</label>'+
+            '<input type="checkbox" id="ed-t1-'+bk.ref+'" '+(bk.teacherG1?'checked':'')+' onchange="recalcEdit(\''+bk.ref+'\')"> 🪷 Full Time Teacher — Guest 1</label>'+
           '<label style="display:flex;align-items:center;gap:6px;font-size:0.78rem;cursor:pointer">'+
-            '<input type="checkbox" id="ed-t2-'+bk.ref+'" '+(bk.teacherG2?'checked':'')+' onchange="recalcEdit(\''+bk.ref+'\')"> 🪷 Teacher — Guest 2</label>'+
+            '<input type="checkbox" id="ed-t2-'+bk.ref+'" '+(bk.teacherG2?'checked':'')+' onchange="recalcEdit(\''+bk.ref+'\')"> 🪷 Full Time Teacher — Guest 2</label>'+
         '</div>'+
         '<div id="ed-price-'+bk.ref+'" style="font-family:\'DM Mono\',monospace;font-size:0.7rem;background:var(--surface);border-radius:6px;padding:8px;margin-bottom:10px;color:var(--text-s)">Updated cost will appear here</div>'+
         '<button onclick="applyEdit(\''+bk.ref+'\')" style="background:var(--clay);color:#fff;border:none;border-radius:100px;padding:7px 20px;font-family:\'DM Mono\',monospace;font-size:0.6rem;cursor:pointer;letter-spacing:0.08em">Apply Changes</button>'+
@@ -1943,8 +1952,8 @@ function recalcEdit(ref){
   if(isLong) lines.push('long stay rate');
   if(isTwo)  lines.push('×1.5 (2 guests)');
   if(isT1&&isT2) lines.push('−25% both');
-  else if(isT1) lines.push('−25% G1');
-  else if(isT2) lines.push('−25% G2');
+  else if(isT1) lines.push('−25% full time teacher G1');
+  else if(isT2) lines.push('−25% full time teacher G2');
   lines.push('Total: ₹'+total.toLocaleString('en-IN'));
   lines.push('Advance: ₹'+advance.toLocaleString('en-IN'));
   var pr=document.getElementById('ed-price-'+ref);
