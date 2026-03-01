@@ -421,7 +421,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 
 <!-- ADMIN BAR -->
 <div id="admin-bar">
-  <span>🔐 Admin Mode · <span style="font-family:'DM Mono',monospace;font-size:0.58rem;opacity:0.8">HTML v20 · Apps Script v7</span></span>
+  <span>🔐 Admin Mode · <span style="font-family:'DM Mono',monospace;font-size:0.58rem;opacity:0.8">HTML v20 · Apps Script v8</span></span>
   <div style="display:flex;gap:7px">
     <button class="admin-btn" onclick="openHostPanel()">📋 Host Panel</button>
     <button class="admin-btn" onclick="openAdminUpload()">＋ Upload Media</button>
@@ -854,7 +854,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
   👁 Visitors: <span id="visitor-count">—</span>
 </div>
 <span id="visitor-geo" style="display:none"></span>
-<footer id="site-footer">Shanthi &amp; Sangha @ Soudhamini · Peaceful Simple Living · Waste Segregated with Ashram Care<span style="font-family:'DM Mono',monospace;font-size:0.55rem;opacity:0.55;margin-left:14px;letter-spacing:0.06em">HTML v24 · AS v7</span></footer>
+<footer id="site-footer">Shanthi &amp; Sangha @ Soudhamini · Peaceful Simple Living · Waste Segregated with Ashram Care<span style="font-family:'DM Mono',monospace;font-size:0.55rem;opacity:0.55;margin-left:14px;letter-spacing:0.06em">HTML v25 · AS v8</span></footer>
 
 <!-- MODALS -->
 <!-- Admin Login -->
@@ -910,7 +910,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 
 <script>
 // ── CONFIG ─────────────────────────────────────────────
-const APP_VERSION='v24';
+const APP_VERSION='v25';
 const CFG={
   APPS_SCRIPT_URL:'https://script.google.com/macros/s/AKfycbzrzBGUChJvK88w3iRmMwdRdUdrhF6Ysgnfemxax3V_JPr_bQh4agHfBPpn9S8pVmm3Sw/exec',
   OWNER_WA:'919148212422',
@@ -1589,6 +1589,91 @@ function doFiles(files,who){
 
 // ── GALLERY ─────────────────────────────────────────────
 // ── LIGHTBOX ────────────────────────────────────────────
+
+function toggleEdit(ref){
+  var el=document.getElementById('edit-'+ref);
+  if(el) el.style.display=el.style.display==='none'?'block':'none';
+  recalcEdit(ref);
+}
+
+function recalcEdit(ref){
+  var bk=[...pendingBookings,...confirmedBookings].find(function(b){return b.ref===ref;});
+  if(!bk)return;
+  var intl=document.getElementById('ed-intl-'+ref);
+  var two=document.getElementById('ed-two-'+ref);
+  var t1=document.getElementById('ed-t1-'+ref);
+  var t2=document.getElementById('ed-t2-'+ref);
+  if(!intl)return;
+  var isIntl=intl.checked; var isTwo=two?two.checked:false;
+  var isT1=t1?t1.checked:false; var isT2=t2?t2.checked:false;
+  var nights=parseInt(bk.nights)||1;
+  var isLong=nights>5;
+  var room=bk.room==='attached'?'attached':'common';
+  var baseRate=prices[room][isLong?'long':'short'];
+  var rate=baseRate+(isIntl?CFG.INTL_SURCHARGE:0);
+  var total;
+  if(!isTwo){
+    total=Math.round(rate*nights*(isT1?0.75:1));
+  } else {
+    var full=rate*nights*SECOND_MULT;
+    total=Math.round(full/2*(isT1?0.75:1)+full/2*(isT2?0.75:1));
+  }
+  var advance=Math.round(total*0.5);
+  var grand=advance+DEPOSIT;
+  var lines=[];
+  lines.push('₹'+baseRate.toLocaleString('en-IN')+'/night × '+nights);
+  if(isIntl) lines.push('+₹'+CFG.INTL_SURCHARGE+' intl/night');
+  if(isLong) lines.push('long stay rate');
+  if(isTwo)  lines.push('×1.5 (2 guests)');
+  if(isT1&&isT2) lines.push('−25% both');
+  else if(isT1) lines.push('−25% G1');
+  else if(isT2) lines.push('−25% G2');
+  lines.push('Total: ₹'+total.toLocaleString('en-IN'));
+  lines.push('Advance: ₹'+advance.toLocaleString('en-IN'));
+  var pr=document.getElementById('ed-price-'+ref);
+  if(pr) pr.textContent=lines.join(' · ');
+}
+
+async function applyEdit(ref){
+  var bk=[...pendingBookings,...confirmedBookings].find(function(b){return b.ref===ref;});
+  if(!bk)return;
+  var intl=document.getElementById('ed-intl-'+ref);
+  var two=document.getElementById('ed-two-'+ref);
+  var t1=document.getElementById('ed-t1-'+ref);
+  var t2=document.getElementById('ed-t2-'+ref);
+  bk.intlGuest=intl?intl.checked:bk.intlGuest;
+  bk.twoGuests=two?two.checked:bk.twoGuests;
+  bk.teacherG1=t1?t1.checked:bk.teacherG1;
+  bk.teacherG2=t2?t2.checked:bk.teacherG2;
+  // Recalculate amounts
+  var nights=parseInt(bk.nights)||1;
+  var isLong=nights>5;
+  var room=bk.room==='attached'?'attached':'common';
+  var baseRate=prices[room][isLong?'long':'short'];
+  var rate=baseRate+(bk.intlGuest?CFG.INTL_SURCHARGE:0);
+  var total;
+  if(!bk.twoGuests){
+    total=Math.round(rate*nights*(bk.teacherG1?0.75:1));
+  } else {
+    var full=rate*nights*SECOND_MULT;
+    total=Math.round(full/2*(bk.teacherG1?0.75:1)+full/2*(bk.teacherG2?0.75:1));
+  }
+  bk.rate=rate; bk.totalRoomCost=total;
+  bk.advance=Math.round(total*0.5); bk.grandTotal=bk.advance+DEPOSIT;
+  // Push update to Apps Script
+  if(CFG.APPS_SCRIPT_URL&&!CFG.APPS_SCRIPT_URL.includes('YOUR_APPS')){
+    try{
+      await fetch(CFG.APPS_SCRIPT_URL,{method:'POST',
+        body:JSON.stringify({action:'updateBooking',ref:bk.ref,
+          intlGuest:bk.intlGuest,twoGuests:bk.twoGuests,
+          teacherG1:bk.teacherG1,teacherG2:bk.teacherG2,
+          rate:bk.rate,totalRoomCost:bk.totalRoomCost,
+          advance:bk.advance,grandTotal:bk.grandTotal})});
+    }catch(e){console.warn('applyEdit push failed:',e);}
+  }
+  document.getElementById('edit-'+ref).style.display='none';
+  renderHP();
+}
 // ── HOST PANEL ───────────────────────────────────────────
 let hpCurrentTab='pending';
 let hpAdminMode=false;
@@ -1751,41 +1836,161 @@ function renderHP(){
   }
 
   list.innerHTML=items.map(bk=>{
-    const isPending=bk.status==='pending';
+    const isPending=bk.status==='pending'||bk.status==='PENDING';
     const g1Phone=String(bk.g1p||'').replace(/\D/g,'');
     const waMsg=encodeURIComponent(buildWAConfirmMsg(bk));
     const balance=((bk.totalRoomCost||0)-(bk.advance||0));
-    return `<div class="booking-card">
-      <div class="bc-top">
-        <div>
-          <div class="bc-ref">${bk.ref}</div>
-          <div style="font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.08em;color:var(--text-s);margin-top:2px">${bk.submittedAt?new Date(bk.submittedAt).toLocaleString('en-IN',{timeZone:'Asia/Kolkata',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):''}${bk.intlGuest?' · 🌏 International':''}</div>
-        </div>
-        <span class="bc-status ${bk.status}">${bk.status.toUpperCase()}</span>
-      </div>
-      <div class="bc-grid">
-        <div class="bc-field"><label>Primary Guest</label><span>${bk.g1n||'—'}</span></div>
-        <div class="bc-field"><label>WhatsApp</label><span>${bk.g1p||'—'}</span></div>
-        <div class="bc-field"><label>Room</label><span>${bk.roomLabel||bk.room||'—'}${bk.twoGuests?' · 2 guests':''}</span></div>
-        <div class="bc-field"><label>Check-in</label><span>${fmtDate(bk.checkin)}</span></div>
-        <div class="bc-field"><label>Check-out</label><span>${fmtDate(bk.checkout)}</span></div>
-        <div class="bc-field"><label>Nights</label><span>${bk.nights} · ${bk.stayType||'—'}</span></div>
-        <div class="bc-field"><label>Paid Now</label><span class="amount">₹${(bk.grandTotal||0).toLocaleString('en-IN')}</span></div>
-        <div class="bc-field"><label>Balance at Checkout</label><span class="amount">₹${balance.toLocaleString('en-IN')}</span></div>
-        ${bk.g2n?`<div class="bc-field"><label>Second Guest</label><span>${bk.g2n}${bk.g2p?' · '+bk.g2p:''}</span></div>`:''}
-      </div>
-      <div class="bc-actions">
-        ${isPending?`<button class="bc-btn confirm" data-confirm="${bk.ref}" onclick="confirmBooking('${bk.ref}')">✓ Confirm &amp; Block Dates</button>`:''}
-        ${g1Phone.length>=10?`<a href="https://t.me/+${g1Phone}" target="_blank" rel="noopener" class="bc-btn" style="background:#229ED9;color:#fff">✈ Telegram Guest</a>`:''}
-        ${g1Phone.length>=10?`<a href="https://wa.me/${g1Phone}?text=${waMsg}" target="_blank" rel="noopener" class="bc-btn wa-guest">💬 WA Confirmation</a>`:''}
-        <a href="https://wa.me/${CFG.OWNER_WA}?text=${encodeURIComponent('📋 Ref: '+bk.ref+' · '+bk.g1n+' · '+fmtDate(bk.checkin)+' → '+fmtDate(bk.checkout))}" target="_blank" rel="noopener" class="bc-btn wa-owner">💬 WA to Self</a>
-        <button class="bc-btn cancel" onclick="cancelBooking('${bk.ref}')">✕ Cancel</button>
-      </div>
-    </div>`;
+    // Flags
+    const flags=[];
+    if(bk.intlGuest) flags.push('🌏 International');
+    if(bk.twoGuests) flags.push('👥 2 Guests');
+    if(bk.teacherG1&&bk.teacherG2) flags.push('🪷 Both Teachers');
+    else if(bk.teacherG1) flags.push('🪷 Teacher G1');
+    else if(bk.teacherG2) flags.push('🪷 Teacher G2');
+    if((bk.stayType||'').toLowerCase().includes('long')) flags.push('📅 Long Stay');
+    const flagsHtml=flags.length
+      ? '<div style="display:flex;flex-wrap:wrap;gap:4px;margin:6px 0">'+
+          flags.map(function(f){return '<span style="background:var(--warm);border:1px solid var(--border);border-radius:100px;padding:2px 8px;font-family:\'DM Mono\',monospace;font-size:0.52rem;color:var(--clay)">'+f+'</span>';}).join('')+
+          '</div>'
+      : '';
+    return '<div class="booking-card" id="card-'+bk.ref+'">'+
+      '<div class="bc-top">'+
+        '<div>'+
+          '<div class="bc-ref">'+bk.ref+'</div>'+
+          '<div style="font-family:\'DM Mono\',monospace;font-size:0.56rem;color:var(--text-s);margin-top:2px">'+
+            (bk.submittedAt?new Date(bk.submittedAt).toLocaleString('en-IN',{timeZone:'Asia/Kolkata',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'')+'</div>'+
+        '</div>'+
+        '<span class="bc-status '+((bk.status||'').toLowerCase())+'">'+((bk.status||'').toUpperCase())+'</span>'+
+      '</div>'+
+      flagsHtml+
+      '<div class="bc-grid">'+
+        '<div class="bc-field"><label>Primary Guest</label><span>'+(bk.g1n||'—')+'</span></div>'+
+        '<div class="bc-field"><label>WhatsApp</label><span>'+(bk.g1p||'—')+'</span></div>'+
+        '<div class="bc-field"><label>Room</label><span>'+(bk.roomLabel||bk.room||'—')+'</span></div>'+
+        '<div class="bc-field"><label>Check-in</label><span>'+fmtDate(bk.checkin)+'</span></div>'+
+        '<div class="bc-field"><label>Check-out</label><span>'+fmtDate(bk.checkout)+'</span></div>'+
+        '<div class="bc-field"><label>Nights</label><span>'+(bk.nights||'—')+'</span></div>'+
+        '<div class="bc-field"><label>Rate/Night</label><span>₹'+(bk.rate||0).toLocaleString('en-IN')+'</span></div>'+
+        '<div class="bc-field"><label>Room Total</label><span class="amount">₹'+(bk.totalRoomCost||0).toLocaleString('en-IN')+'</span></div>'+
+        '<div class="bc-field"><label>Advance Paid</label><span class="amount">₹'+(bk.advance||0).toLocaleString('en-IN')+'</span></div>'+
+        '<div class="bc-field"><label>Balance at Checkout</label><span class="amount">₹'+balance.toLocaleString('en-IN')+'</span></div>'+
+        (bk.g2n?'<div class="bc-field"><label>Second Guest</label><span>'+bk.g2n+(bk.g2p?' · '+bk.g2p:'')+'</span></div>':'')+
+      '</div>'+
+      // Edit panel
+      '<div id="edit-'+bk.ref+'" style="display:none;background:var(--warm);border:1px solid var(--border);border-radius:8px;padding:12px;margin-top:8px">'+
+        '<div style="font-family:\'DM Mono\',monospace;font-size:0.58rem;color:var(--clay);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.08em">✏ Edit Booking Flags</div>'+
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">'+
+          '<label style="display:flex;align-items:center;gap:6px;font-size:0.78rem;cursor:pointer">'+
+            '<input type="checkbox" id="ed-intl-'+bk.ref+'" '+(bk.intlGuest?'checked':'')+' onchange="recalcEdit(\''+bk.ref+'\')"> 🌏 International</label>'+
+          '<label style="display:flex;align-items:center;gap:6px;font-size:0.78rem;cursor:pointer">'+
+            '<input type="checkbox" id="ed-two-'+bk.ref+'" '+(bk.twoGuests?'checked':'')+' onchange="recalcEdit(\''+bk.ref+'\')"> 👥 Two Guests</label>'+
+          '<label style="display:flex;align-items:center;gap:6px;font-size:0.78rem;cursor:pointer">'+
+            '<input type="checkbox" id="ed-t1-'+bk.ref+'" '+(bk.teacherG1?'checked':'')+' onchange="recalcEdit(\''+bk.ref+'\')"> 🪷 Teacher — Guest 1</label>'+
+          '<label style="display:flex;align-items:center;gap:6px;font-size:0.78rem;cursor:pointer">'+
+            '<input type="checkbox" id="ed-t2-'+bk.ref+'" '+(bk.teacherG2?'checked':'')+' onchange="recalcEdit(\''+bk.ref+'\')"> 🪷 Teacher — Guest 2</label>'+
+        '</div>'+
+        '<div id="ed-price-'+bk.ref+'" style="font-family:\'DM Mono\',monospace;font-size:0.7rem;background:var(--surface);border-radius:6px;padding:8px;margin-bottom:10px;color:var(--text-s)">Updated cost will appear here</div>'+
+        '<button onclick="applyEdit(\''+bk.ref+'\')" style="background:var(--clay);color:#fff;border:none;border-radius:100px;padding:7px 20px;font-family:\'DM Mono\',monospace;font-size:0.6rem;cursor:pointer;letter-spacing:0.08em">Apply Changes</button>'+
+        '<button onclick="document.getElementById(\'edit-'+bk.ref+'\').style.display=\'none\'" style="background:none;border:1px solid var(--border);border-radius:100px;padding:7px 14px;font-family:\'DM Mono\',monospace;font-size:0.6rem;cursor:pointer;margin-left:6px">Cancel</button>'+
+      '</div>'+
+      '<div class="bc-actions">'+
+        (isPending?'<button class="bc-btn confirm" onclick="confirmBooking(\''+bk.ref+'\')">✓ Confirm &amp; Block Dates</button>':'')+
+        '<button class="bc-btn" onclick="toggleEdit(\''+bk.ref+'\')" style="background:var(--warm);border:1px solid var(--border);color:var(--clay)">✏ Edit</button>'+
+        (g1Phone.length>=10?'<a href="https://t.me/+'+g1Phone+'" target="_blank" class="bc-btn" style="background:#229ED9;color:#fff">✈ Telegram</a>':'')+
+        (g1Phone.length>=10?'<a href="https://wa.me/'+g1Phone+'?text='+waMsg+'" target="_blank" class="bc-btn wa-guest">💬 WA Guest</a>':'')+
+        '<a href="https://wa.me/'+CFG.OWNER_WA+'?text='+encodeURIComponent('📋 '+bk.ref+' · '+(bk.g1n||'')+'\n'+fmtDate(bk.checkin)+' → '+fmtDate(bk.checkout))+'" target="_blank" class="bc-btn wa-owner">💬 WA Self</a>'+
+        '<button class="bc-btn cancel" onclick="cancelBooking(\''+bk.ref+'\')">✕ Cancel</button>'+
+      '</div>'+
+    '</div>';
   }).join('');
 }
 
 
+
+function toggleEdit(ref){
+  var el=document.getElementById('edit-'+ref);
+  if(el) el.style.display=el.style.display==='none'?'block':'none';
+  recalcEdit(ref);
+}
+
+function recalcEdit(ref){
+  var bk=[...pendingBookings,...confirmedBookings].find(function(b){return b.ref===ref;});
+  if(!bk)return;
+  var intl=document.getElementById('ed-intl-'+ref);
+  var two=document.getElementById('ed-two-'+ref);
+  var t1=document.getElementById('ed-t1-'+ref);
+  var t2=document.getElementById('ed-t2-'+ref);
+  if(!intl)return;
+  var isIntl=intl.checked; var isTwo=two?two.checked:false;
+  var isT1=t1?t1.checked:false; var isT2=t2?t2.checked:false;
+  var nights=parseInt(bk.nights)||1;
+  var isLong=nights>5;
+  var room=bk.room==='attached'?'attached':'common';
+  var baseRate=prices[room][isLong?'long':'short'];
+  var rate=baseRate+(isIntl?CFG.INTL_SURCHARGE:0);
+  var total;
+  if(!isTwo){
+    total=Math.round(rate*nights*(isT1?0.75:1));
+  } else {
+    var full=rate*nights*SECOND_MULT;
+    total=Math.round(full/2*(isT1?0.75:1)+full/2*(isT2?0.75:1));
+  }
+  var advance=Math.round(total*0.5);
+  var grand=advance+DEPOSIT;
+  var lines=[];
+  lines.push('₹'+baseRate.toLocaleString('en-IN')+'/night × '+nights);
+  if(isIntl) lines.push('+₹'+CFG.INTL_SURCHARGE+' intl/night');
+  if(isLong) lines.push('long stay rate');
+  if(isTwo)  lines.push('×1.5 (2 guests)');
+  if(isT1&&isT2) lines.push('−25% both');
+  else if(isT1) lines.push('−25% G1');
+  else if(isT2) lines.push('−25% G2');
+  lines.push('Total: ₹'+total.toLocaleString('en-IN'));
+  lines.push('Advance: ₹'+advance.toLocaleString('en-IN'));
+  var pr=document.getElementById('ed-price-'+ref);
+  if(pr) pr.textContent=lines.join(' · ');
+}
+
+async function applyEdit(ref){
+  var bk=[...pendingBookings,...confirmedBookings].find(function(b){return b.ref===ref;});
+  if(!bk)return;
+  var intl=document.getElementById('ed-intl-'+ref);
+  var two=document.getElementById('ed-two-'+ref);
+  var t1=document.getElementById('ed-t1-'+ref);
+  var t2=document.getElementById('ed-t2-'+ref);
+  bk.intlGuest=intl?intl.checked:bk.intlGuest;
+  bk.twoGuests=two?two.checked:bk.twoGuests;
+  bk.teacherG1=t1?t1.checked:bk.teacherG1;
+  bk.teacherG2=t2?t2.checked:bk.teacherG2;
+  // Recalculate amounts
+  var nights=parseInt(bk.nights)||1;
+  var isLong=nights>5;
+  var room=bk.room==='attached'?'attached':'common';
+  var baseRate=prices[room][isLong?'long':'short'];
+  var rate=baseRate+(bk.intlGuest?CFG.INTL_SURCHARGE:0);
+  var total;
+  if(!bk.twoGuests){
+    total=Math.round(rate*nights*(bk.teacherG1?0.75:1));
+  } else {
+    var full=rate*nights*SECOND_MULT;
+    total=Math.round(full/2*(bk.teacherG1?0.75:1)+full/2*(bk.teacherG2?0.75:1));
+  }
+  bk.rate=rate; bk.totalRoomCost=total;
+  bk.advance=Math.round(total*0.5); bk.grandTotal=bk.advance+DEPOSIT;
+  // Push update to Apps Script
+  if(CFG.APPS_SCRIPT_URL&&!CFG.APPS_SCRIPT_URL.includes('YOUR_APPS')){
+    try{
+      await fetch(CFG.APPS_SCRIPT_URL,{method:'POST',
+        body:JSON.stringify({action:'updateBooking',ref:bk.ref,
+          intlGuest:bk.intlGuest,twoGuests:bk.twoGuests,
+          teacherG1:bk.teacherG1,teacherG2:bk.teacherG2,
+          rate:bk.rate,totalRoomCost:bk.totalRoomCost,
+          advance:bk.advance,grandTotal:bk.grandTotal})});
+    }catch(e){console.warn('applyEdit push failed:',e);}
+  }
+  document.getElementById('edit-'+ref).style.display='none';
+  renderHP();
+}
 // ── HOST PANEL: VISITOR GEOGRAPHY ───────────────────────────────────
 async function renderHPVisitors(){
   const body = document.getElementById('hp-list');
