@@ -421,7 +421,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 
 <!-- ADMIN BAR -->
 <div id="admin-bar">
-  <span>🔐 Admin Mode · <span style="font-family:'DM Mono',monospace;font-size:0.58rem;opacity:0.8">HTML v20 · Apps Script v8</span></span>
+  <span>🔐 Admin Mode · <span style="font-family:'DM Mono',monospace;font-size:0.58rem;opacity:0.8">HTML v20 · Apps Script v9</span></span>
   <div style="display:flex;gap:7px">
     <button class="admin-btn" onclick="openHostPanel()">📋 Host Panel</button>
     <button class="admin-btn" onclick="openAdminUpload()">＋ Upload Media</button>
@@ -854,7 +854,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
   👁 Visitors: <span id="visitor-count">—</span>
 </div>
 <span id="visitor-geo" style="display:none"></span>
-<footer id="site-footer">Shanthi &amp; Sangha @ Soudhamini · Peaceful Simple Living · Waste Segregated with Ashram Care<span style="font-family:'DM Mono',monospace;font-size:0.55rem;opacity:0.55;margin-left:14px;letter-spacing:0.06em">HTML v27 · AS v8</span></footer>
+<footer id="site-footer">Shanthi &amp; Sangha @ Soudhamini · Peaceful Simple Living · Waste Segregated with Ashram Care<span style="font-family:'DM Mono',monospace;font-size:0.55rem;opacity:0.55;margin-left:14px;letter-spacing:0.06em">HTML v28 · AS v9</span></footer>
 
 <!-- MODALS -->
 <!-- Admin Login -->
@@ -910,7 +910,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 
 <script>
 // ── CONFIG ─────────────────────────────────────────────
-const APP_VERSION='v27';
+const APP_VERSION='v28';
 const CFG={
   APPS_SCRIPT_URL:'https://script.google.com/macros/s/AKfycbzrzBGUChJvK88w3iRmMwdRdUdrhF6Ysgnfemxax3V_JPr_bQh4agHfBPpn9S8pVmm3Sw/exec',
   OWNER_WA:'919148212422',
@@ -1728,8 +1728,8 @@ async function loadBookingsFromSheet(){
             advance:sb.advance,grandTotal:sb.grandTotal,status:'confirmed',
             twoGuests:sb.twoGuests===true||sb.twoGuests==='TRUE'||sb.twoGuests==='true',
             intlGuest:sb.intlGuest===true||sb.intlGuest==='TRUE'||sb.intlGuest==='true',
-            teacherG1:sb.teacherG1===true||sb.teacherG1==='TRUE'||sb.teacherG1==='true',
-            teacherG2:sb.teacherG2===true||sb.teacherG2==='TRUE'||sb.teacherG2==='true'
+            teacherG1:sb.teacherG1===true||sb.teacherG1==='TRUE'||sb.teacherG1==='true'||sb.teacherG1==='Yes',
+            teacherG2:sb.teacherG2===true||sb.teacherG2==='TRUE'||sb.teacherG2==='true'||sb.teacherG2==='Yes'
           });
         }
       });
@@ -1747,8 +1747,8 @@ async function loadBookingsFromSheet(){
             advance:sb.advance,grandTotal:sb.grandTotal,
             twoGuests:sb.twoGuests===true||sb.twoGuests==='TRUE'||sb.twoGuests==='true',
             intlGuest:sb.intlGuest===true||sb.intlGuest==='TRUE'||sb.intlGuest==='true',
-            teacherG1:sb.teacherG1===true||sb.teacherG1==='TRUE'||sb.teacherG1==='true',
-            teacherG2:sb.teacherG2===true||sb.teacherG2==='TRUE'||sb.teacherG2==='true',
+            teacherG1:sb.teacherG1===true||sb.teacherG1==='TRUE'||sb.teacherG1==='true'||sb.teacherG1==='Yes',
+            teacherG2:sb.teacherG2===true||sb.teacherG2==='TRUE'||sb.teacherG2==='true'||sb.teacherG2==='Yes',
             status:'pending',submittedAt:sb.submittedAt
           });
         }
