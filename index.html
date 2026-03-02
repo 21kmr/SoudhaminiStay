@@ -854,7 +854,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
   👁 Visitors: <span id="visitor-count">—</span>
 </div>
 <span id="visitor-geo" style="display:none"></span>
-<footer id="site-footer">Shanthi &amp; Sangha @ Soudhamini · Peaceful Simple Living · Waste Segregated with Ashram Care<span style="font-family:'DM Mono',monospace;font-size:0.55rem;opacity:0.55;margin-left:14px;letter-spacing:0.06em">HTML v29 · AS v9</span></footer>
+<footer id="site-footer">Shanthi &amp; Sangha @ Soudhamini · Peaceful Simple Living · Waste Segregated with Ashram Care<span style="font-family:'DM Mono',monospace;font-size:0.55rem;opacity:0.55;margin-left:14px;letter-spacing:0.06em">HTML v30 · AS v9</span></footer>
 
 <!-- MODALS -->
 <!-- Admin Login -->
@@ -910,7 +910,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 
 <script>
 // ── CONFIG ─────────────────────────────────────────────
-const APP_VERSION='v29';
+const APP_VERSION='v30';
 const CFG={
   APPS_SCRIPT_URL:'https://script.google.com/macros/s/AKfycbzrzBGUChJvK88w3iRmMwdRdUdrhF6Ysgnfemxax3V_JPr_bQh4agHfBPpn9S8pVmm3Sw/exec',
   OWNER_WA:'919148212422',
@@ -2425,6 +2425,9 @@ function openRoomsModal(){
   document.getElementById('rooms-modal').classList.add('open');
   document.body.style.overflow='hidden';
   document.getElementById('rooms-admin-upload').style.display=adminMode?'block':'none';
+  // Show skeleton while loading
+  var grid=document.getElementById('rooms-media-grid');
+  if(grid&&grid.innerHTML==='') grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:30px;font-family:\'DM Mono\',monospace;font-size:0.7rem;color:var(--text-s)">⏳ Loading…</div>';
   try{var c=JSON.parse(localStorage.getItem('sdm_rooms_data')||'null');
     if(c&&typeof c==='object'){['shanthi','sangha','kitchen','service','portico','foyer'].forEach(function(r){if(!c[r])c[r]=[];});roomsData=c;renderRoomsGrid();}
   }catch(e){}
@@ -2464,8 +2467,14 @@ function renderRoomsGrid(){
         '<span style="font-size:3rem;opacity:0.7">&#9654;</span></div>'+
         '<div class="rm-label">'+item.label+'</div>'+del+'</div>';
     }
+    // Use smaller thumbnail for grid, full src for viewer
+    var thumbSrc=item.src;
+    // Convert lh3 download URLs to smaller thumbnail size for grid
+    if(thumbSrc&&thumbSrc.includes('googleusercontent.com')&&!thumbSrc.includes('=s')){
+      thumbSrc=thumbSrc.split('=')[0]+'=s400';
+    }
     return '<div class="rooms-media-item" onclick="openRoomsViewer(\''+currentRoomTab+'\','+i+')">'+
-      '<img src="'+item.src+'" alt="'+item.label+'" loading="lazy">'+
+      '<img src="'+thumbSrc+'" alt="'+item.label+'" loading="lazy" style="width:100%;aspect-ratio:4/3;object-fit:cover;display:block" onerror="this.style.opacity=0.3;this.alt=\'Load failed\'">'+
       '<div class="rm-label">'+item.label+'</div>'+del+'</div>';
   }).join('');
 }
@@ -2474,9 +2483,12 @@ function openRoomsViewer(room,idx){
   if(!item)return;
   var content=document.getElementById('rooms-viewer-content');
   if(item.type==='video'){
-    content.innerHTML='<iframe src="'+item.src+'" style="width:min(640px,92vw);aspect-ratio:16/9;border:none;border-radius:8px" allowfullscreen></iframe>';
+    content.innerHTML='<iframe src="'+item.src+'" style="width:min(680px,94vw);aspect-ratio:16/9;border:none;border-radius:8px" allowfullscreen allow="autoplay"></iframe>';
   } else {
-    content.innerHTML='<img src="'+item.src+'" style="max-width:92vw;max-height:88vh;border-radius:8px;display:block">';
+    // For lh3 URLs strip size param to get full resolution
+    var fullSrc=item.src;
+    if(fullSrc&&fullSrc.includes('googleusercontent.com')) fullSrc=fullSrc.split('=')[0];
+    content.innerHTML='<img src="'+fullSrc+'" style="max-width:92vw;max-height:88vh;border-radius:8px;display:block" loading="eager">';
   }
   document.getElementById('rooms-viewer').classList.add('open');
 }
@@ -2555,11 +2567,10 @@ async function loadRoomsFromServer(){
         allRooms.forEach(function(room){
           if(!remote[room])remote[room]=[];
           remote[room].forEach(function(item){
-            if(item.src&&item.src.includes('uc?export=view')){
+            // Fix old thumbnail URLs — replace with uc?export=view (no auth needed)
+            if(item.src&&item.src.includes('thumbnail?id=')){
               var m=item.src.match(/[?&]id=([^&]+)/);
-              if(m)item.src=item.type==='video'
-                ?'https://drive.google.com/file/d/'+m[1]+'/preview'
-                :'https://drive.google.com/thumbnail?id='+m[1]+'&sz=w1600';
+              if(m)item.src='https://drive.google.com/uc?export=view&id='+m[1];
             }
           });
         });
