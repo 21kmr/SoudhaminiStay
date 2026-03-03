@@ -337,9 +337,6 @@ main{max-width:860px;margin:0 auto;padding:0 20px 60px;}
 .hp-header-meta{font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;opacity:0.8;margin-top:2px;}
 .hp-close{background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);color:#fff;padding:6px 14px;border-radius:100px;font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:background 0.2s;}
 .hp-close:hover{background:rgba(255,255,255,0.35);}
-.hp-footer{text-align:center;padding:16px 20px;font-family:'DM Mono',monospace;
-  font-size:0.52rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-s);
-  border-top:1px solid var(--border);margin-top:auto;}
 .hp-body{max-width:900px;margin:0 auto;padding:24px 20px 60px;width:100%;}
 .hp-tabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap;}
 .hp-tab{font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.14em;text-transform:uppercase;padding:7px 16px;border-radius:100px;border:1px solid var(--border);background:transparent;color:var(--clay);cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:5px;}
@@ -396,30 +393,22 @@ main{max-width:860px;margin:0 auto;padding:0 20px 60px;}
 
 footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-s);border-top:1px solid var(--border);}
 
-/* ── ROOMS MODAL ──────────────────────────────────── */
-.rooms-modal-overlay{position:fixed;inset:0;background:rgba(10,5,2,0.92);z-index:1500;display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px 0;opacity:0;pointer-events:none;transition:opacity 0.3s;}
-.rooms-modal-overlay.open{opacity:1;pointer-events:all;}
-.rooms-modal{background:var(--surface);border-radius:14px;width:min(700px,96vw);padding:24px;position:relative;margin:auto;}
-.rooms-modal-close{position:absolute;top:14px;right:14px;background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--text-s);line-height:1;}
-.rooms-modal h2{font-family:'Playfair Display',serif;font-size:1.3rem;margin:0 0 4px;color:var(--text);}
-.rooms-modal-sub{font-size:0.75rem;color:var(--text-s);margin-bottom:20px;}
-.rooms-tabs{display:flex;gap:8px;margin-bottom:18px;}
-.rooms-tab{font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;padding:7px 18px;border-radius:100px;border:1px solid var(--border);background:transparent;color:var(--clay);cursor:pointer;transition:all 0.2s;}
-.rooms-tab.active{background:var(--clay);color:#fff;border-color:var(--clay);}
-.rooms-media-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;}
-.rooms-media-item{position:relative;border-radius:8px;overflow:hidden;background:var(--warm);cursor:pointer;}
-.rooms-media-item img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;}
-.rooms-media-item .play-badge{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.3);}
-.rooms-media-item .play-badge span{font-size:2rem;opacity:0.9;}
-.rooms-media-item .rm-label{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.6));color:#fff;font-size:0.65rem;padding:14px 8px 6px;font-family:'DM Mono',monospace;}
-.rooms-empty{text-align:center;padding:40px 20px;color:var(--text-s);font-size:0.8rem;}
-.rooms-upload-btn{display:block;width:100%;margin-top:14px;padding:10px;background:none;border:1px dashed var(--border);border-radius:8px;color:var(--text-s);font-family:'DM Mono',monospace;font-size:0.6rem;cursor:pointer;transition:all 0.2s;text-align:center;}
-.rooms-upload-btn:hover{border-color:var(--clay);color:var(--clay);}
-.rooms-viewer-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:2000;display:flex;align-items:center;justify-content:center;display:none;}
-.rooms-viewer-overlay.open{display:flex;}
-.rooms-viewer-close{position:fixed;top:14px;right:18px;background:none;border:none;color:#fff;font-size:1.6rem;cursor:pointer;}
-
-
+/* ── UPLOAD PROGRESS ─────────────────────────────────── */
+.upload-progress-overlay{position:absolute;inset:0;background:rgba(250,245,235,0.96);z-index:100;
+  display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;
+  transition:opacity 0.2s;border-radius:inherit;}
+.upload-progress-overlay.show{opacity:1;pointer-events:all;}
+.upload-progress-box{background:transparent;padding:20px 24px;width:100%;text-align:center;}
+.upload-progress-icon{font-size:2.5rem;margin-bottom:10px;animation:spin 1.2s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.upload-progress-label{font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--text-s);
+  letter-spacing:0.08em;text-transform:uppercase;margin-bottom:14px;}
+.upload-progress-bar-wrap{background:var(--warm);border-radius:100px;height:8px;overflow:hidden;margin-bottom:8px;}
+.upload-progress-bar{height:100%;background:var(--clay);border-radius:100px;
+  width:0%;transition:width 0.3s ease;}
+.upload-progress-pct{font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--clay);}
+.upload-progress-file{font-size:0.7rem;color:var(--text-s);margin-top:6px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:280px;}
 </style>
 </head>
 <body>
@@ -437,7 +426,6 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 <header style="position:relative">
   <div style="position:absolute;top:10px;right:12px;display:flex;flex-direction:column;gap:6px;align-items:flex-end;z-index:10">
     <button onclick="goHome()" title="Start over" style="background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.35);border-radius:50%;width:44px;height:44px;font-size:1.4rem;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1">🏠</button>
-    <button onclick="openRoomsModal()" title="View room photos &amp; videos" style="background:var(--clay);color:#fff;border:none;border-radius:10px;padding:10px 16px;font-family:'DM Mono',monospace;font-size:0.72rem;font-weight:600;cursor:pointer;letter-spacing:0.06em;box-shadow:0 2px 8px rgba(0,0,0,0.2);display:flex;align-items:center;gap:6px;white-space:nowrap">📷 View Rooms</button>
   </div>
   <span class="leaf-div">❧ ❧ ❧</span>
   <h1 onclick="goHome()" style="cursor:pointer;user-select:none"><em>Shanthi &amp; Sangha</em> @ Soudhamini</h1>
@@ -859,7 +847,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
   👁 Visitors: <span id="visitor-count">—</span>
 </div>
 <span id="visitor-geo" style="display:none"></span>
-<footer id="site-footer">Shanthi &amp; Sangha @ Soudhamini · Peaceful Simple Living · Waste Segregated with Ashram Care<span style="font-family:'DM Mono',monospace;font-size:0.55rem;opacity:0.55;margin-left:14px;letter-spacing:0.06em">HTML v35 · AS v10</span></footer>
+<footer id="site-footer">Shanthi &amp; Sangha @ Soudhamini · Peaceful Simple Living · Waste Segregated with Ashram Care<span style="font-family:'DM Mono',monospace;font-size:0.55rem;opacity:0.55;margin-left:14px;letter-spacing:0.06em">HTML v34 · AS v9</span></footer>
 
 <!-- MODALS -->
 <!-- Admin Login -->
@@ -879,35 +867,6 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
   </div>
 </div>
 
-<!-- Admin Upload -->
-<div class="modal-overlay" id="admin-upload-modal">
-  <div class="modal" onclick="event.stopPropagation()" style="position:relative">
-    
-    <div class="upload-progress-pct" id="upload-progress-pct">0%</div>
-    <div class="upload-progress-file" id="upload-progress-file"></div>
-  </div>
-</div>
-    <button class="modal-close" onclick="closeModal('admin-upload-modal')">✕</button>
-    <h3>Upload to Room</h3>
-    <p style="font-size:0.78rem;color:var(--text-s);margin-bottom:12px">Select the room section and upload photos or videos. They will be visible to all visitors.</p>
-    <span class="m-label">Room Section</span>
-    <select id="adm-room-select" style="width:100%;margin-bottom:12px;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:0.85rem;background:var(--surface)">
-      <option value="shanthi">Shanthi Room</option>
-      <option value="sangha">Sangha Room</option>
-      <option value="kitchen">Kitchen</option>
-      <option value="service">Service Area</option>
-      <option value="portico">Portico</option>
-      <option value="foyer">Foyer &amp; Hall</option>
-    </select>
-    <div class="drop-zone" id="adm-drop" onclick="document.getElementById('adm-file').click()" ondragover="doDrag(event,'adm-drop')" ondragleave="noDrag('adm-drop')" ondrop="onDrop(event,'adm')">
-      <div class="drop-icon">🏞️</div><p>Drop files or click to browse</p><small>JPG, PNG, MP4 · Max 50MB</small>
-    </div>
-    <input type="file" id="adm-file" class="hidden" multiple accept="image/*,video/*" onchange="onAdmFiles(event)">
-    <div class="preview-strip" id="adm-previews"></div>
-    <button class="btn-primary" id="btn-adm-upload" disabled onclick="doRoomUploadFromAdmin()">Upload ✦</button>
-  </div>
-</div>
-
 <!-- Lightbox -->
 <div class="lightbox" id="lightbox">
   <button class="lb-close" onclick="closeLB()">✕</button>
@@ -920,7 +879,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 
 <script>
 // ── CONFIG ─────────────────────────────────────────────
-const APP_VERSION='v35';
+const APP_VERSION='v34';
 const CFG={
   APPS_SCRIPT_URL:'https://script.google.com/macros/s/AKfycbzrzBGUChJvK88w3iRmMwdRdUdrhF6Ysgnfemxax3V_JPr_bQh4agHfBPpn9S8pVmm3Sw/exec',
   OWNER_WA:'919148212422',
@@ -977,7 +936,6 @@ let twoGuests=false,intlGuest=false,teacherDiscount=false,adminMode=false;
 let visitorSession={fingerprint:null,isAdmin:false,isTestBooking:false,geoLogged:false};
 const prices={attached:{short:2000,long:1500},common:{short:1500,long:1000}};
 const DEPOSIT=1000,SECOND_MULT=1.5;
-const pFiles={adm:[]};
 const avatarColors=['#8b4a2a','#4a6741','#7a9e72','#b8962a','#b07c50','#4a6fa5','#7a5c8a'];
 
 // Reviews
@@ -1481,7 +1439,7 @@ function adminLogin(){
   if(pw===CFG.ADMIN_PW){
     adminMode=true;
   var vd=document.getElementById('admin-ver-display');
-  if(vd)vd.textContent='HTML '+APP_VERSION+' · AS v10';var hpvf=document.getElementById('hp-ver-footer');if(hpvf)hpvf.textContent='HTML '+APP_VERSION+' · AS v10';document.getElementById('admin-bar').classList.add('visible');
+  if(vd)vd.textContent='HTML '+APP_VERSION+' · AS v9';document.getElementById('admin-bar').classList.add('visible');
     visitorSession.isAdmin=true;
     if(visitorSession.fingerprint && visitorSession.geo)
       logVisitToServer(visitorSession.fingerprint, visitorSession.geo, true, false);
@@ -1507,72 +1465,6 @@ function openAdminUpload(){
   document.getElementById('admin-upload-modal').classList.add('open');
 }
 
-function onAdmFiles(evt){
-  var files=[...evt.target.files];
-  pFiles.adm=files;
-  var strip=document.getElementById('adm-previews');
-  strip.innerHTML='';
-  files.forEach(function(f){
-    var div=document.createElement('div');
-    div.className='preview-item';
-    if(f.type.startsWith('video/')){
-      div.innerHTML='<div style="width:60px;height:60px;background:#2a1f10;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:1.5rem">▶</div>';
-    } else {
-      var img=document.createElement('img');
-      img.style.cssText='width:60px;height:60px;object-fit:cover;border-radius:6px';
-      var fr=new FileReader();
-      fr.onload=function(e){img.src=e.target.result;};
-      fr.readAsDataURL(f);
-      div.appendChild(img);
-    }
-    strip.appendChild(div);
-  });
-  document.getElementById('btn-adm-upload').disabled=files.length===0;
-}
-
-async function doRoomUploadFromAdmin(){
-  var files=pFiles.adm||[];
-  if(!files.length)return;
-  var room=document.getElementById('adm-room-select').value;
-  var btn=document.getElementById('btn-adm-upload');
-  if(btn){btn.disabled=true;btn.textContent='Uploading...';}
-
-  for(var i=0;i<files.length;i++){
-    var f=files[i];
-    var isV=f.type.startsWith('video/');
-    var cap=f.name.replace(/\.[^.]+$/,'').replace(/[-_]/g,' ');
-    var src=null; var fileId=null;
-    try{
-      var b64=await new Promise(function(res,rej){
-        var fr=new FileReader();
-        fr.onload=function(e){res({name:f.name,type:f.type,data:e.target.result.split(',')[1]});};
-        fr.onerror=rej; fr.readAsDataURL(f);
-      });
-      if(CFG.APPS_SCRIPT_URL&&!CFG.APPS_SCRIPT_URL.includes('YOUR_APPS')){
-        var res=await fetch(CFG.APPS_SCRIPT_URL,{method:'POST',
-          body:JSON.stringify({action:'uploadRoomMedia',fileName:b64.name,
-            mimeType:b64.type,data:b64.data,room:room,caption:cap})});
-        var result=await res.json();
-        console.log('[SDM] uploadRoomMedia:',JSON.stringify(result).slice(0,120));
-        if(result.url){
-          fileId=result.fileId||null;
-          src=isV
-            ?(fileId?'https://drive.google.com/uc?export=download&id='+fileId:result.url)
-            :(result.url||'https://drive.google.com/uc?export=view&id='+fileId);
-        }
-      }
-      if(!src)src='data:'+b64.type+';base64,'+b64.data;
-      if(!roomsData[room])roomsData[room]=[];
-      roomsData[room].push({type:isV?'video':'image',src:src,label:cap,fileId:fileId,addedAt:new Date().toISOString()});
-    }catch(e){console.error('Admin room upload error:',e);}
-  }
-  pFiles.adm=[];
-  document.getElementById('adm-previews').innerHTML='';
-  try{localStorage.setItem('sdm_rooms_data',JSON.stringify(roomsData));}catch(e){}
-  await loadRoomsFromServer();
-  if(btn){btn.disabled=false;btn.textContent='Upload ❆';}
-  closeModal('admin-upload-modal');
-}
 // Triple-click footer = admin login
 document.getElementById('site-footer').addEventListener('click',(function(){let c=0,t;return function(){c++;clearTimeout(t);t=setTimeout(()=>c=0,600);if(c>=3){document.getElementById('admin-login-modal').classList.add('open');c=0;}};})());
 
@@ -1581,23 +1473,6 @@ function closeModal(id){ document.getElementById(id).classList.remove('open'); }
 document.querySelectorAll('.modal-overlay').forEach(o=>{o.addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});});
 
 // ── FILES ───────────────────────────────────────────────
-function doDrag(e,id){e.preventDefault();document.getElementById(id).classList.add('dragover');}
-function noDrag(id){document.getElementById(id).classList.remove('dragover');}
-function onDrop(e,who){e.preventDefault();const z={adm:'adm-drop'};noDrag(z[who]||who);doFiles([...e.dataTransfer.files],who);}
-function onFiles(e,who){doFiles([...e.target.files],who);}
-function doFiles(files,who){
-  const ps={adm:'adm-previews'};
-  const bs={adm:'btn-adm-upload'};
-  const strip=document.getElementById(ps[who]);
-  files.slice(0,10).forEach(f=>{
-    if(f.size>50*1024*1024)return;
-    pFiles[who].push(f);
-    if(f.type.startsWith('image/')){const r=new FileReader();r.onload=ev=>{const i=document.createElement('img');i.src=ev.target.result;i.className='preview-thumb';strip.appendChild(i);};r.readAsDataURL(f);}
-    else{const d=document.createElement('div');d.className='preview-vid';d.textContent='🎬';strip.appendChild(d);}
-  });
-  if(bs[who])document.getElementById(bs[who]).disabled=pFiles[who].length===0;
-}
-
 // ── GALLERY ─────────────────────────────────────────────
 // ── LIGHTBOX ────────────────────────────────────────────
 
@@ -1654,20 +1529,16 @@ async function applyEdit(ref){
   var t1=document.getElementById('ed-t1-'+ref);
   var t2=document.getElementById('ed-t2-'+ref);
   var roomSel2=document.getElementById('ed-room-'+ref);
-  var nameInp=document.getElementById('ed-name-'+ref);
   var oldRef=ref;
-  // Update guest name if changed
-  if(nameInp&&nameInp.value.trim()) bk.g1n=nameInp.value.trim();
-  // Update room
   if(roomSel2){
     bk.room=roomSel2.value;
     bk.roomLabel=roomSel2.value==='attached'?'Shanthi':'Sangha';
+    // Rebuild ref: NAME-DDMMYY-ROOM
+    var ciParts=(bk.checkin||'').split('-'); // YYYY-MM-DD
+    var ciShortE=ciParts.length===3?(ciParts[2]+ciParts[1]+ciParts[0].slice(2)):oldRef.split('-')[1]||'';
+    var namePartE=(bk.g1n||'').split(' ')[0].replace(/[^a-zA-Z]/g,'').toUpperCase().slice(0,10);
+    bk.ref=namePartE+'-'+ciShortE+'-'+bk.roomLabel.toUpperCase();
   }
-  // Always rebuild ref from current name + checkin + room
-  var ciParts=(bk.checkin||'').split('-');
-  var ciShortE=ciParts.length===3?(ciParts[2]+ciParts[1]+ciParts[0].slice(2)):'';
-  var namePartE=(bk.g1n||'').split(' ')[0].replace(/[^a-zA-Z]/g,'').toUpperCase().slice(0,10);
-  bk.ref=namePartE+'-'+ciShortE+'-'+(bk.roomLabel||'').toUpperCase();
   bk.intlGuest=intl?intl.checked:bk.intlGuest;
   bk.twoGuests=two?two.checked:bk.twoGuests;
   bk.teacherG1=t1?t1.checked:bk.teacherG1;
@@ -1918,11 +1789,6 @@ function renderHP(){
       // Edit panel
       '<div id="edit-'+bk.ref+'" style="display:none;background:var(--warm);border:1px solid var(--border);border-radius:8px;padding:12px;margin-top:8px">'+
         '<div style="font-family:\'DM Mono\',monospace;font-size:0.58rem;color:var(--clay);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.08em">✏ Edit Booking</div>'+
-        '<div style="margin-bottom:10px">'+
-        '<label style="display:block;font-family:\'DM Mono\',monospace;font-size:0.55rem;color:var(--text-s);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:4px">Guest Name</label>'+
-        '<input type="text" id="ed-name-'+bk.ref+'" value="'+(bk.g1n||'')+'" '+
-          'style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:0.82rem;background:var(--surface);box-sizing:border-box">'+
-        '</div>'+
         '<div style="margin-bottom:10px">'+
         '<label style="display:block;font-family:\'DM Mono\',monospace;font-size:0.55rem;color:var(--text-s);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:4px">Room</label>'+
         '<select id="ed-room-'+bk.ref+'" onchange="recalcEdit(this.closest(\'[id^=edit-]\').id.slice(5))" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:0.82rem;background:var(--surface)">'+
@@ -2445,202 +2311,9 @@ function logVisitToServer(fingerprint, geo, isAdmin, isTestBooking){
 
 // ══════════════════════════════════════════════════════════
 
-function setUploadProgress(pct,done,pfx){
-  pfx=pfx||'';
-  var bar=document.getElementById(pfx+'upload-progress-bar');
-  var txt=document.getElementById(pfx+'upload-progress-pct');
-  var ic=document.getElementById(pfx+'upload-progress-icon');
-  if(bar)bar.style.width=pct+'%';
-  if(txt)txt.textContent=Math.round(pct)+'%';
-  if(done){if(ic){ic.textContent='✅';ic.style.animation='none';}}
-}
-function hideUploadProgress(pfx){
-  pfx=pfx||'';
-  setTimeout(function(){
-    var ov=document.getElementById(pfx+'upload-progress-overlay');
-    if(ov)ov.classList.remove('show');
-    var ic=document.getElementById(pfx+'upload-progress-icon');
-    if(ic){ic.textContent='⏳';ic.style.animation='';}
-  },800);
-}
+// ── UPLOAD PROGRESS HELPERS ──────────────────────────────
 // ROOMS MEDIA
 // ══════════════════════════════════════════════════════════
-let roomsData={shanthi:[],sangha:[],kitchen:[],service:[],portico:[],foyer:[]};
-let currentRoomTab='shanthi';
-
-function openRoomsModal(){
-  document.getElementById('rooms-modal').classList.add('open');
-  document.body.style.overflow='hidden';
-  document.getElementById('rooms-admin-upload').style.display=adminMode?'block':'none';
-  // Show skeleton while loading
-  var grid=document.getElementById('rooms-media-grid');
-  if(grid&&grid.innerHTML==='') grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:30px;font-family:\'DM Mono\',monospace;font-size:0.7rem;color:var(--text-s)">⏳ Loading…</div>';
-  try{var c=JSON.parse(localStorage.getItem('sdm_rooms_data')||'null');
-    if(c&&typeof c==='object'){['shanthi','sangha','kitchen','service','portico','foyer'].forEach(function(r){if(!c[r])c[r]=[];});roomsData=c;renderRoomsGrid();}
-  }catch(e){}
-  loadRoomsFromServer();
-}
-function closeRoomsModal(){
-  document.getElementById('rooms-modal').classList.remove('open');
-  document.body.style.overflow='';
-}
-function switchRoomTab(tab,btn){
-  currentRoomTab=tab;
-  document.querySelectorAll('.rooms-tab').forEach(t=>t.classList.remove('active'));
-  btn.classList.add('active');
-  renderRoomsGrid();
-}
-function renderRoomsGrid(){
-  const grid=document.getElementById('rooms-media-grid');
-  const items=roomsData[currentRoomTab]||[];
-  if(!items.length){
-    grid.innerHTML='<div class="rooms-empty">'+
-      (adminMode?'Use the upload button below to add photos & videos.':'No media yet — check back soon!')+
-      '</div>';
-    return;
-  }
-  grid.innerHTML=items.map(function(item,i){
-    var isV=item.type==='video';
-    var del=adminMode
-      ?'<button onclick="event.stopPropagation();deleteRoomMedia(\''+currentRoomTab+'\','+i+')" '+
-        'style="position:absolute;top:5px;right:5px;background:rgba(139,74,42,0.85);color:#fff;'+
-        'border:none;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:0.7rem;'+
-        'display:flex;align-items:center;justify-content:center;z-index:2">&#x2715;</button>'
-      :'';
-    if(isV){
-      return '<div class="rooms-media-item" onclick="openRoomsViewer(\''+currentRoomTab+'\','+i+')">'+
-        '<div style="aspect-ratio:4/3;background:linear-gradient(135deg,#1a1005,#3a2510);'+
-        'display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;">'+
-        '<span style="font-size:2.5rem">🎬</span>'+
-        '<span style="font-family:\'DM Mono\',monospace;font-size:0.5rem;color:rgba(255,255,255,0.5);letter-spacing:0.08em;text-transform:uppercase">Tap to play</span></div>'+
-        '<div class="rm-label">'+item.label+'</div>'+del+'</div>';
-    }
-    // Use smaller thumbnail for grid, full src for viewer
-    var thumbSrc=item.src;
-    // Convert lh3 download URLs to smaller thumbnail size for grid
-    if(thumbSrc&&thumbSrc.includes('googleusercontent.com')&&!thumbSrc.includes('=s')){
-      thumbSrc=thumbSrc.split('=')[0]+'=s400';
-    }
-    return '<div class="rooms-media-item" onclick="openRoomsViewer(\''+currentRoomTab+'\','+i+')">'+
-      '<img src="'+thumbSrc+'" alt="'+item.label+'" loading="lazy" style="width:100%;aspect-ratio:4/3;object-fit:cover;display:block" onerror="this.style.opacity=0.3;this.alt=\'Load failed\'">'+
-      '<div class="rm-label">'+item.label+'</div>'+del+'</div>';
-  }).join('');
-}
-function openRoomsViewer(room,idx){
-  var item=(roomsData[room]||[])[idx];
-  if(!item)return;
-  var content=document.getElementById('rooms-viewer-content');
-  if(item.type==='video'){
-    // Normalise URL: convert old /preview to uc?export=view for direct <video> playback
-    var vidSrc=item.src||'';
-    if(item.fileId) vidSrc='https://drive.google.com/uc?export=view&id='+item.fileId;
-    else if(vidSrc.includes('/preview')) vidSrc=vidSrc.replace('/preview','')+'?export=view';
-    content.innerHTML='<video controls autoplay playsinline '+
-      'style="width:min(680px,94vw);max-height:80vh;border-radius:8px;background:#000">'+
-      '<source src="'+vidSrc+'" type="video/mp4">'+
-      '<source src="'+vidSrc+'" type="video/webm">'+
-      '</video>'+
-      '<div style="text-align:center;margin-top:8px">'+
-      '<a href="'+vidSrc+'" target="_blank" style="font-family:\'DM Mono\',monospace;font-size:0.6rem;color:var(--clay)">↗ Open in browser if video doesn\'t play</a></div>';
-  } else {
-    // For lh3 URLs strip size param to get full resolution
-    var fullSrc=item.src;
-    if(fullSrc&&fullSrc.includes('googleusercontent.com')) fullSrc=fullSrc.split('=')[0];
-    content.innerHTML='<img src="'+fullSrc+'" style="max-width:92vw;max-height:88vh;border-radius:8px;display:block" loading="eager">';
-  }
-  document.getElementById('rooms-viewer').classList.add('open');
-}
-function closeRoomsViewer(){
-  document.getElementById('rooms-viewer').classList.remove('open');
-  document.getElementById('rooms-viewer-content').innerHTML='';
-}
-function triggerRoomUpload(){
-  document.getElementById('room-file-input').click();
-}
-async function handleRoomUpload(input){
-  var files=[...input.files];
-  if(!files.length)return;
-  var btn=document.querySelector('.rooms-upload-btn');
-  if(btn){btn.disabled=true;btn.textContent='Uploading...';}
-  for(var i=0;i<files.length;i++){
-    var f=files[i];
-    var isV=f.type.startsWith('video/');
-    var cap=f.name.replace(/\.[^.]+$/,'').replace(/[-_]/g,' ');
-    var src=null;
-    var fileId=null;
-    try{
-      var b64=await new Promise(function(res,rej){
-        var fr=new FileReader();
-        fr.onload=function(e){res({name:f.name,type:f.type,data:e.target.result.split(',')[1]});};
-        fr.onerror=rej;
-        fr.readAsDataURL(f);
-      });
-      if(CFG.APPS_SCRIPT_URL&&!CFG.APPS_SCRIPT_URL.includes('YOUR_APPS')){
-        var res=await fetch(CFG.APPS_SCRIPT_URL,{method:'POST',
-          body:JSON.stringify({action:'uploadRoomMedia',fileName:b64.name,
-            mimeType:b64.type,data:b64.data,room:currentRoomTab,caption:cap})});
-        var result=await res.json();
-        if(result.url){
-          fileId=result.fileId||null;
-          src=isV
-            ?(fileId?'https://drive.google.com/uc?export=download&id='+fileId:result.url)
-            :(result.url||'https://drive.google.com/uc?export=view&id='+fileId);
-        }
-      }
-      if(!src)src='data:'+b64.type+';base64,'+b64.data;
-      if(!roomsData[currentRoomTab])roomsData[currentRoomTab]=[];
-      roomsData[currentRoomTab].push({type:isV?'video':'image',src:src,label:cap,fileId:fileId,addedAt:new Date().toISOString()});
-    }catch(e){console.error('Room upload error:',e);}
-  }
-  input.value='';
-  try{localStorage.setItem('sdm_rooms_data',JSON.stringify(roomsData));}catch(e){}
-  await loadRoomsFromServer();
-  if(btn){btn.disabled=false;btn.textContent='+ Upload Photo / Video';}
-}
-function deleteRoomMedia(room,idx){
-  if(!confirm('Remove this item?'))return;
-  var item=(roomsData[room]||[])[idx];
-  roomsData[room].splice(idx,1);
-  renderRoomsGrid();
-  if(item&&item.fileId&&CFG.APPS_SCRIPT_URL&&!CFG.APPS_SCRIPT_URL.includes('YOUR_APPS')){
-    fetch(CFG.APPS_SCRIPT_URL,{method:'POST',
-      body:JSON.stringify({action:'deleteRoomMedia',fileId:item.fileId,room:room})}).catch(function(){});
-    fetch(CFG.APPS_SCRIPT_URL,{method:'POST',
-      body:JSON.stringify({action:'saveRoomsData',data:roomsData})}).catch(function(){});
-  }
-}
-async function loadRoomsFromServer(){
-  if(!CFG.APPS_SCRIPT_URL||CFG.APPS_SCRIPT_URL.includes('YOUR_APPS'))return;
-  try{
-    var res=await fetch(CFG.APPS_SCRIPT_URL+'?action=getRoomsData');
-    var rawText=await res.text();
-    console.log('[SDM] getRoomsData:',rawText.slice(0,120));
-    var data=JSON.parse(rawText);
-    if(data&&data.rooms){
-      var remote=JSON.parse(data.rooms);
-      if(remote&&typeof remote==='object'){
-        var allRooms=['shanthi','sangha','kitchen','service','portico','foyer'];
-        allRooms.forEach(function(room){
-          if(!remote[room])remote[room]=[];
-          remote[room].forEach(function(item){
-            // Fix old thumbnail URLs — replace with uc?export=view (no auth needed)
-            if(item.src&&item.src.includes('thumbnail?id=')){
-              var m=item.src.match(/[?&]id=([^&]+)/);
-              if(m)item.src='https://drive.google.com/uc?export=view&id='+m[1];
-            }
-            // Ensure video fileId is used for direct stream URL
-            if(item.type==='video'&&item.fileId&&!item.src.includes('export=view')){
-              item.src='https://drive.google.com/uc?export=view&id='+item.fileId;
-            }
-          });
-        });
-        roomsData=remote;
-        try{localStorage.setItem('sdm_rooms_data',JSON.stringify(remote));}catch(e){}
-        renderRoomsGrid();
-      }
-    }
-  }catch(e){console.error('[SDM] loadRoomsFromServer:',e.message);}
-}
 
 </script>
 <!-- HOST PANEL -->
@@ -2665,41 +2338,8 @@ async function loadRoomsFromServer(){
     </div>
     <div id="hp-list"></div>
   </div>
-  <div class="hp-footer" id="hp-ver-footer">HTML v35 · AS v10</div>
 </div>
 
 
-<!-- ROOMS MODAL -->
-<div class="rooms-modal-overlay" id="rooms-modal">
-  <div class="rooms-modal">
-    <button class="rooms-modal-close" onclick="closeRoomsModal()">✕</button>
-    <h2>🏡 Shanthi &amp; Sangha Rooms</h2>
-    <p class="rooms-modal-sub">Photos &amp; videos of your stay space</p>
-    <div class="rooms-tabs">
-      <button class="rooms-tab active" id="rtab-shanthi" onclick="switchRoomTab('shanthi',this)">Shanthi Room</button>
-      <button class="rooms-tab" id="rtab-sangha" onclick="switchRoomTab('sangha',this)">Sangha Room</button>
-      <button class="rooms-tab" id="rtab-kitchen" onclick="switchRoomTab('kitchen',this)">Kitchen</button>
-      <button class="rooms-tab" id="rtab-service" onclick="switchRoomTab('service',this)">Service Area</button>
-      <button class="rooms-tab" id="rtab-portico" onclick="switchRoomTab('portico',this)">Portico</button>
-      <button class="rooms-tab" id="rtab-foyer" onclick="switchRoomTab('foyer',this)">Foyer &amp; Hall</button>
-    </div>
-    <div id="rooms-media-grid" class="rooms-media-grid"></div>
-    <div id="rooms-admin-upload" style="display:none;position:relative">
-      
-    <div class="upload-progress-pct" id="rooms-upload-progress-pct">0%</div>
-    <div class="upload-progress-file" id="rooms-upload-progress-file"></div>
-  </div>
-</div>
-      <button class="rooms-upload-btn" onclick="triggerRoomUpload()">＋ Upload Photo / Video</button>
-      <input type="file" id="room-file-input" accept="image/*,video/*" multiple style="display:none" onchange="handleRoomUpload(this)">
-    </div>
-  </div>
-</div>
-
-<!-- ROOMS VIEWER -->
-<div class="rooms-viewer-overlay" id="rooms-viewer">
-  <button class="rooms-viewer-close" onclick="closeRoomsViewer()">✕</button>
-  <div id="rooms-viewer-content"></div>
-</div>
 </body>
 </html>
