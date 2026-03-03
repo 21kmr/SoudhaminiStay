@@ -416,22 +416,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 .rooms-viewer-overlay.open{display:flex;}
 .rooms-viewer-close{position:fixed;top:14px;right:18px;background:none;border:none;color:#fff;font-size:1.6rem;cursor:pointer;}
 
-/* ── UPLOAD PROGRESS ─────────────────────────────────── */
-.upload-progress-overlay{position:absolute;inset:0;background:rgba(250,245,235,0.96);z-index:100;
-  display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;
-  transition:opacity 0.2s;border-radius:inherit;}
-.upload-progress-overlay.show{opacity:1;pointer-events:all;}
-.upload-progress-box{background:transparent;padding:20px 24px;width:100%;text-align:center;}
-.upload-progress-icon{font-size:2.5rem;margin-bottom:10px;animation:spin 1.2s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg);}}
-.upload-progress-label{font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--text-s);
-  letter-spacing:0.08em;text-transform:uppercase;margin-bottom:14px;}
-.upload-progress-bar-wrap{background:var(--warm);border-radius:100px;height:8px;overflow:hidden;margin-bottom:8px;}
-.upload-progress-bar{height:100%;background:var(--clay);border-radius:100px;
-  width:0%;transition:width 0.3s ease;}
-.upload-progress-pct{font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--clay);}
-.upload-progress-file{font-size:0.7rem;color:var(--text-s);margin-top:6px;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:280px;}
+
 </style>
 </head>
 <body>
@@ -871,7 +856,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
   👁 Visitors: <span id="visitor-count">—</span>
 </div>
 <span id="visitor-geo" style="display:none"></span>
-<footer id="site-footer">Shanthi &amp; Sangha @ Soudhamini · Peaceful Simple Living · Waste Segregated with Ashram Care<span style="font-family:'DM Mono',monospace;font-size:0.55rem;opacity:0.55;margin-left:14px;letter-spacing:0.06em">HTML v33 · AS v9</span></footer>
+<footer id="site-footer">Shanthi &amp; Sangha @ Soudhamini · Peaceful Simple Living · Waste Segregated with Ashram Care<span style="font-family:'DM Mono',monospace;font-size:0.55rem;opacity:0.55;margin-left:14px;letter-spacing:0.06em">HTML v35 · AS v10</span></footer>
 
 <!-- MODALS -->
 <!-- Admin Login -->
@@ -894,13 +879,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 <!-- Admin Upload -->
 <div class="modal-overlay" id="admin-upload-modal">
   <div class="modal" onclick="event.stopPropagation()" style="position:relative">
-    <div class="upload-progress-overlay" id="upload-progress-overlay">
-  <div class="upload-progress-box">
-    <div class="upload-progress-icon" id="upload-progress-icon">⏳</div>
-    <div class="upload-progress-label" id="upload-progress-label">Uploading…</div>
-    <div class="upload-progress-bar-wrap">
-      <div class="upload-progress-bar" id="upload-progress-bar"></div>
-    </div>
+    
     <div class="upload-progress-pct" id="upload-progress-pct">0%</div>
     <div class="upload-progress-file" id="upload-progress-file"></div>
   </div>
@@ -938,7 +917,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 
 <script>
 // ── CONFIG ─────────────────────────────────────────────
-const APP_VERSION='v33';
+const APP_VERSION='v35';
 const CFG={
   APPS_SCRIPT_URL:'https://script.google.com/macros/s/AKfycbzrzBGUChJvK88w3iRmMwdRdUdrhF6Ysgnfemxax3V_JPr_bQh4agHfBPpn9S8pVmm3Sw/exec',
   OWNER_WA:'919148212422',
@@ -1499,7 +1478,7 @@ function adminLogin(){
   if(pw===CFG.ADMIN_PW){
     adminMode=true;
   var vd=document.getElementById('admin-ver-display');
-  if(vd)vd.textContent='HTML '+APP_VERSION+' · AS v9';document.getElementById('admin-bar').classList.add('visible');
+  if(vd)vd.textContent='HTML '+APP_VERSION+' · AS v10';document.getElementById('admin-bar').classList.add('visible');
     visitorSession.isAdmin=true;
     if(visitorSession.fingerprint && visitorSession.geo)
       logVisitToServer(visitorSession.fingerprint, visitorSession.geo, true, false);
@@ -1554,7 +1533,6 @@ async function doRoomUploadFromAdmin(){
   var room=document.getElementById('adm-room-select').value;
   var btn=document.getElementById('btn-adm-upload');
   if(btn){btn.disabled=true;btn.textContent='Uploading...';}
-  showUploadProgress('Uploading to Drive…', files[0]?files[0].name:'');
 
   for(var i=0;i<files.length;i++){
     var f=files[i];
@@ -1567,38 +1545,30 @@ async function doRoomUploadFromAdmin(){
         fr.onload=function(e){res({name:f.name,type:f.type,data:e.target.result.split(',')[1]});};
         fr.onerror=rej; fr.readAsDataURL(f);
       });
-      setUploadProgress(Math.round((i+0.3)/files.length*100),false,'rooms-');
-      var rpf=document.getElementById('rooms-upload-progress-file');if(rpf)rpf.textContent=f.name;
       if(CFG.APPS_SCRIPT_URL&&!CFG.APPS_SCRIPT_URL.includes('YOUR_APPS')){
         var res=await fetch(CFG.APPS_SCRIPT_URL,{method:'POST',
           body:JSON.stringify({action:'uploadRoomMedia',fileName:b64.name,
             mimeType:b64.type,data:b64.data,room:room,caption:cap})});
-        setUploadProgress(Math.round((i+0.9)/files.length*100),false,'rooms-');
         var result=await res.json();
         console.log('[SDM] uploadRoomMedia:',JSON.stringify(result).slice(0,120));
         if(result.url){
           fileId=result.fileId||null;
-          if(isV){
-            // Store fileId-based direct URL for <video> tag
-            src=fileId?'https://drive.google.com/uc?export=download&id='+fileId:result.url;
-          } else {
-            // lh3 direct URL from AS getDownloadUrl, or fallback
-            src=result.url||('https://drive.google.com/uc?export=view&id='+fileId);
-          }
+          src=isV
+            ?(fileId?'https://drive.google.com/uc?export=download&id='+fileId:result.url)
+            :(result.url||'https://drive.google.com/uc?export=view&id='+fileId);
         }
       }
       if(!src)src='data:'+b64.type+';base64,'+b64.data;
       if(!roomsData[room])roomsData[room]=[];
-      roomsData[room].push({type:isV?'video':'image',src:src,label:cap,fileId:fileId});
+      roomsData[room].push({type:isV?'video':'image',src:src,label:cap,fileId:fileId,addedAt:new Date().toISOString()});
     }catch(e){console.error('Admin room upload error:',e);}
   }
-
   pFiles.adm=[];
   document.getElementById('adm-previews').innerHTML='';
+  try{localStorage.setItem('sdm_rooms_data',JSON.stringify(roomsData));}catch(e){}
+  await loadRoomsFromServer();
   if(btn){btn.disabled=false;btn.textContent='Upload ❆';}
   closeModal('admin-upload-modal');
-  // Refresh from server to confirm save
-  await loadRoomsFromServer();
 }
 // Triple-click footer = admin login
 document.getElementById('site-footer').addEventListener('click',(function(){let c=0,t;return function(){c++;clearTimeout(t);t=setTimeout(()=>c=0,600);if(c>=3){document.getElementById('admin-login-modal').classList.add('open');c=0;}};})());
@@ -1681,16 +1651,20 @@ async function applyEdit(ref){
   var t1=document.getElementById('ed-t1-'+ref);
   var t2=document.getElementById('ed-t2-'+ref);
   var roomSel2=document.getElementById('ed-room-'+ref);
+  var nameInp=document.getElementById('ed-name-'+ref);
   var oldRef=ref;
+  // Update guest name if changed
+  if(nameInp&&nameInp.value.trim()) bk.g1n=nameInp.value.trim();
+  // Update room
   if(roomSel2){
     bk.room=roomSel2.value;
     bk.roomLabel=roomSel2.value==='attached'?'Shanthi':'Sangha';
-    // Rebuild ref: NAME-DDMMYY-ROOM
-    var ciParts=(bk.checkin||'').split('-'); // YYYY-MM-DD
-    var ciShortE=ciParts.length===3?(ciParts[2]+ciParts[1]+ciParts[0].slice(2)):oldRef.split('-')[1]||'';
-    var namePartE=(bk.g1n||'').split(' ')[0].replace(/[^a-zA-Z]/g,'').toUpperCase().slice(0,10);
-    bk.ref=namePartE+'-'+ciShortE+'-'+bk.roomLabel.toUpperCase();
   }
+  // Always rebuild ref from current name + checkin + room
+  var ciParts=(bk.checkin||'').split('-');
+  var ciShortE=ciParts.length===3?(ciParts[2]+ciParts[1]+ciParts[0].slice(2)):'';
+  var namePartE=(bk.g1n||'').split(' ')[0].replace(/[^a-zA-Z]/g,'').toUpperCase().slice(0,10);
+  bk.ref=namePartE+'-'+ciShortE+'-'+(bk.roomLabel||'').toUpperCase();
   bk.intlGuest=intl?intl.checked:bk.intlGuest;
   bk.twoGuests=two?two.checked:bk.twoGuests;
   bk.teacherG1=t1?t1.checked:bk.teacherG1;
@@ -1941,6 +1915,11 @@ function renderHP(){
       // Edit panel
       '<div id="edit-'+bk.ref+'" style="display:none;background:var(--warm);border:1px solid var(--border);border-radius:8px;padding:12px;margin-top:8px">'+
         '<div style="font-family:\'DM Mono\',monospace;font-size:0.58rem;color:var(--clay);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.08em">✏ Edit Booking</div>'+
+        '<div style="margin-bottom:10px">'+
+        '<label style="display:block;font-family:\'DM Mono\',monospace;font-size:0.55rem;color:var(--text-s);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:4px">Guest Name</label>'+
+        '<input type="text" id="ed-name-'+bk.ref+'" value="'+(bk.g1n||'')+'" '+
+          'style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:0.82rem;background:var(--surface);box-sizing:border-box">'+
+        '</div>'+
         '<div style="margin-bottom:10px">'+
         '<label style="display:block;font-family:\'DM Mono\',monospace;font-size:0.55rem;color:var(--text-s);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:4px">Room</label>'+
         '<select id="ed-room-'+bk.ref+'" onchange="recalcEdit(this.closest(\'[id^=edit-]\').id.slice(5))" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:0.82rem;background:var(--surface)">'+
@@ -2463,17 +2442,6 @@ function logVisitToServer(fingerprint, geo, isAdmin, isTestBooking){
 
 // ══════════════════════════════════════════════════════════
 
-// ── UPLOAD PROGRESS HELPERS ──────────────────────────────
-function showUploadProgress(label,filename,pfx){
-  pfx=pfx||'';
-  var ov=document.getElementById(pfx+'upload-progress-overlay');
-  var lb=document.getElementById(pfx+'upload-progress-label');
-  var fl=document.getElementById(pfx+'upload-progress-file');
-  if(ov)ov.classList.add('show');
-  if(lb)lb.textContent=label||'Uploading…';
-  if(fl)fl.textContent=filename||'';
-  setUploadProgress(0,false,pfx);
-}
 function setUploadProgress(pct,done,pfx){
   pfx=pfx||'';
   var bar=document.getElementById(pfx+'upload-progress-bar');
@@ -2488,7 +2456,6 @@ function hideUploadProgress(pfx){
   setTimeout(function(){
     var ov=document.getElementById(pfx+'upload-progress-overlay');
     if(ov)ov.classList.remove('show');
-    setUploadProgress(0,false,pfx);
     var ic=document.getElementById(pfx+'upload-progress-icon');
     if(ic){ic.textContent='⏳';ic.style.animation='';}
   },800);
@@ -2561,13 +2528,17 @@ function openRoomsViewer(room,idx){
   if(!item)return;
   var content=document.getElementById('rooms-viewer-content');
   if(item.type==='video'){
-    // Use <video> tag for direct playback — Drive /preview iframes are blocked in many browsers
+    // Normalise URL: convert old /preview to uc?export=view for direct <video> playback
+    var vidSrc=item.src||'';
+    if(item.fileId) vidSrc='https://drive.google.com/uc?export=view&id='+item.fileId;
+    else if(vidSrc.includes('/preview')) vidSrc=vidSrc.replace('/preview','')+'?export=view';
     content.innerHTML='<video controls autoplay playsinline '+
-      'style="width:min(680px,94vw);max-height:80vh;border-radius:8px;background:#000" '+
-      'onerror="this.outerHTML=\'<p style=\\"color:#fff;text-align:center;padding:20px\\">Video unavailable — <a href=\\"'+item.src+'\\">open in Drive</a></p>\'">'+
-      '<source src="'+item.src+'" type="video/mp4">'+
-      '<source src="'+item.src+'" type="video/webm">'+
-      'Your browser does not support video.</video>';
+      'style="width:min(680px,94vw);max-height:80vh;border-radius:8px;background:#000">'+
+      '<source src="'+vidSrc+'" type="video/mp4">'+
+      '<source src="'+vidSrc+'" type="video/webm">'+
+      '</video>'+
+      '<div style="text-align:center;margin-top:8px">'+
+      '<a href="'+vidSrc+'" target="_blank" style="font-family:\'DM Mono\',monospace;font-size:0.6rem;color:var(--clay)">↗ Open in browser if video doesn\'t play</a></div>';
   } else {
     // For lh3 URLs strip size param to get full resolution
     var fullSrc=item.src;
@@ -2588,7 +2559,6 @@ async function handleRoomUpload(input){
   if(!files.length)return;
   var btn=document.querySelector('.rooms-upload-btn');
   if(btn){btn.disabled=true;btn.textContent='Uploading...';}
-  showUploadProgress('Uploading to Drive…', files[0]?files[0].name:'','rooms-');
   for(var i=0;i<files.length;i++){
     var f=files[i];
     var isV=f.type.startsWith('video/');
@@ -2609,22 +2579,17 @@ async function handleRoomUpload(input){
         var result=await res.json();
         if(result.url){
           fileId=result.fileId||null;
-          if(isV){
-            // Store fileId-based direct URL for <video> tag
-            src=fileId?'https://drive.google.com/uc?export=download&id='+fileId:result.url;
-          } else {
-            // lh3 direct URL from AS getDownloadUrl, or fallback
-            src=result.url||('https://drive.google.com/uc?export=view&id='+fileId);
-          }
+          src=isV
+            ?(fileId?'https://drive.google.com/uc?export=download&id='+fileId:result.url)
+            :(result.url||'https://drive.google.com/uc?export=view&id='+fileId);
         }
       }
       if(!src)src='data:'+b64.type+';base64,'+b64.data;
       if(!roomsData[currentRoomTab])roomsData[currentRoomTab]=[];
-      roomsData[currentRoomTab].push({type:isV?'video':'image',src:src,label:cap,fileId:fileId});
+      roomsData[currentRoomTab].push({type:isV?'video':'image',src:src,label:cap,fileId:fileId,addedAt:new Date().toISOString()});
     }catch(e){console.error('Room upload error:',e);}
   }
   input.value='';
-  if(btn){btn.textContent='Reloading...';}
   try{localStorage.setItem('sdm_rooms_data',JSON.stringify(roomsData));}catch(e){}
   await loadRoomsFromServer();
   if(btn){btn.disabled=false;btn.textContent='+ Upload Photo / Video';}
@@ -2659,6 +2624,10 @@ async function loadRoomsFromServer(){
             if(item.src&&item.src.includes('thumbnail?id=')){
               var m=item.src.match(/[?&]id=([^&]+)/);
               if(m)item.src='https://drive.google.com/uc?export=view&id='+m[1];
+            }
+            // Ensure video fileId is used for direct stream URL
+            if(item.type==='video'&&item.fileId&&!item.src.includes('export=view')){
+              item.src='https://drive.google.com/uc?export=view&id='+item.fileId;
             }
           });
         });
@@ -2712,13 +2681,7 @@ async function loadRoomsFromServer(){
     </div>
     <div id="rooms-media-grid" class="rooms-media-grid"></div>
     <div id="rooms-admin-upload" style="display:none;position:relative">
-      <div class="upload-progress-overlay" id="rooms-upload-progress-overlay">
-  <div class="upload-progress-box">
-    <div class="upload-progress-icon" id="rooms-upload-progress-icon">⏳</div>
-    <div class="upload-progress-label" id="rooms-upload-progress-label">Uploading…</div>
-    <div class="upload-progress-bar-wrap">
-      <div class="upload-progress-bar" id="rooms-upload-progress-bar"></div>
-    </div>
+      
     <div class="upload-progress-pct" id="rooms-upload-progress-pct">0%</div>
     <div class="upload-progress-file" id="rooms-upload-progress-file"></div>
   </div>
