@@ -417,11 +417,11 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 .rooms-viewer-close{position:fixed;top:14px;right:18px;background:none;border:none;color:#fff;font-size:1.6rem;cursor:pointer;}
 
 /* ── UPLOAD PROGRESS ─────────────────────────────────── */
-.upload-progress-overlay{position:fixed;inset:0;background:rgba(10,5,2,0.85);z-index:3000;
-  display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s;}
+.upload-progress-overlay{position:absolute;inset:0;background:rgba(250,245,235,0.96);z-index:100;
+  display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;
+  transition:opacity 0.2s;border-radius:inherit;}
 .upload-progress-overlay.show{opacity:1;pointer-events:all;}
-.upload-progress-box{background:var(--surface);border-radius:14px;padding:28px 32px;
-  width:min(340px,88vw);text-align:center;}
+.upload-progress-box{background:transparent;padding:20px 24px;width:100%;text-align:center;}
 .upload-progress-icon{font-size:2.5rem;margin-bottom:10px;animation:spin 1.2s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
 .upload-progress-label{font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--text-s);
@@ -871,7 +871,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
   👁 Visitors: <span id="visitor-count">—</span>
 </div>
 <span id="visitor-geo" style="display:none"></span>
-<footer id="site-footer">Shanthi &amp; Sangha @ Soudhamini · Peaceful Simple Living · Waste Segregated with Ashram Care<span style="font-family:'DM Mono',monospace;font-size:0.55rem;opacity:0.55;margin-left:14px;letter-spacing:0.06em">HTML v31 · AS v9</span></footer>
+<footer id="site-footer">Shanthi &amp; Sangha @ Soudhamini · Peaceful Simple Living · Waste Segregated with Ashram Care<span style="font-family:'DM Mono',monospace;font-size:0.55rem;opacity:0.55;margin-left:14px;letter-spacing:0.06em">HTML v33 · AS v9</span></footer>
 
 <!-- MODALS -->
 <!-- Admin Login -->
@@ -893,7 +893,18 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 
 <!-- Admin Upload -->
 <div class="modal-overlay" id="admin-upload-modal">
-  <div class="modal" onclick="event.stopPropagation()">
+  <div class="modal" onclick="event.stopPropagation()" style="position:relative">
+    <div class="upload-progress-overlay" id="upload-progress-overlay">
+  <div class="upload-progress-box">
+    <div class="upload-progress-icon" id="upload-progress-icon">⏳</div>
+    <div class="upload-progress-label" id="upload-progress-label">Uploading…</div>
+    <div class="upload-progress-bar-wrap">
+      <div class="upload-progress-bar" id="upload-progress-bar"></div>
+    </div>
+    <div class="upload-progress-pct" id="upload-progress-pct">0%</div>
+    <div class="upload-progress-file" id="upload-progress-file"></div>
+  </div>
+</div>
     <button class="modal-close" onclick="closeModal('admin-upload-modal')">✕</button>
     <h3>Upload to Room</h3>
     <p style="font-size:0.78rem;color:var(--text-s);margin-bottom:12px">Select the room section and upload photos or videos. They will be visible to all visitors.</p>
@@ -927,7 +938,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 
 <script>
 // ── CONFIG ─────────────────────────────────────────────
-const APP_VERSION='v31';
+const APP_VERSION='v33';
 const CFG={
   APPS_SCRIPT_URL:'https://script.google.com/macros/s/AKfycbzrzBGUChJvK88w3iRmMwdRdUdrhF6Ysgnfemxax3V_JPr_bQh4agHfBPpn9S8pVmm3Sw/exec',
   OWNER_WA:'919148212422',
@@ -1556,13 +1567,13 @@ async function doRoomUploadFromAdmin(){
         fr.onload=function(e){res({name:f.name,type:f.type,data:e.target.result.split(',')[1]});};
         fr.onerror=rej; fr.readAsDataURL(f);
       });
-      setUploadProgress(Math.round((i+0.3)/files.length*100));
-      document.getElementById('upload-progress-file').textContent=f.name;
+      setUploadProgress(Math.round((i+0.3)/files.length*100),false,'rooms-');
+      var rpf=document.getElementById('rooms-upload-progress-file');if(rpf)rpf.textContent=f.name;
       if(CFG.APPS_SCRIPT_URL&&!CFG.APPS_SCRIPT_URL.includes('YOUR_APPS')){
         var res=await fetch(CFG.APPS_SCRIPT_URL,{method:'POST',
           body:JSON.stringify({action:'uploadRoomMedia',fileName:b64.name,
             mimeType:b64.type,data:b64.data,room:room,caption:cap})});
-        setUploadProgress(Math.round((i+0.9)/files.length*100));
+        setUploadProgress(Math.round((i+0.9)/files.length*100),false,'rooms-');
         var result=await res.json();
         console.log('[SDM] uploadRoomMedia:',JSON.stringify(result).slice(0,120));
         if(result.url){
@@ -1670,7 +1681,16 @@ async function applyEdit(ref){
   var t1=document.getElementById('ed-t1-'+ref);
   var t2=document.getElementById('ed-t2-'+ref);
   var roomSel2=document.getElementById('ed-room-'+ref);
-  if(roomSel2){bk.room=roomSel2.value;bk.roomLabel=roomSel2.value==='attached'?'Shanthi':'Sangha';}
+  var oldRef=ref;
+  if(roomSel2){
+    bk.room=roomSel2.value;
+    bk.roomLabel=roomSel2.value==='attached'?'Shanthi':'Sangha';
+    // Rebuild ref: NAME-DDMMYY-ROOM
+    var ciParts=(bk.checkin||'').split('-'); // YYYY-MM-DD
+    var ciShortE=ciParts.length===3?(ciParts[2]+ciParts[1]+ciParts[0].slice(2)):oldRef.split('-')[1]||'';
+    var namePartE=(bk.g1n||'').split(' ')[0].replace(/[^a-zA-Z]/g,'').toUpperCase().slice(0,10);
+    bk.ref=namePartE+'-'+ciShortE+'-'+bk.roomLabel.toUpperCase();
+  }
   bk.intlGuest=intl?intl.checked:bk.intlGuest;
   bk.twoGuests=two?two.checked:bk.twoGuests;
   bk.teacherG1=t1?t1.checked:bk.teacherG1;
@@ -1678,8 +1698,7 @@ async function applyEdit(ref){
   // Recalculate amounts
   var nights=parseInt(bk.nights)||1;
   var isLong=nights>5;
-  var roomSel=document.getElementById('ed-room-'+ref);
-  var room=roomSel?roomSel.value:(bk.room==='attached'?'attached':'common');
+  var room=bk.room||'common';
   var baseRate=prices[room][isLong?'long':'short'];
   var rate=baseRate+(bk.intlGuest?CFG.INTL_SURCHARGE:0);
   var total;
@@ -1694,8 +1713,9 @@ async function applyEdit(ref){
   // Push update to Apps Script
   if(CFG.APPS_SCRIPT_URL&&!CFG.APPS_SCRIPT_URL.includes('YOUR_APPS')){
     try{
-      await fetch(CFG.APPS_SCRIPT_URL,{method:'POST',
-        body:JSON.stringify({action:'updateBooking',ref:bk.ref,
+      await fetch(CFG.APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({action:'updateBooking',ref:oldRef,newRef:bk.ref,
           room:bk.roomLabel,
           intlGuest:bk.intlGuest,twoGuests:bk.twoGuests,
           teacherG1:bk.teacherG1,teacherG2:bk.teacherG2,
@@ -1703,8 +1723,7 @@ async function applyEdit(ref){
           advance:bk.advance,grandTotal:bk.grandTotal})});
     }catch(e){console.warn('applyEdit push failed:',e);}
   }
-  document.getElementById('edit-'+ref).style.display='none';
-  // Persist and refresh calendar so room change reflects immediately
+  // Persist and refresh
   saveConfirmed(confirmedBookings);
   renderCal();
   renderHP();
@@ -2445,29 +2464,32 @@ function logVisitToServer(fingerprint, geo, isAdmin, isTestBooking){
 // ══════════════════════════════════════════════════════════
 
 // ── UPLOAD PROGRESS HELPERS ──────────────────────────────
-function showUploadProgress(label,filename){
-  var ov=document.getElementById('upload-progress-overlay');
-  var lb=document.getElementById('upload-progress-label');
-  var fl=document.getElementById('upload-progress-file');
+function showUploadProgress(label,filename,pfx){
+  pfx=pfx||'';
+  var ov=document.getElementById(pfx+'upload-progress-overlay');
+  var lb=document.getElementById(pfx+'upload-progress-label');
+  var fl=document.getElementById(pfx+'upload-progress-file');
   if(ov)ov.classList.add('show');
   if(lb)lb.textContent=label||'Uploading…';
   if(fl)fl.textContent=filename||'';
-  setUploadProgress(0);
+  setUploadProgress(0,false,pfx);
 }
-function setUploadProgress(pct,done){
-  var bar=document.getElementById('upload-progress-bar');
-  var txt=document.getElementById('upload-progress-pct');
-  var ic=document.getElementById('upload-progress-icon');
+function setUploadProgress(pct,done,pfx){
+  pfx=pfx||'';
+  var bar=document.getElementById(pfx+'upload-progress-bar');
+  var txt=document.getElementById(pfx+'upload-progress-pct');
+  var ic=document.getElementById(pfx+'upload-progress-icon');
   if(bar)bar.style.width=pct+'%';
   if(txt)txt.textContent=Math.round(pct)+'%';
   if(done){if(ic){ic.textContent='✅';ic.style.animation='none';}}
 }
-function hideUploadProgress(){
+function hideUploadProgress(pfx){
+  pfx=pfx||'';
   setTimeout(function(){
-    var ov=document.getElementById('upload-progress-overlay');
+    var ov=document.getElementById(pfx+'upload-progress-overlay');
     if(ov)ov.classList.remove('show');
-    setUploadProgress(0);
-    var ic=document.getElementById('upload-progress-icon');
+    setUploadProgress(0,false,pfx);
+    var ic=document.getElementById(pfx+'upload-progress-icon');
     if(ic){ic.textContent='⏳';ic.style.animation='';}
   },800);
 }
@@ -2566,7 +2588,7 @@ async function handleRoomUpload(input){
   if(!files.length)return;
   var btn=document.querySelector('.rooms-upload-btn');
   if(btn){btn.disabled=true;btn.textContent='Uploading...';}
-  showUploadProgress('Uploading to Drive…', files[0]?files[0].name:'');
+  showUploadProgress('Uploading to Drive…', files[0]?files[0].name:'','rooms-');
   for(var i=0;i<files.length;i++){
     var f=files[i];
     var isV=f.type.startsWith('video/');
@@ -2689,7 +2711,18 @@ async function loadRoomsFromServer(){
       <button class="rooms-tab" id="rtab-foyer" onclick="switchRoomTab('foyer',this)">Foyer &amp; Hall</button>
     </div>
     <div id="rooms-media-grid" class="rooms-media-grid"></div>
-    <div id="rooms-admin-upload" style="display:none">
+    <div id="rooms-admin-upload" style="display:none;position:relative">
+      <div class="upload-progress-overlay" id="rooms-upload-progress-overlay">
+  <div class="upload-progress-box">
+    <div class="upload-progress-icon" id="rooms-upload-progress-icon">⏳</div>
+    <div class="upload-progress-label" id="rooms-upload-progress-label">Uploading…</div>
+    <div class="upload-progress-bar-wrap">
+      <div class="upload-progress-bar" id="rooms-upload-progress-bar"></div>
+    </div>
+    <div class="upload-progress-pct" id="rooms-upload-progress-pct">0%</div>
+    <div class="upload-progress-file" id="rooms-upload-progress-file"></div>
+  </div>
+</div>
       <button class="rooms-upload-btn" onclick="triggerRoomUpload()">＋ Upload Photo / Video</button>
       <input type="file" id="room-file-input" accept="image/*,video/*" multiple style="display:none" onchange="handleRoomUpload(this)">
     </div>
@@ -2700,19 +2733,6 @@ async function loadRoomsFromServer(){
 <div class="rooms-viewer-overlay" id="rooms-viewer">
   <button class="rooms-viewer-close" onclick="closeRoomsViewer()">✕</button>
   <div id="rooms-viewer-content"></div>
-</div>
-
-<!-- UPLOAD PROGRESS OVERLAY -->
-<div class="upload-progress-overlay" id="upload-progress-overlay">
-  <div class="upload-progress-box">
-    <div class="upload-progress-icon" id="upload-progress-icon">⏳</div>
-    <div class="upload-progress-label" id="upload-progress-label">Uploading…</div>
-    <div class="upload-progress-bar-wrap">
-      <div class="upload-progress-bar" id="upload-progress-bar"></div>
-    </div>
-    <div class="upload-progress-pct" id="upload-progress-pct">0%</div>
-    <div class="upload-progress-file" id="upload-progress-file"></div>
-  </div>
 </div>
 </body>
 </html>
