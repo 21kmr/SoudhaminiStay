@@ -425,6 +425,22 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 .gallery-photo-wrap img{width:100%;display:block;object-fit:cover;}
 .gallery-caption{text-align:center;font-family:'DM Mono',monospace;font-size:0.58rem;color:var(--text-s);letter-spacing:0.08em;text-transform:uppercase;margin-top:10px;}
 </style>
+<!-- Google Analytics 4 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-6PGWC2WZ0F"></script>
+<script>
+  window.dataLayer=window.dataLayer||[];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js',new Date());
+  gtag('config','G-6PGWC2WZ0F');
+</script>
+<!-- Google Analytics 4 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-6PGWC2WZ0F"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-6PGWC2WZ0F');
+</script>
 </head>
 <body>
 
@@ -900,7 +916,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
   </div>
 </section>
 
-<footer id="site-footer">Shanthi &amp; Sangha @ Soudhamini · Peaceful Simple Living · Waste Segregated with Ashram Care<span style="font-family:'DM Mono',monospace;font-size:0.55rem;opacity:0.55;margin-left:14px;letter-spacing:0.06em">HTML v35 · AS v9</span></footer>
+<footer id="site-footer">Shanthi &amp; Sangha @ Soudhamini · Peaceful Simple Living · Waste Segregated with Ashram Care<span style="font-family:'DM Mono',monospace;font-size:0.55rem;opacity:0.55;margin-left:14px;letter-spacing:0.06em">HTML v36 · AS v9</span></footer>
 
 <!-- MODALS -->
 <!-- Admin Login -->
@@ -932,7 +948,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 
 <script>
 // ── CONFIG ─────────────────────────────────────────────
-const APP_VERSION='v35';
+const APP_VERSION='v36';
 const CFG={
   APPS_SCRIPT_URL:'https://script.google.com/macros/s/AKfycbzrzBGUChJvK88w3iRmMwdRdUdrhF6Ysgnfemxax3V_JPr_bQh4agHfBPpn9S8pVmm3Sw/exec',
   OWNER_WA:'919148212422',
@@ -995,6 +1011,7 @@ const avatarColors=['#8b4a2a','#4a6741','#7a9e72','#b8962a','#b07c50','#4a6fa5',
 
 // ── BOOKING FLOW ────────────────────────────────────────
 function selectRoom(t){
+  track("room_selected",{room:t});
   if(!selRoom||selRoom!==t){ selRoom=t; }
   else { return; }
   document.getElementById('card-attached').classList.toggle('selected',t==='attached');
@@ -1091,6 +1108,7 @@ function recalc(){
 }
 
 function goTo(p){
+  track("booking_step",{step:p});
   document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
   document.getElementById('page'+p).classList.add('active');
   if(p===2)renderCal(); // refresh calendar with latest bookings
@@ -1262,6 +1280,7 @@ function fmtDate(d){
 
 let isSubmitting=false;
 async function submitBooking(){
+  track('booking_submitted',{});
   if(isSubmitting)return;
   isSubmitting=true;
   // Flag test booking if submitted in admin mode
@@ -1634,6 +1653,7 @@ let hpCurrentTab='pending';
 let hpAdminMode=false;
 
 function openHostPanel(){
+  track('host_panel_opened',{});
   document.getElementById('host-panel').classList.add('open');
   document.body.style.overflow='hidden';
   renderHP();
@@ -2371,6 +2391,7 @@ function logVisitToServer(fingerprint, geo, isAdmin, isTestBooking){
 
 // ── ROOMS GALLERY ──────────────────────────────────────
 function switchGalleryTab(panel,btn){
+  track('gallery_viewed',{room:panel});
   document.querySelectorAll('.gallery-panel').forEach(function(p){p.classList.remove('active');});
   document.querySelectorAll('.gallery-tab').forEach(function(t){t.classList.remove('active');});
   var el=document.getElementById('gpanel-'+panel);
@@ -2378,6 +2399,12 @@ function switchGalleryTab(panel,btn){
   if(btn)btn.classList.add('active');
 }
 
+
+// ── ANALYTICS TRACKING ─────────────────────────────────
+function track(event, params){
+  if(typeof gtag==='undefined') return;
+  gtag('event', event, params||{});
+}
 </script>
 <!-- HOST PANEL -->
 <div class="host-panel" id="host-panel">
@@ -2386,7 +2413,10 @@ function switchGalleryTab(panel,btn){
       <h2>Host Panel — Shanthi &amp; Sangha @ Soudhamini</h2>
       <div class="hp-header-meta">Booking management &amp; confirmation</div>
     </div>
-    <button class="hp-close" onclick="closeHostPanel()">✕ Close</button>
+    <div style="display:flex;gap:8px;align-items:center">
+      <a href="https://analytics.google.com" target="_blank" style="font-family:'DM Mono',monospace;font-size:0.58rem;background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:5px 10px;text-decoration:none;letter-spacing:0.05em;white-space:nowrap">📊 Analytics</a>
+      <button class="hp-close" onclick="closeHostPanel()">✕ Close</button>
+    </div>
   </div>
   <div class="hp-body">
     <div class="hp-refresh">
