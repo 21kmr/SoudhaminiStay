@@ -971,7 +971,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
   </div>
 </section>
 
-<footer id="site-footer">Shanthi &amp; Sangha @ Soudhamini · Peaceful Simple Living · Waste Segregated with Ashram Care<span style="font-family:'DM Mono',monospace;font-size:0.55rem;opacity:0.55;margin-left:14px;letter-spacing:0.06em">HTML v46 · AS v17</span></footer>
+<footer id="site-footer">Shanthi &amp; Sangha @ Soudhamini · Peaceful Simple Living · Waste Segregated with Ashram Care<span style="font-family:'DM Mono',monospace;font-size:0.55rem;opacity:0.55;margin-left:14px;letter-spacing:0.06em">HTML v47 · AS v17</span></footer>
 
 <!-- MODALS -->
 <!-- Admin Login -->
@@ -1003,7 +1003,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 
 <script>
 // ── CONFIG ─────────────────────────────────────────────
-const APP_VERSION='v46';
+const APP_VERSION='v47';
 const CFG={
   APPS_SCRIPT_URL:'https://script.google.com/macros/s/AKfycbzrzBGUChJvK88w3iRmMwdRdUdrhF6Ysgnfemxax3V_JPr_bQh4agHfBPpn9S8pVmm3Sw/exec',
   OWNER_WA:'919148212422',
@@ -1769,8 +1769,7 @@ async function loadBookingsFromSheet(){
     const res=await fetch(url);
     const data=await res.json();
     if(data.bookings){
-      console.log("[SDM] ALL bookings:", JSON.stringify(data.bookings.filter(b=>b.status==="CONFIRMED")));
-      // Merge sheet bookings into local state
+            // Merge sheet bookings into local state
       // Confirmed in sheet = block dates
       const sheetConfirmed=data.bookings.filter(b=>b.status==='CONFIRMED'||b.status==='confirmed');
       const sheetPending=data.bookings.filter(b=>b.status==='PENDING'||b.status==='pending');
@@ -1814,8 +1813,7 @@ async function loadBookingsFromSheet(){
         }
       });
       document.getElementById('hp-last-refresh').textContent='Last refreshed: '+new Date().toLocaleTimeString('en-IN')+' · '+data.bookings.length+' bookings in sheet';
-      console.log("[SDM] confirmedBookings after merge:", JSON.stringify(confirmedBookings));
-      renderHP();
+            renderHP();
     }
   } catch(err){
     document.getElementById('hp-last-refresh').textContent='Error loading from sheet: '+err.message;
@@ -2202,7 +2200,7 @@ function renderHPCalendar(container, confirmed){
     const from=new Date(toISO(bk.checkin)+'T00:00:00');
     const to=new Date(toISO(bk.checkout)+'T00:00:00');
     for(let d=new Date(from);d<to;d.setDate(d.getDate()+1)){
-      const key=d.toISOString().split('T')[0];
+      const key=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
       if(!dateMap[key])dateMap[key]={attached:false,common:false};
       if(bk.room==='attached'||bk.roomLabel==='Shanthi')dateMap[key].attached=true;
       if(bk.room==='common'||bk.roomLabel==='Sangha')dateMap[key].common=true;
@@ -2295,7 +2293,7 @@ function getBookedDates(){
     const from=new Date(toISO(bk.checkin)+'T00:00:00');
     const to=new Date(toISO(bk.checkout)+'T00:00:00');
     for(let d=new Date(from);d<to;d.setDate(d.getDate()+1)){
-      booked.add(d.toISOString().split('T')[0]);
+      booked.add(d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'));
     }
   });
   return booked;
