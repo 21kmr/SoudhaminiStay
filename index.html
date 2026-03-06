@@ -1814,6 +1814,7 @@ async function loadBookingsFromSheet(){
         }
       });
       document.getElementById('hp-last-refresh').textContent='Last refreshed: '+new Date().toLocaleTimeString('en-IN')+' · '+data.bookings.length+' bookings in sheet';
+      console.log("[SDM] confirmedBookings after merge:", JSON.stringify(confirmedBookings));
       renderHP();
     }
   } catch(err){
