@@ -971,7 +971,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
   </div>
 </section>
 
-<footer id="site-footer">Shanthi &amp; Sangha @ Soudhamini · Peaceful Simple Living · Waste Segregated with Ashram Care<span style="font-family:'DM Mono',monospace;font-size:0.55rem;opacity:0.55;margin-left:14px;letter-spacing:0.06em">HTML v43 · AS v15</span></footer>
+<footer id="site-footer">Shanthi &amp; Sangha @ Soudhamini · Peaceful Simple Living · Waste Segregated with Ashram Care<span style="font-family:'DM Mono',monospace;font-size:0.55rem;opacity:0.55;margin-left:14px;letter-spacing:0.06em">HTML v44 · AS v15</span></footer>
 
 <!-- MODALS -->
 <!-- Admin Login -->
@@ -1003,7 +1003,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 
 <script>
 // ── CONFIG ─────────────────────────────────────────────
-const APP_VERSION='v43';
+const APP_VERSION='v44';
 const CFG={
   APPS_SCRIPT_URL:'https://script.google.com/macros/s/AKfycbzrzBGUChJvK88w3iRmMwdRdUdrhF6Ysgnfemxax3V_JPr_bQh4agHfBPpn9S8pVmm3Sw/exec',
   OWNER_WA:'919148212422',
@@ -1769,6 +1769,8 @@ async function loadBookingsFromSheet(){
     const res=await fetch(url);
     const data=await res.json();
     if(data.bookings){
+      // DEBUG: log first booking dates
+      if(data.bookings[0]) console.log('[SDM] raw dates from sheet:',data.bookings[0].checkin, data.bookings[0].checkout);
       // Merge sheet bookings into local state
       // Confirmed in sheet = block dates
       const sheetConfirmed=data.bookings.filter(b=>b.status==='CONFIRMED'||b.status==='confirmed');
@@ -1780,7 +1782,7 @@ async function loadBookingsFromSheet(){
           ref:sb.ref,room:sb.room==='Shanthi'?'attached':'common',
           roomLabel:sb.room,g1n:sb.g1n||sb.guestName,g1p:sb.g1p||sb.phone,
           g2n:sb.g2n||'',g2p:sb.g2p||'',
-          checkin:sb.checkin,checkout:sb.checkout,nights:sb.nights,
+          checkin:toISO(sb.checkin),checkout:toISO(sb.checkout),nights:sb.nights,
           stayType:sb.stayType,rate:sb.rate,totalRoomCost:sb.totalRoomCost||sb.total,
           advance:sb.advance,grandTotal:sb.grandTotal,status:'confirmed',
           twoGuests:sb.twoGuests===true||sb.twoGuests==='TRUE'||sb.twoGuests==='true',
@@ -1800,7 +1802,7 @@ async function loadBookingsFromSheet(){
             ref:sb.ref,room:sb.room==='Shanthi'?'attached':'common',
             roomLabel:sb.room,g1n:sb.g1n||sb.guestName,g1p:sb.g1p||sb.phone,
             g2n:sb.g2n||'',g2p:sb.g2p||'',
-            checkin:sb.checkin,checkout:sb.checkout,nights:sb.nights,
+            checkin:toISO(sb.checkin),checkout:toISO(sb.checkout),nights:sb.nights,
             stayType:sb.stayType,rate:sb.rate,
             totalRoomCost:sb.totalRoomCost||sb.total,
             advance:sb.advance,grandTotal:sb.grandTotal,
@@ -2197,8 +2199,8 @@ function renderHPCalendar(container, confirmed){
   // Build date map
   const dateMap={};
   confirmed.forEach(bk=>{
-    const from=new Date(bk.checkin+'T00:00:00');
-    const to=new Date(bk.checkout+'T00:00:00');
+    const from=new Date(toISO(bk.checkin)+'T00:00:00');
+    const to=new Date(toISO(bk.checkout)+'T00:00:00');
     for(let d=new Date(from);d<to;d.setDate(d.getDate()+1)){
       const key=d.toISOString().split('T')[0];
       if(!dateMap[key])dateMap[key]={attached:false,common:false};
@@ -2274,13 +2276,24 @@ function calNav(dir){
   renderCal();
 }
 
+// Parse any date string to YYYY-MM-DD safely (handles YYYY-MM-DD and DD/MM/YYYY)
+function toISO(d){
+  if(!d) return '';
+  var s=String(d).trim();
+  // Already YYYY-MM-DD
+  if(/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0,10);
+  // DD/MM/YYYY or DD-MM-YYYY
+  var m=s.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/);
+  if(m) return m[3]+'-'+m[2].padStart(2,'0')+'-'+m[1].padStart(2,'0');
+  return s.slice(0,10);
+}
 function getBookedDates(){
   // Build set of booked date strings for selected room
   const booked=new Set();
   confirmedBookings.forEach(bk=>{
     if(bk.room!==selRoom)return;
-    const from=new Date(bk.checkin+'T00:00:00');
-    const to=new Date(bk.checkout+'T00:00:00');
+    const from=new Date(toISO(bk.checkin)+'T00:00:00');
+    const to=new Date(toISO(bk.checkout)+'T00:00:00');
     for(let d=new Date(from);d<to;d.setDate(d.getDate()+1)){
       booked.add(d.toISOString().split('T')[0]);
     }
