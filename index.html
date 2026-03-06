@@ -971,7 +971,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
   </div>
 </section>
 
-<footer id="site-footer">Shanthi &amp; Sangha @ Soudhamini · Peaceful Simple Living · Waste Segregated with Ashram Care<span style="font-family:'DM Mono',monospace;font-size:0.55rem;opacity:0.55;margin-left:14px;letter-spacing:0.06em">HTML v40 · AS v12</span></footer>
+<footer id="site-footer">Shanthi &amp; Sangha @ Soudhamini · Peaceful Simple Living · Waste Segregated with Ashram Care<span style="font-family:'DM Mono',monospace;font-size:0.55rem;opacity:0.55;margin-left:14px;letter-spacing:0.06em">HTML v41 · AS v13</span></footer>
 
 <!-- MODALS -->
 <!-- Admin Login -->
@@ -1003,7 +1003,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 
 <script>
 // ── CONFIG ─────────────────────────────────────────────
-const APP_VERSION='v40';
+const APP_VERSION='v41';
 const CFG={
   APPS_SCRIPT_URL:'https://script.google.com/macros/s/AKfycbzrzBGUChJvK88w3iRmMwdRdUdrhF6Ysgnfemxax3V_JPr_bQh4agHfBPpn9S8pVmm3Sw/exec',
   OWNER_WA:'919148212422',
@@ -1719,10 +1719,17 @@ async function applyEdit(ref){
           advance:bk.advance,grandTotal:bk.grandTotal})});
     }catch(e){console.warn('applyEdit push failed:',e);}
   }
-  // Persist and refresh
+  // Update local state immediately so calendar renders now
   saveConfirmed(confirmedBookings);
   renderCal();
   renderHP();
+  // Then reload from sheet to ensure localStorage matches sheet (source of truth)
+  if(CFG.APPS_SCRIPT_URL&&!CFG.APPS_SCRIPT_URL.includes('YOUR_APPS')){
+    setTimeout(async function(){
+      await loadBookingsFromSheet();
+      renderCal();
+    }, 1500); // give AS 1.5s to write before we re-read
+  }
 }
 // ── HOST PANEL ───────────────────────────────────────────
 let hpCurrentTab='pending';
