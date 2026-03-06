@@ -1769,6 +1769,7 @@ async function loadBookingsFromSheet(){
     const res=await fetch(url);
     const data=await res.json();
     if(data.bookings){
+      console.log("[SDM] booking[0] raw:", JSON.stringify(data.bookings[0]));
       // Merge sheet bookings into local state
       // Confirmed in sheet = block dates
       const sheetConfirmed=data.bookings.filter(b=>b.status==='CONFIRMED'||b.status==='confirmed');
