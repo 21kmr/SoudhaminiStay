@@ -971,7 +971,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
   </div>
 </section>
 
-<footer id="site-footer">Shanthi &amp; Sangha @ Soudhamini · Peaceful Simple Living · Waste Segregated with Ashram Care<span style="font-family:'DM Mono',monospace;font-size:0.55rem;opacity:0.55;margin-left:14px;letter-spacing:0.06em">HTML v41 · AS v13</span></footer>
+<footer id="site-footer">Shanthi &amp; Sangha @ Soudhamini · Peaceful Simple Living · Waste Segregated with Ashram Care<span style="font-family:'DM Mono',monospace;font-size:0.55rem;opacity:0.55;margin-left:14px;letter-spacing:0.06em">HTML v42 · AS v14</span></footer>
 
 <!-- MODALS -->
 <!-- Admin Login -->
@@ -1003,7 +1003,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 
 <script>
 // ── CONFIG ─────────────────────────────────────────────
-const APP_VERSION='v41';
+const APP_VERSION='v42';
 const CFG={
   APPS_SCRIPT_URL:'https://script.google.com/macros/s/AKfycbzrzBGUChJvK88w3iRmMwdRdUdrhF6Ysgnfemxax3V_JPr_bQh4agHfBPpn9S8pVmm3Sw/exec',
   OWNER_WA:'919148212422',
@@ -1033,10 +1033,10 @@ function saveConfirmed(arr){
 }
 function isConflict(room,from,to){
   // Only confirmed bookings block dates
-  const d1=new Date(from),d2=new Date(to);
+  const d1=new Date(from+"T00:00:00"),d2=new Date(to+"T00:00:00");
   return confirmedBookings.some(bk=>{
     if(bk.room!==room)return false;
-    const bf=new Date(bk.checkin),bt=new Date(bk.checkout);
+    const bf=new Date(bk.checkin+"T00:00:00"),bt=new Date(bk.checkout+"T00:00:00");
     return d1<bt && d2>bf;
   });
 }
@@ -1672,7 +1672,7 @@ async function applyEdit(ref){
   if(ciInp2&&ciInp2.value) bk.checkin=ciInp2.value;
   if(coInp2&&coInp2.value) bk.checkout=coInp2.value;
   if(bk.checkin&&bk.checkout){
-    var d1n=new Date(bk.checkin),d2n=new Date(bk.checkout);
+    var d1n=new Date(bk.checkin+"T00:00:00"),d2n=new Date(bk.checkout+"T00:00:00");
     bk.nights=Math.max(1,Math.round((d2n-d1n)/86400000));
   }
   // Update room
