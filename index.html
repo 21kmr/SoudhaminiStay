@@ -18,11 +18,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#0f0a05;--surface:#1a1208;--border:#2e2318;--warm:#1f1710;
-  --clay:#c8935a;--terr:#a05a30;--moss:#5a8050;--sage:#8ab882;
-  --sage-lt:#1a2e18;--text:#f0e8d8;--text-mid:#c8b898;--text-s:#8a7a68;
-  --gold:#d4a83a;--shadow:rgba(0,0,0,0.4);--r:8px;
-  --intl:#7a9fd0;--intl-lt:#0f1a2e;
+  --bg:#faf7f2;--surface:#fff;--border:#e6ddd0;--warm:#ede5d8;
+  --clay:#b07c50;--terr:#8b4a2a;--moss:#4a6741;--sage:#7a9e72;
+  --sage-lt:#ddecd8;--text:#2c1f0f;--text-mid:#5a4a38;--text-s:#8a7a68;
+  --gold:#b8962a;--shadow:rgba(44,31,15,0.08);--r:8px;
+  --intl:#4a5fa0;--intl-lt:#e8edf8;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;font-size:15px;line-height:1.6;min-height:100vh;overflow-x:hidden;}
@@ -59,7 +59,7 @@ header h1 em{font-style:italic;color:var(--terr);}
 .fac-strip span::before{content:'✦ ';color:var(--gold);}
 
 /* STEPPER */
-.stepper{display:flex;align-items:center;max-width:760px;margin:24px auto 20px;padding:0 20px;}
+.stepper{display:flex;align-items:center;max-width:760px;margin:0 auto;padding:16px 20px;position:sticky;top:0;background:var(--bg);z-index:50;border-bottom:1px solid var(--border);}
 .step-node{display:flex;flex-direction:column;align-items:center;flex:1;position:relative;cursor:default;}.step-node.done,.step-node.active{cursor:pointer;}
 .step-node:not(:last-child)::after{content:'';position:absolute;top:17px;left:50%;width:100%;height:2px;background:var(--border);z-index:0;transition:background 0.4s;}
 .step-node.done:not(:last-child)::after{background:var(--sage);}
@@ -71,8 +71,8 @@ header h1 em{font-style:italic;color:var(--terr);}
 .step-node.done .step-label{color:var(--sage);}
 
 /* MAIN */
-main{max-width:860px;margin:0 auto;padding:0 20px 60px;}
-.page{display:none;}
+main{max-width:860px;margin:0 auto;padding:0 20px 60px;min-height:60vh;}
+.page{display:none;min-height:400px;}
 .page.active{display:block;animation:fadeUp 0.3s ease both;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
 
@@ -104,8 +104,8 @@ main{max-width:860px;margin:0 auto;padding:0 20px 60px;}
 /* INTERNATIONAL TOGGLE */
 .intl-toggle{margin-top:12px;padding:14px 16px;background:var(--intl-lt);border:1.5px solid var(--intl);border-radius:var(--r);cursor:pointer;display:flex;align-items:center;gap:10px;}
 .intl-toggle input[type=checkbox]{width:17px;height:17px;accent-color:var(--intl);flex-shrink:0;cursor:pointer;}
-.intl-toggle-label strong{display:block;font-size:0.9rem;color:var(--intl);}
-.intl-toggle-label span{font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--intl);opacity:0.8;}
+
+
 .intl-badge{font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.08em;background:var(--intl);color:#fff;padding:3px 9px;border-radius:100px;white-space:nowrap;}
 
 /* GUEST TOGGLE */
@@ -142,34 +142,34 @@ main{max-width:860px;margin:0 auto;padding:0 20px 60px;}
 .field{display:flex;flex-direction:column;gap:5px;}
 .field label{font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--clay);}
 .field input,.field select,.field textarea{width:100%;padding:9px 11px;border:1px solid var(--border);border-radius:5px;background:var(--bg);font-family:'Lato',sans-serif;font-size:0.9rem;color:var(--text);outline:none;transition:border-color 0.2s;appearance:none;}
-.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--clay);background:var(--surface);}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--clay);background:#fff;}
 .field textarea{resize:vertical;min-height:70px;}
-.two-col{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:12px;}
-@media(max-width:540px){.two-col{grid-template-columns:1fr;}}
-.full-row{grid-column:1/-1;}
+
+@media(max-width:540px){}
+
 
 /* AADHAAR / PHOTO UPLOAD */
-.upload-box{margin-top:8px;border:1.5px dashed var(--border);border-radius:6px;padding:12px 14px;background:var(--bg);text-align:center;cursor:pointer;transition:border-color 0.2s;}
-.upload-box:hover{border-color:var(--clay);}
-.upload-box p{font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--clay);margin-bottom:2px;}
-.upload-box small{font-family:'DM Mono',monospace;font-size:0.56rem;color:var(--text-s);}
-.upload-preview-img{width:100%;max-height:110px;object-fit:cover;border-radius:4px;margin-top:7px;border:1px solid var(--border);display:none;}
-.upload-pdf-badge{display:none;margin-top:6px;font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--moss);background:var(--sage-lt);padding:3px 9px;border-radius:4px;}
+
+
+
+
+
+
 .hidden{display:none;}
 
 /* GUEST SECTION */
-.guest-section{margin-top:16px;padding:15px;background:var(--warm);border-radius:var(--r);border:1px solid var(--border);}
-.guest-sec-title{font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--clay);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+
+
 .guest-sec-title::after{content:'';flex:1;height:1px;background:var(--border);}
 
 /* INTL SECTION */
-.intl-section{margin-top:16px;padding:16px;background:var(--intl-lt);border-radius:var(--r);border:1.5px solid var(--intl);}
-.intl-sec-title{font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--intl);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+
+
 .intl-sec-title::after{content:'';flex:1;height:1px;background:rgba(74,95,160,0.3);}
-.intl-note{font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.07em;color:var(--intl);background:rgba(74,95,160,0.1);padding:8px 11px;border-radius:5px;margin-bottom:12px;line-height:1.65;}
+
 
 /* WA NOTE */
-.wa-note{font-family:'DM Mono',monospace;font-size:0.57rem;letter-spacing:0.08em;color:var(--moss);background:var(--sage-lt);padding:5px 9px;border-radius:4px;margin-top:4px;display:flex;align-items:center;gap:4px;}
+
 
 /* BUTTONS */
 .btn-primary{display:block;width:100%;padding:13px;background:var(--terr);color:#fff;border:none;border-radius:var(--r);font-family:'DM Mono',monospace;font-size:0.68rem;letter-spacing:0.22em;text-transform:uppercase;cursor:pointer;margin-top:15px;transition:background 0.22s,transform 0.15s;}
@@ -290,7 +290,7 @@ main{max-width:860px;margin:0 auto;padding:0 20px 60px;}
 .modal h3{font-family:'Playfair Display',serif;font-size:1.25rem;font-weight:400;font-style:italic;margin-bottom:16px;}
 .modal-close{position:absolute;top:12px;right:14px;background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--clay);line-height:1;}
 .m-label{font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--clay);display:block;margin-top:11px;margin-bottom:3px;}
-.modal input[type=text],.modal input[type=tel],.modal select,.modal textarea{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:5px;background:var(--surface);font-family:'Lato',sans-serif;font-size:0.86rem;color:var(--text);outline:none;transition:border-color 0.2s;margin-top:3px;}
+.modal input[type=text],.modal input[type=tel],.modal select,.modal textarea{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:5px;background:#fff;font-family:'Lato',sans-serif;font-size:0.86rem;color:var(--text);outline:none;transition:border-color 0.2s;margin-top:3px;}
 .modal input:focus,.modal select:focus,.modal textarea:focus{border-color:var(--clay);}
 .modal textarea{resize:vertical;min-height:75px;}
 
@@ -421,20 +421,36 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 .upload-progress-file{font-size:0.7rem;color:var(--text-s);margin-top:6px;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:280px;}
 
-/* ── ROOMS GALLERY ───────────────────────────────────── */
-.gallery-section{padding:32px 20px 48px;max-width:860px;margin:0 auto;}
-.gallery-title{font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--text);margin:0 0 4px;text-align:center;}
-.gallery-sub{font-size:0.68rem;color:var(--text-s);font-family:'DM Mono',monospace;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:20px;text-align:center;}
-.gallery-tabs{display:flex;gap:8px;justify-content:center;margin-bottom:20px;flex-wrap:wrap;}
-.gallery-tab{padding:7px 16px;border:1px solid var(--border);border-radius:100px;font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.07em;text-transform:uppercase;cursor:pointer;background:none;color:var(--text-s);transition:all 0.2s;}
-.gallery-tab.active,.gallery-tab:hover{background:var(--clay);color:#fff;border-color:var(--clay);}
-.gallery-panel{display:none;}
-.gallery-panel.active{display:block;}
-.gallery-video-wrap{position:relative;width:100%;border-radius:12px;overflow:hidden;background:#1a1005;aspect-ratio:9/16;max-width:380px;margin:0 auto;box-shadow:0 4px 24px rgba(0,0,0,0.18);}
-.gallery-video-wrap iframe{position:absolute;inset:0;width:100%;height:100%;border:none;}
-.gallery-photo-wrap{border-radius:12px;overflow:hidden;max-width:600px;margin:0 auto;box-shadow:0 4px 24px rgba(0,0,0,0.18);}
-.gallery-photo-wrap img{width:100%;display:block;object-fit:cover;}
-.gallery-caption{text-align:center;font-family:'DM Mono',monospace;font-size:0.58rem;color:var(--text-s);letter-spacing:0.08em;text-transform:uppercase;margin-top:10px;}
+
+
+/* ── GUEST DETAILS (PAGE 3) ─────────────────────────────── */
+.g-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;box-shadow:0 2px 14px var(--shadow);}
+.g-block{background:var(--warm);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:14px;}
+.g-block-title{font-family:'DM Mono',monospace;font-size:0.62rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--clay);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.g-field{margin-bottom:13px;}
+.g-label{display:block;font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-s);margin-bottom:5px;}
+.g-req{color:var(--terr);}
+.g-input{width:100%;padding:10px 13px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text);font-family:'Lato',sans-serif;font-size:0.92rem;outline:none;transition:border-color 0.2s;box-sizing:border-box;}
+.g-input:focus{border-color:var(--clay);background:#fff;}
+textarea.g-input{resize:vertical;min-height:64px;}
+.g-hint{font-size:0.72rem;color:var(--text-s);margin-top:4px;}
+.g-hidden{display:none;}
+.g-upload{border:1.5px dashed var(--border);border-radius:8px;padding:16px;text-align:center;cursor:pointer;transition:all 0.2s;background:var(--bg);margin-top:4px;}
+.g-upload:hover{border-color:var(--clay);background:var(--warm);}
+.g-upload-icon{font-size:1.4rem;margin-bottom:4px;}
+.g-upload-text{font-size:0.82rem;color:var(--text-mid);font-weight:600;}
+.g-upload-sub{font-size:0.62rem;color:var(--text-s);margin-top:3px;}
+.g-upload-preview{max-width:100%;max-height:120px;border-radius:6px;margin-top:8px;object-fit:cover;}
+.g-upload-done{color:var(--moss);font-size:0.78rem;margin-top:6px;font-weight:600;}
+.g-teacher-toggle{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--surface);border-radius:8px;border:1.5px solid var(--border);cursor:pointer;margin-top:10px;transition:border-color 0.2s;}
+.g-teacher-toggle:hover{border-color:var(--clay);}
+.g-teacher-toggle input[type=checkbox]{width:17px;height:17px;accent-color:var(--moss);flex-shrink:0;cursor:pointer;}
+.g-teacher-info{flex:1;}
+.g-teacher-title{display:block;font-size:0.84rem;font-weight:600;color:var(--text);}
+.g-teacher-sub{font-family:'DM Mono',monospace;font-size:0.54rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-s);}
+.g-teacher-badge{font-family:'DM Mono',monospace;font-size:0.58rem;background:var(--moss);color:#fff;padding:3px 9px;border-radius:100px;white-space:nowrap;}
+.g-intl-note{font-size:0.78rem;color:var(--text-s);margin-bottom:14px;line-height:1.6;}
+
 </style>
 <!-- Google Analytics 4 -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-6PGWC2WZ0F"></script>
@@ -542,6 +558,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 </div>
 
 <main>
+<div id="pages-container" style="overflow-y:auto;">
 
 <!-- PAGE 1: ROOM -->
 <div class="page active" id="page1">
@@ -653,158 +670,158 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 <!-- PAGE 3: GUESTS -->
 <div class="page" id="page3">
   <div class="sec-label">Step 3 — Guest Details</div>
-  <div class="card">
+  <div class="g-card">
 
     <!-- PRIMARY GUEST -->
-    <div class="guest-section">
-      <div class="guest-sec-title">Primary Guest</div>
-      <div class="two-col">
-        <div class="field full-row">
-          <label id="g1-name-label">Full Name * (as per Aadhaar)</label>
-          <input type="text" id="g1-name" placeholder="Full name as on Aadhaar / Passport" oninput="checkDetails()">
-        </div>
-        <div class="field">
-          <label>Telegram / WhatsApp Number *</label>
-          <input type="tel" id="g1-phone" placeholder="+91 98765 43210" oninput="checkDetails()">
-          <div class="wa-note">💬 Active on Telegram (preferred) or WhatsApp</div>
-        </div>
+    <div class="g-block">
+      <div class="g-block-title">👤 Primary Guest</div>
+      <div class="g-field">
+        <label class="g-label">Full Name <span class="g-req">*</span></label>
+        <input type="text" id="g1-name" class="g-input" placeholder="As on Aadhaar / Passport" oninput="checkDetails()">
       </div>
-      <div style="margin-top:12px">
-        <div class="field"><label id="g1-id-label">Aadhaar Card *</label></div>
-        <div class="upload-box" id="g1-id-box" onclick="document.getElementById('g1-id-file').click()">
-          <p>📎 Tap to upload Aadhaar Card</p>
-          <small>JPG, PNG or PDF · Front side · Max 5MB</small>
-          <img id="g1-id-preview" class="upload-preview-img" alt="">
-          <div id="g1-id-pdf" class="upload-pdf-badge">📄 PDF uploaded ✓</div>
+      <div class="g-field">
+        <label class="g-label">WhatsApp Number <span class="g-req">*</span></label>
+        <input type="tel" id="g1-phone" class="g-input" placeholder="+91 98765 43210" oninput="checkDetails()">
+        <div class="g-hint">Booking confirmation sent here</div>
+      </div>
+      <div class="g-field">
+        <label class="g-label">Aadhaar Card <span class="g-req">*</span></label>
+        <div class="g-upload" id="g1-id-box" onclick="document.getElementById('g1-id-file').click()">
+          <div class="g-upload-icon">📎</div>
+          <div class="g-upload-text">Tap to upload Aadhaar</div>
+          <div class="g-upload-sub">JPG · PNG · PDF · Front side · Max 5MB</div>
+          <img id="g1-id-preview" class="g-upload-preview" alt="" style="display:none">
+          <div id="g1-id-done" class="g-upload-done" style="display:none">✅ Uploaded</div>
         </div>
-        <input type="file" id="g1-id-file" class="hidden" accept="image/*,application/pdf" onchange="handleUpload('g1-id')">
-      <!-- Teacher discount — Guest 1 -->
-      <label style="margin-top:11px;display:flex;align-items:center;gap:10px;padding:11px 13px;background:var(--surface);border-radius:8px;border:1.5px solid var(--clay);cursor:pointer">
-        <input type="checkbox" id="teacher-chk-g1" onchange="toggleTeacher()" style="width:16px;height:16px;accent-color:#4a7fc0;flex-shrink:0;cursor:pointer">
-        <div style="flex:1">
-          <strong style="display:block;font-size:0.84rem;color:var(--clay)">Full-time Teacher?</strong>
-          <span style="font-family:'DM Mono',monospace;font-size:0.55rem;letter-spacing:0.07em;text-transform:uppercase;color:#4a7fc0">Upload ID to avail 25% off your share</span>
+        <input type="file" id="g1-id-file" class="g-hidden" accept="image/*,application/pdf" onchange="handleUpload('g1-id')">
+      </div>
+      <!-- Teacher discount -->
+      <label class="g-teacher-toggle" id="teacher-toggle-g1">
+        <input type="checkbox" id="teacher-chk-g1" onchange="toggleTeacher()">
+        <div class="g-teacher-info">
+          <span class="g-teacher-title">Full-time Art of Living Teacher?</span>
+          <span class="g-teacher-sub">Upload Teacher ID to avail 25% discount</span>
         </div>
-        <span style="font-family:'DM Mono',monospace;font-size:0.56rem;background:#4a7fc0;color:#fff;padding:2px 8px;border-radius:100px;white-space:nowrap">− 25%</span>
+        <span class="g-teacher-badge">−25%</span>
       </label>
-      <div id="teacher-id-section-g1" style="display:none;margin-top:8px">
-        <div class="upload-box" onclick="document.getElementById('teacher-id-g1-file').click()" style="border-color:#4a7fc0;padding:14px 10px">
-          <p style="color:var(--clay);margin:0 0 3px">📎 Tap to upload Teacher ID Card</p>
-          <small>Art of Living Teacher ID · JPG, PNG or PDF</small>
-          <img id="teacher-id-g1-preview" class="upload-preview-img" alt="">
-          <div id="teacher-id-g1-pdf" class="upload-pdf-badge" style="display:none">📄 PDF uploaded ✓</div>
+      <div id="teacher-id-section-g1" style="display:none">
+        <div class="g-upload" onclick="document.getElementById('teacher-id-g1-file').click()" style="border-color:var(--moss)">
+          <div class="g-upload-icon">🪷</div>
+          <div class="g-upload-text">Upload Teacher ID Card</div>
+          <div class="g-upload-sub">Art of Living Teacher ID · JPG · PNG · PDF</div>
+          <img id="teacher-id-g1-preview" class="g-upload-preview" alt="" style="display:none">
+          <div id="teacher-id-g1-done" class="g-upload-done" style="display:none">✅ Uploaded</div>
         </div>
-        <input type="file" id="teacher-id-g1-file" class="hidden" accept="image/*,application/pdf" onchange="handleUpload('teacher-id-g1');checkDetails()">
-      </div>
+        <input type="file" id="teacher-id-g1-file" class="g-hidden" accept="image/*,application/pdf" onchange="handleUpload('teacher-id-g1');checkDetails()">
       </div>
     </div>
 
-        <!-- SECOND GUEST -->
-    <div class="guest-section" id="second-guest-section" style="display:none">
-      <div class="guest-sec-title">Second Guest (Spouse / Friend)</div>
-      <div class="two-col">
-        <div class="field full-row">
-          <label id="g2-name-label">Full Name * (as per Aadhaar)</label>
-          <input type="text" id="g2-name" placeholder="Full name" oninput="checkDetails()">
-        </div>
-        <div class="field">
-          <label>Telegram / WhatsApp Number</label>
-          <input type="tel" id="g2-phone" placeholder="+91 98765 43210">
-          <div class="wa-note">✈ Telegram / 💬 WhatsApp — confirmation sent here</div>
-        </div>
+    <!-- SECOND GUEST -->
+    <div class="g-block" id="second-guest-section" style="display:none">
+      <div class="g-block-title">👤 Second Guest</div>
+      <div class="g-field">
+        <label class="g-label">Full Name <span class="g-req">*</span></label>
+        <input type="text" id="g2-name" class="g-input" placeholder="As on Aadhaar / Passport" oninput="checkDetails()">
       </div>
-      <div style="margin-top:12px">
-        <div class="field"><label>Aadhaar Card *</label></div>
-        <div class="upload-box" onclick="document.getElementById('g2-id-file').click()">
-          <p>📎 Tap to upload Aadhaar Card</p>
-          <small>JPG, PNG or PDF · Front side · Max 5MB</small>
-          <img id="g2-id-preview" class="upload-preview-img" alt="">
-          <div id="g2-id-pdf" class="upload-pdf-badge">📄 PDF uploaded ✓</div>
+      <div class="g-field">
+        <label class="g-label">WhatsApp Number</label>
+        <input type="tel" id="g2-phone" class="g-input" placeholder="+91 98765 43210">
+      </div>
+      <div class="g-field">
+        <label class="g-label">Aadhaar Card <span class="g-req">*</span></label>
+        <div class="g-upload" onclick="document.getElementById('g2-id-file').click()">
+          <div class="g-upload-icon">📎</div>
+          <div class="g-upload-text">Tap to upload Aadhaar</div>
+          <div class="g-upload-sub">JPG · PNG · PDF · Front side · Max 5MB</div>
+          <img id="g2-id-preview" class="g-upload-preview" alt="" style="display:none">
+          <div id="g2-id-done" class="g-upload-done" style="display:none">✅ Uploaded</div>
         </div>
-        <input type="file" id="g2-id-file" class="hidden" accept="image/*,application/pdf" onchange="handleUpload('g2-id')">
-      <!-- Teacher discount — Guest 2 -->
-      <label style="margin-top:11px;display:flex;align-items:center;gap:10px;padding:11px 13px;background:var(--surface);border-radius:8px;border:1.5px solid var(--clay);cursor:pointer">
-        <input type="checkbox" id="teacher-chk-g2" onchange="toggleTeacher()" style="width:16px;height:16px;accent-color:#4a7fc0;flex-shrink:0;cursor:pointer">
-        <div style="flex:1">
-          <strong style="display:block;font-size:0.84rem;color:var(--clay)">Full-time Teacher?</strong>
-          <span style="font-family:'DM Mono',monospace;font-size:0.55rem;letter-spacing:0.07em;text-transform:uppercase;color:#4a7fc0">Upload ID to avail 25% off your share</span>
+        <input type="file" id="g2-id-file" class="g-hidden" accept="image/*,application/pdf" onchange="handleUpload('g2-id')">
+      </div>
+      <label class="g-teacher-toggle">
+        <input type="checkbox" id="teacher-chk-g2" onchange="toggleTeacher()">
+        <div class="g-teacher-info">
+          <span class="g-teacher-title">Full-time Art of Living Teacher?</span>
+          <span class="g-teacher-sub">Upload Teacher ID to avail 25% discount</span>
         </div>
-        <span style="font-family:'DM Mono',monospace;font-size:0.56rem;background:#4a7fc0;color:#fff;padding:2px 8px;border-radius:100px;white-space:nowrap">− 25%</span>
+        <span class="g-teacher-badge">−25%</span>
       </label>
-      <div id="teacher-id-section-g2" style="display:none;margin-top:8px">
-        <div class="upload-box" onclick="document.getElementById('teacher-id-g2-file').click()" style="border-color:#4a7fc0;padding:14px 10px">
-          <p style="color:var(--clay);margin:0 0 3px">📎 Tap to upload Teacher ID Card</p>
-          <small>Art of Living Teacher ID · JPG, PNG or PDF</small>
-          <img id="teacher-id-g2-preview" class="upload-preview-img" alt="">
-          <div id="teacher-id-g2-pdf" class="upload-pdf-badge" style="display:none">📄 PDF uploaded ✓</div>
+      <div id="teacher-id-section-g2" style="display:none">
+        <div class="g-upload" onclick="document.getElementById('teacher-id-g2-file').click()" style="border-color:var(--moss)">
+          <div class="g-upload-icon">🪷</div>
+          <div class="g-upload-text">Upload Teacher ID Card</div>
+          <div class="g-upload-sub">Art of Living Teacher ID · JPG · PNG · PDF</div>
+          <img id="teacher-id-g2-preview" class="g-upload-preview" alt="" style="display:none">
+          <div id="teacher-id-g2-done" class="g-upload-done" style="display:none">✅ Uploaded</div>
         </div>
-        <input type="file" id="teacher-id-g2-file" class="hidden" accept="image/*,application/pdf" onchange="handleUpload('teacher-id-g2');checkDetails()">
-      </div>
+        <input type="file" id="teacher-id-g2-file" class="g-hidden" accept="image/*,application/pdf" onchange="handleUpload('teacher-id-g2');checkDetails()">
       </div>
     </div>
 
     <!-- INTERNATIONAL FORM C -->
-    <div class="intl-section" id="intl-section" style="display:none">
-      <div class="intl-sec-title">🌏 International Guest — Form C Details</div>
-      <p class="intl-note">Form C registration is a Government of India requirement for foreign nationals staying in accommodation. Please provide all details accurately.</p>
-      <div class="two-col">
-        <div class="field full-row">
-          <label>Photograph *</label>
-          <div class="upload-box" onclick="document.getElementById('intl-photo-file').click()" style="border-color:rgba(74,95,160,0.4)">
-            <p style="color:var(--intl)">📷 Passport-size photograph</p>
-            <small>JPG or PNG · Clear face visible</small>
-            <img id="intl-photo-preview" class="upload-preview-img" alt="">
-          </div>
-          <input type="file" id="intl-photo-file" class="hidden" accept="image/*" onchange="handleUpload('intl-photo')">
+    <div class="g-block" id="intl-section" style="display:none">
+      <div class="g-block-title">🌏 International Guest — Form C</div>
+      <p class="g-intl-note">Form C is a Government of India requirement for foreign nationals. Please provide all details accurately.</p>
+      <div class="g-field">
+        <label class="g-label">Passport Photo <span class="g-req">*</span></label>
+        <div class="g-upload" onclick="document.getElementById('intl-photo-file').click()">
+          <div class="g-upload-icon">📷</div>
+          <div class="g-upload-text">Passport-size photograph</div>
+          <div class="g-upload-sub">JPG or PNG · Clear face visible</div>
+          <img id="intl-photo-preview" class="g-upload-preview" alt="" style="display:none">
+          <div id="intl-photo-done" class="g-upload-done" style="display:none">✅ Uploaded</div>
         </div>
-        <div class="field">
-          <label>Passport — Identity & Address Page *</label>
-          <div class="upload-box" onclick="document.getElementById('intl-passport-id-file').click()" style="border-color:rgba(74,95,160,0.4)">
-            <p style="color:var(--intl)">📄 Passport ID/address page</p>
-            <small>JPG, PNG or PDF</small>
-            <img id="intl-passport-id-preview" class="upload-preview-img" alt="">
-            <div id="intl-passport-id-pdf" class="upload-pdf-badge">📄 PDF uploaded ✓</div>
-          </div>
-          <input type="file" id="intl-passport-id-file" class="hidden" accept="image/*,application/pdf" onchange="handleUpload('intl-passport-id')">
+        <input type="file" id="intl-photo-file" class="g-hidden" accept="image/*" onchange="handleUpload('intl-photo');checkDetails()">
+      </div>
+      <div class="g-field">
+        <label class="g-label">Passport — ID & Address Page <span class="g-req">*</span></label>
+        <div class="g-upload" onclick="document.getElementById('intl-passport-id-file').click()">
+          <div class="g-upload-icon">📄</div>
+          <div class="g-upload-text">Passport identity page</div>
+          <div class="g-upload-sub">JPG · PNG · PDF</div>
+          <img id="intl-passport-id-preview" class="g-upload-preview" alt="" style="display:none">
+          <div id="intl-passport-id-done" class="g-upload-done" style="display:none">✅ Uploaded</div>
         </div>
-        <div class="field">
-          <label>Passport — Visa Page *</label>
-          <div class="upload-box" onclick="document.getElementById('intl-visa-file').click()" style="border-color:rgba(74,95,160,0.4)">
-            <p style="color:var(--intl)">🗂 Visa details page</p>
-            <small>JPG, PNG or PDF</small>
-            <img id="intl-visa-preview" class="upload-preview-img" alt="">
-            <div id="intl-visa-pdf" class="upload-pdf-badge">📄 PDF uploaded ✓</div>
-          </div>
-          <input type="file" id="intl-visa-file" class="hidden" accept="image/*,application/pdf" onchange="handleUpload('intl-visa')">
+        <input type="file" id="intl-passport-id-file" class="g-hidden" accept="image/*,application/pdf" onchange="handleUpload('intl-passport-id');checkDetails()">
+      </div>
+      <div class="g-field">
+        <label class="g-label">Passport — Visa Page <span class="g-req">*</span></label>
+        <div class="g-upload" onclick="document.getElementById('intl-visa-file').click()">
+          <div class="g-upload-icon">🗂</div>
+          <div class="g-upload-text">Visa details page</div>
+          <div class="g-upload-sub">JPG · PNG · PDF</div>
+          <img id="intl-visa-preview" class="g-upload-preview" alt="" style="display:none">
+          <div id="intl-visa-done" class="g-upload-done" style="display:none">✅ Uploaded</div>
         </div>
-        <div class="field full-row">
-          <label>Permanent Home Address *</label>
-          <textarea id="intl-address" rows="2" placeholder="Full home address including country" oninput="checkDetails()"></textarea>
-        </div>
-        <div class="field full-row">
-          <label>Travel History (last 3 countries visited)</label>
-          <input type="text" id="intl-travel" placeholder="e.g. Germany, Thailand, Nepal">
-        </div>
-        <div class="field">
-          <label>Date of Arrival in India *</label>
-          <input type="date" id="intl-arrival-date" oninput="checkDetails()">
-        </div>
-        <div class="field">
-          <label>Arrival Time in India</label>
-          <input type="time" id="intl-arrival-time">
-        </div>
-        <div class="field full-row">
-          <label>Purpose of Visit to India *</label>
-          <input type="text" id="intl-purpose" placeholder="e.g. Tourism, Yoga retreat, Pilgrimage" oninput="checkDetails()">
-        </div>
-        <div class="field">
-          <label>Contact Number in India *</label>
-          <input type="tel" id="intl-contact-india" placeholder="Local SIM / Telegram / WhatsApp number" oninput="checkDetails()">
-        </div>
-        <div class="field">
-          <label>Emergency Contact (home country)</label>
-          <input type="tel" id="intl-emergency" placeholder="Country code + number">
-        </div>
+        <input type="file" id="intl-visa-file" class="g-hidden" accept="image/*,application/pdf" onchange="handleUpload('intl-visa');checkDetails()">
+      </div>
+      <div class="g-field">
+        <label class="g-label">Permanent Home Address <span class="g-req">*</span></label>
+        <textarea id="intl-address" class="g-input" rows="2" placeholder="Full address including country" oninput="checkDetails()"></textarea>
+      </div>
+      <div class="g-field">
+        <label class="g-label">Date of Arrival in India <span class="g-req">*</span></label>
+        <input type="date" id="intl-arrival-date" class="g-input" oninput="checkDetails()">
+      </div>
+      <div class="g-field">
+        <label class="g-label">Purpose of Visit <span class="g-req">*</span></label>
+        <input type="text" id="intl-purpose" class="g-input" placeholder="e.g. Yoga retreat, Pilgrimage" oninput="checkDetails()">
+      </div>
+      <div class="g-field">
+        <label class="g-label">India Contact Number <span class="g-req">*</span></label>
+        <input type="tel" id="intl-contact-india" class="g-input" placeholder="Local SIM / WhatsApp" oninput="checkDetails()">
+      </div>
+      <div class="g-field">
+        <label class="g-label">Travel History (last 3 countries)</label>
+        <input type="text" id="intl-travel" class="g-input" placeholder="e.g. Germany, Thailand, Nepal">
+      </div>
+      <div class="g-field">
+        <label class="g-label">Emergency Contact (home country)</label>
+        <input type="tel" id="intl-emergency" class="g-input" placeholder="Country code + number">
+      </div>
+      <div class="g-field">
+        <label class="g-label">Arrival Time in India</label>
+        <input type="time" id="intl-arrival-time" class="g-input">
       </div>
     </div>
 
@@ -922,6 +939,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
   <button class="btn-secondary" style="margin-top:11px" onclick="resetBooking()">Make Another Booking</button>
 </div>
 
+</div>
 </main>
 
 
@@ -930,49 +948,8 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 </div>
 <span id="visitor-geo" style="display:none"></span>
 
-<!-- ROOMS GALLERY -->
-<div style="max-width:860px;margin:0 auto;padding:0 20px 8px;text-align:center;">
-  <p style="font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--text-s);letter-spacing:0.06em;line-height:1.8;text-transform:uppercase;">
-    Kanakapura Road · Next to Art of Living International Centre · Bengaluru
-  </p>
-</div>
-<section class="gallery-section" id="rooms-gallery">
-  <h2 class="gallery-title">Your Stay Space</h2>
-  <p class="gallery-sub">Shanthi &amp; Sangha · Peaceful Simple Living</p>
-  <div class="gallery-tabs">
-    <button class="gallery-tab active" onclick="switchGalleryTab('sangha',this)">🌿 Sangha Room</button>
-    <button class="gallery-tab" onclick="switchGalleryTab('shanthi',this)">🏡 Shanthi Room</button>
-    <button class="gallery-tab" onclick="switchGalleryTab('portico',this)">🌳 Portico</button>
-  </div>
 
-  <div class="gallery-panel active" id="gpanel-sangha">
-    <div class="gallery-video-wrap">
-      <iframe src="https://www.youtube.com/embed/Vj-I7tExJj4?rel=0&modestbranding=1&playsinline=1"
-        allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
-      </iframe>
-    </div>
-    <p class="gallery-caption">Sangha Room &middot; Common Bath &middot; Quiet &amp; Simple</p>
-  </div>
-
-  <div class="gallery-panel" id="gpanel-shanthi">
-    <div class="gallery-video-wrap">
-      <iframe src="https://www.youtube.com/embed/UAmxKKO8CdA?rel=0&modestbranding=1&playsinline=1"
-        allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
-      </iframe>
-    </div>
-    <p class="gallery-caption">Shanthi Room &middot; Attached Bath &middot; Private &amp; Calm</p>
-  </div>
-
-  <div class="gallery-panel" id="gpanel-portico">
-    <div class="gallery-photo-wrap">
-      <img src="https://lh3.googleusercontent.com/pw/AP1GczOGHpVlRxpdQOGA2JXuitzyQ4XLB-B20HLAZWGojlufxZGSZHcp_MDMUwRXUhncDh_A0OfWsBsiUB8PnqIyesRQE0HWpzRcNbWZkefhY1pWfWtDdQ=w1200-h900-no"
-           alt="Portico at Soudhamini" loading="lazy">
-    </div>
-    <p class="gallery-caption">Portico &middot; Open Air &middot; Garden View</p>
-  </div>
-</section>
-
-<footer id="site-footer">Shanthi &amp; Sangha @ Soudhamini · Peaceful Simple Living · Waste Segregated with Ashram Care<span style="font-family:'DM Mono',monospace;font-size:0.55rem;opacity:0.55;margin-left:14px;letter-spacing:0.06em">HTML v51 · AS v17</span></footer>
+<footer id="site-footer">Shanthi &amp; Sangha @ Soudhamini · Peaceful Simple Living · Waste Segregated with Ashram Care<span style="font-family:'DM Mono',monospace;font-size:0.55rem;opacity:0.55;margin-left:14px;letter-spacing:0.06em">HTML v66 · AS v17</span></footer>
 
 <!-- MODALS -->
 <!-- Admin Login -->
@@ -1004,7 +981,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 
 <script>
 // ── CONFIG ─────────────────────────────────────────────
-const APP_VERSION='v51';
+const APP_VERSION='v66';
 const CFG={
   APPS_SCRIPT_URL:'https://script.google.com/macros/s/AKfycbzrzBGUChJvK88w3iRmMwdRdUdrhF6Ysgnfemxax3V_JPr_bQh4agHfBPpn9S8pVmm3Sw/exec',
   OWNER_WA:'919148212422',
@@ -1166,8 +1143,10 @@ function recalc(){
 function goTo(p){
   track("booking_step",{step:p});
   document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
-  document.getElementById('page'+p).classList.add('active');
-  if(p===2)renderCal(); // refresh calendar with latest bookings
+  var pg=document.getElementById('page'+p);
+  if(!pg)return;
+  pg.classList.add('active');
+  if(p===2)renderCal();
   for(let i=1;i<=5;i++){
     const n=document.getElementById('sn'+i);
     n.classList.remove('active','done');
@@ -1176,7 +1155,10 @@ function goTo(p){
   }
   if(p===4)buildSummary();
   if(p===5)buildPaymentPage();
-  window.scrollTo({top:0,behavior:'smooth'});
+  // Reset scroll on page switch
+  try{document.getElementById('pages-container').scrollTop=0;}catch(e){}
+  try{document.documentElement.scrollTop=0;document.body.scrollTop=0;}catch(e){}
+  try{pg.scrollIntoView({behavior:'auto',block:'start'});}catch(e){}
 }
 
 function checkDateConflict(){
@@ -1246,14 +1228,16 @@ function handleUpload(id){
   const f=document.getElementById(id+'-file').files[0];
   if(!f)return;
   const prev=document.getElementById(id+'-preview');
+  const done=document.getElementById(id+'-done');
   const pdf=document.getElementById(id+'-pdf');
   if(f.type==='application/pdf'){
     if(prev)prev.style.display='none';
     if(pdf){pdf.style.display='block';pdf.textContent='📄 '+f.name+' ✓';}
   } else {
     if(pdf)pdf.style.display='none';
-    if(prev){ const r=new FileReader();r.onload=ev=>{prev.src=ev.target.result;prev.style.display='block';};r.readAsDataURL(f); }
+    if(prev){const r=new FileReader();r.onload=ev=>{prev.src=ev.target.result;prev.style.display='block';};r.readAsDataURL(f);}
   }
+  if(done)done.style.display='block';
   checkDetails();
 }
 
@@ -1269,23 +1253,17 @@ function checkDetails(){
   }
   const g1t=document.getElementById('teacher-chk-g1');
   const g2t=document.getElementById('teacher-chk-g2');
-  if(g1t&&g1t.checked){
-    const tid1=document.getElementById('teacher-id-g1-file').files.length>0;
-    ok=ok&&tid1;
-  }
-  if(g2t&&g2t.checked&&twoGuests){
-    const tid2=document.getElementById('teacher-id-g2-file').files.length>0;
-    ok=ok&&tid2;
-  }
+  if(g1t&&g1t.checked){ok=ok&&document.getElementById('teacher-id-g1-file').files.length>0;}
+  if(g2t&&g2t.checked&&twoGuests){ok=ok&&document.getElementById('teacher-id-g2-file').files.length>0;}
   if(intlGuest){
-    const addr=document.getElementById('intl-address').value.trim();
-    const arr=document.getElementById('intl-arrival-date').value;
-    const purp=document.getElementById('intl-purpose').value.trim();
-    const cont=document.getElementById('intl-contact-india').value.trim();
-    const photo=document.getElementById('intl-photo-file').files.length>0;
-    const pass=document.getElementById('intl-passport-id-file').files.length>0;
-    const visa=document.getElementById('intl-visa-file').files.length>0;
-    ok=ok&&addr&&arr&&purp&&cont&&photo&&pass&&visa;
+    ok=ok&&
+      document.getElementById('intl-address').value.trim()&&
+      document.getElementById('intl-arrival-date').value&&
+      document.getElementById('intl-purpose').value.trim()&&
+      document.getElementById('intl-contact-india').value.trim()&&
+      document.getElementById('intl-photo-file').files.length>0&&
+      document.getElementById('intl-passport-id-file').files.length>0&&
+      document.getElementById('intl-visa-file').files.length>0;
   }
   document.getElementById('btn-to-review').disabled=!ok;
 }
@@ -1526,7 +1504,11 @@ Thank you for your stay! Please do leave us a review 🌿
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('success-card').classList.add('visible');
   document.getElementById('stepper').style.display='none';
-  window.scrollTo({top:0,behavior:'smooth'});
+  // Scroll every possible scrollable container to top
+  try{document.documentElement.scrollTop=0;}catch(e){}
+  try{document.body.scrollTop=0;}catch(e){}
+  try{var par=pg.parentElement;while(par){par.scrollTop=0;par=par.parentElement;}}catch(e){}
+  try{pg.scrollIntoView({behavior:'auto',block:'nearest'});}catch(e){}
 }
 
 function goHome(){
@@ -2504,14 +2486,7 @@ function logVisitToServer(fingerprint, geo, isAdmin, isTestBooking){
 
 
 // ── ROOMS GALLERY ──────────────────────────────────────
-function switchGalleryTab(panel,btn){
-  track('gallery_viewed',{room:panel});
-  document.querySelectorAll('.gallery-panel').forEach(function(p){p.classList.remove('active');});
-  document.querySelectorAll('.gallery-tab').forEach(function(t){t.classList.remove('active');});
-  var el=document.getElementById('gpanel-'+panel);
-  if(el)el.classList.add('active');
-  if(btn)btn.classList.add('active');
-}
+
 
 
 // ── ANALYTICS TRACKING ─────────────────────────────────
@@ -2519,6 +2494,42 @@ function track(event, params){
   if(typeof gtag==='undefined') return;
   gtag('event', event, params||{});
 }
+
+// ── LIGHTBOX ───────────────────────────────────────────
+var lbItems=[],lbIdx=0;
+function openLB(items,idx){
+  lbItems=items; lbIdx=idx||0;
+  document.getElementById('lightbox').classList.add('open');
+  renderLB();
+}
+function closeLB(){
+  document.getElementById('lightbox').classList.remove('open');
+}
+function lbNav(dir){
+  lbIdx=(lbIdx+dir+lbItems.length)%lbItems.length;
+  renderLB();
+}
+function renderLB(){
+  var item=lbItems[lbIdx];
+  if(!item)return;
+  var c=document.getElementById('lb-content');
+  var cap=document.getElementById('lb-caption');
+  var ctr=document.getElementById('lb-counter');
+  if(item.type==='video'){
+    c.innerHTML='<video controls autoplay playsinline style="max-width:90vw;max-height:80vh;border-radius:8px"><source src="'+item.src+'"></video>';
+  } else {
+    c.innerHTML='<img src="'+item.src+'" style="max-width:90vw;max-height:80vh;border-radius:8px;object-fit:contain">';
+  }
+  if(cap) cap.textContent=item.label||'';
+  if(ctr) ctr.textContent=(lbIdx+1)+' / '+lbItems.length;
+}
+document.addEventListener('keydown',function(e){
+  var lb=document.getElementById('lightbox');
+  if(!lb||!lb.classList.contains('open'))return;
+  if(e.key==='ArrowLeft')lbNav(-1);
+  else if(e.key==='ArrowRight')lbNav(1);
+  else if(e.key==='Escape')closeLB();
+});
 </script>
 <!-- HOST PANEL -->
 <div class="host-panel" id="host-panel">
