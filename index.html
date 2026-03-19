@@ -643,6 +643,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
       <div class="dep-row" id="dep-teacher-row" style="display:none"><span>🪷 Teacher discount</span><span id="dep-teacher" style="color:var(--moss)">—</span></div>
       <div class="dep-row" style="border-top:1px solid var(--border);margin-top:6px;padding-top:8px;font-weight:600"><span>Room charges total</span><span id="dep-room">—</span></div>
       <div class="dep-row"><span>Refundable security deposit</span><span>₹1,000</span></div>
+      <div class="dep-row" style="border-top:1px solid var(--border);margin-top:6px;padding-top:8px;font-weight:700;color:var(--clay)"><span>Grand Total (Advance + Deposit)</span><span id="dep-total">—</span></div>
     <div class="timing-note" style="margin-top:11px">Check-in 2:00 PM · Check-out 11:30 AM</div>
     <button class="btn-primary" id="btn-to-guests" disabled onclick="goTo(3)">Guest Details →</button>
     <button class="btn-secondary" onclick="goTo(1)">← Back</button>
@@ -971,7 +972,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
   </div>
 </section>
 
-<footer id="site-footer">Shanthi &amp; Sangha @ Soudhamini · Peaceful Simple Living · Waste Segregated with Ashram Care<span style="font-family:'DM Mono',monospace;font-size:0.55rem;opacity:0.55;margin-left:14px;letter-spacing:0.06em">HTML v49 · AS v17</span></footer>
+<footer id="site-footer">Shanthi &amp; Sangha @ Soudhamini · Peaceful Simple Living · Waste Segregated with Ashram Care<span style="font-family:'DM Mono',monospace;font-size:0.55rem;opacity:0.55;margin-left:14px;letter-spacing:0.06em">HTML v50 · AS v17</span></footer>
 
 <!-- MODALS -->
 <!-- Admin Login -->
@@ -1003,7 +1004,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 
 <script>
 // ── CONFIG ─────────────────────────────────────────────
-const APP_VERSION='v49';
+const APP_VERSION='v50';
 const CFG={
   APPS_SCRIPT_URL:'https://script.google.com/macros/s/AKfycbzrzBGUChJvK88w3iRmMwdRdUdrhF6Ysgnfemxax3V_JPr_bQh4agHfBPpn9S8pVmm3Sw/exec',
   OWNER_WA:'919148212422',
@@ -1196,7 +1197,7 @@ function calcStay(){
   document.getElementById('deposit-box').classList.remove('vis');
   document.getElementById('btn-to-guests').disabled=true;
   if(!ci||!co||!selRoom)return;
-  const d1=new Date(ci),d2=new Date(co);
+  const d1=new Date(ci+"T00:00:00"),d2=new Date(co+"T00:00:00");
   nights=Math.round((d2-d1)/86400000);
   if(nights<=0)return;
   if(checkDateConflict())return;
