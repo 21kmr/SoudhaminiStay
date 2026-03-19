@@ -18,11 +18,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#faf7f2;--surface:#fff;--border:#e6ddd0;--warm:#ede5d8;
-  --clay:#b07c50;--terr:#8b4a2a;--moss:#4a6741;--sage:#7a9e72;
-  --sage-lt:#ddecd8;--text:#2c1f0f;--text-mid:#5a4a38;--text-s:#8a7a68;
-  --gold:#b8962a;--shadow:rgba(44,31,15,0.08);--r:8px;
-  --intl:#4a5fa0;--intl-lt:#e8edf8;
+  --bg:#0f0a05;--surface:#1c1209;--border:#2e2318;--warm:#241a0e;
+  --clay:#c8935a;--terr:#a05a30;--moss:#5a8050;--sage:#8ab882;
+  --sage-lt:#1a2e18;--text:#f0e8d8;--text-mid:#c8b898;--text-s:#9a8a78;
+  --gold:#d4a83a;--shadow:rgba(0,0,0,0.5);--r:8px;
+  --intl:#7a9fd0;--intl-lt:#0f1a2e;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;font-size:15px;line-height:1.6;min-height:100vh;overflow-x:hidden;}
@@ -72,8 +72,8 @@ header h1 em{font-style:italic;color:var(--terr);}
 
 /* MAIN */
 main{max-width:860px;margin:0 auto;padding:0 20px 60px;min-height:60vh;}
-.page{display:none;min-height:400px;}
-.page.active{display:block;animation:fadeUp 0.3s ease both;}
+.page{display:none;}
+.page.active{display:block;animation:fadeUp 0.3s ease both;min-height:50vh;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
 
 /* SEC LABEL */
@@ -90,7 +90,7 @@ main{max-width:860px;margin:0 auto;padding:0 20px 60px;min-height:60vh;}
 .room-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:var(--clay);transform:scaleX(0);transition:transform 0.28s;border-radius:var(--r) var(--r) 0 0;}
 .room-card:hover{border-color:var(--clay);transform:translateY(-2px);box-shadow:0 6px 20px var(--shadow);}
 .room-card:hover::before{transform:scaleX(1);}
-.room-card.selected{border-color:var(--terr);background:#fdf7f2;}
+.room-card.selected{border-color:var(--clay);background:var(--warm);}
 .room-card.selected::before{transform:scaleX(1);background:var(--terr);}
 .room-card.disabled-card{opacity:0.4;cursor:not-allowed;pointer-events:none;}
 .room-card h3{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:400;margin-bottom:3px;}
@@ -142,7 +142,7 @@ main{max-width:860px;margin:0 auto;padding:0 20px 60px;min-height:60vh;}
 .field{display:flex;flex-direction:column;gap:5px;}
 .field label{font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--clay);}
 .field input,.field select,.field textarea{width:100%;padding:9px 11px;border:1px solid var(--border);border-radius:5px;background:var(--bg);font-family:'Lato',sans-serif;font-size:0.9rem;color:var(--text);outline:none;transition:border-color 0.2s;appearance:none;}
-.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--clay);background:#fff;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--clay);background:var(--warm);}
 .field textarea{resize:vertical;min-height:70px;}
 
 @media(max-width:540px){}
@@ -431,7 +431,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 .g-label{display:block;font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-s);margin-bottom:5px;}
 .g-req{color:var(--terr);}
 .g-input{width:100%;padding:10px 13px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text);font-family:'Lato',sans-serif;font-size:0.92rem;outline:none;transition:border-color 0.2s;box-sizing:border-box;}
-.g-input:focus{border-color:var(--clay);background:#fff;}
+.g-input:focus{border-color:var(--clay);background:var(--warm);}
 textarea.g-input{resize:vertical;min-height:64px;}
 .g-hint{font-size:0.72rem;color:var(--text-s);margin-top:4px;}
 .g-hidden{display:none;}
@@ -451,6 +451,19 @@ textarea.g-input{resize:vertical;min-height:64px;}
 .g-teacher-badge{font-family:'DM Mono',monospace;font-size:0.58rem;background:var(--moss);color:#fff;padding:3px 9px;border-radius:100px;white-space:nowrap;}
 .g-intl-note{font-size:0.78rem;color:var(--text-s);margin-bottom:14px;line-height:1.6;}
 
+
+/* ── ROOMS VIDEO GRID ──────────────────────────────────── */
+.rooms-video-section{padding:40px 20px 50px;max-width:1000px;margin:0 auto;}
+.rooms-video-title{font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--text);text-align:center;margin:0 0 4px;}
+.rooms-video-sub{font-family:'DM Mono',monospace;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-s);text-align:center;margin-bottom:24px;}
+.rooms-video-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+@media(max-width:700px){.rooms-video-grid{grid-template-columns:1fr;}}
+.rooms-video-card{border-radius:12px;overflow:hidden;background:var(--surface);border:1px solid var(--border);}
+.rooms-video-wrap{position:relative;width:100%;aspect-ratio:9/16;background:#000;}
+.rooms-video-wrap iframe{position:absolute;inset:0;width:100%;height:100%;border:none;}
+.rooms-video-wrap img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.rooms-video-label{font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--clay);text-align:center;padding:10px 8px 4px;}
+.rooms-video-sublabel{font-size:0.58rem;color:var(--text-s);text-align:center;padding:0 8px 10px;font-family:'DM Mono',monospace;}
 </style>
 <!-- Google Analytics 4 -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-6PGWC2WZ0F"></script>
@@ -558,7 +571,6 @@ textarea.g-input{resize:vertical;min-height:64px;}
 </div>
 
 <main>
-<div id="pages-container" style="overflow-y:auto;">
 
 <!-- PAGE 1: ROOM -->
 <div class="page active" id="page1">
@@ -661,11 +673,12 @@ textarea.g-input{resize:vertical;min-height:64px;}
       <div class="dep-row" style="border-top:1px solid var(--border);margin-top:6px;padding-top:8px;font-weight:600"><span>Room charges total</span><span id="dep-room">—</span></div>
       <div class="dep-row"><span>Refundable security deposit</span><span>₹1,000</span></div>
       <div class="dep-row" style="border-top:1px solid var(--border);margin-top:6px;padding-top:8px;font-weight:700;color:var(--clay)"><span>Grand Total (Advance + Deposit)</span><span id="dep-total">—</span></div>
+    </div><!-- /deposit-box -->
     <div class="timing-note" style="margin-top:11px">Check-in 2:00 PM · Check-out 11:30 AM</div>
     <button class="btn-primary" id="btn-to-guests" disabled onclick="goTo(3)">Guest Details →</button>
     <button class="btn-secondary" onclick="goTo(1)">← Back</button>
-  </div>
-</div>
+  </div><!-- /card -->
+</div><!-- /page2 -->
 
 <!-- PAGE 3: GUESTS -->
 <div class="page" id="page3">
@@ -939,7 +952,6 @@ textarea.g-input{resize:vertical;min-height:64px;}
   <button class="btn-secondary" style="margin-top:11px" onclick="resetBooking()">Make Another Booking</button>
 </div>
 
-</div>
 </main>
 
 
@@ -949,7 +961,41 @@ textarea.g-input{resize:vertical;min-height:64px;}
 <span id="visitor-geo" style="display:none"></span>
 
 
-<footer id="site-footer">Shanthi &amp; Sangha @ Soudhamini · Peaceful Simple Living · Waste Segregated with Ashram Care<span style="font-family:'DM Mono',monospace;font-size:0.55rem;opacity:0.55;margin-left:14px;letter-spacing:0.06em">HTML v66 · AS v17</span></footer>
+
+<!-- ROOMS VIDEO GRID -->
+<section class="rooms-video-section">
+  <h2 class="rooms-video-title">Your Stay Space</h2>
+  <p class="rooms-video-sub">Shanthi &amp; Sangha &middot; Kanakapura Road &middot; Bengaluru</p>
+  <div class="rooms-video-grid">
+    <div class="rooms-video-card">
+      <div class="rooms-video-wrap">
+        <iframe src="https://www.youtube.com/embed/UAmxKKO8CdA?rel=0&modestbranding=1&playsinline=1"
+          allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
+        </iframe>
+      </div>
+      <div class="rooms-video-label">&#127968; Shanthi Room</div>
+      <div class="rooms-video-sublabel">Attached Bath &middot; Private &amp; Calm</div>
+    </div>
+    <div class="rooms-video-card">
+      <div class="rooms-video-wrap">
+        <iframe src="https://www.youtube.com/embed/Vj-I7tExJj4?rel=0&modestbranding=1&playsinline=1"
+          allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
+        </iframe>
+      </div>
+      <div class="rooms-video-label">&#127807; Sangha Room</div>
+      <div class="rooms-video-sublabel">Common Bath &middot; Quiet &amp; Simple</div>
+    </div>
+    <div class="rooms-video-card">
+      <div class="rooms-video-wrap">
+        <img src="https://lh3.googleusercontent.com/pw/AP1GczOGHpVlRxpdQOGA2JXuitzyQ4XLB-B20HLAZWGojlufxZGSZHcp_MDMUwRXUhncDh_A0OfWsBsiUB8PnqIyesRQE0HWpzRcNbWZkefhY1pWfWtDdQ=w1200-h900-no" alt="Portico">
+      </div>
+      <div class="rooms-video-label">&#127795; Portico</div>
+      <div class="rooms-video-sublabel">Open Air &middot; Garden View</div>
+    </div>
+  </div>
+</section>
+
+<footer id="site-footer">Shanthi &amp; Sangha @ Soudhamini · Peaceful Simple Living · Waste Segregated with Ashram Care<span style="font-family:'DM Mono',monospace;font-size:0.55rem;opacity:0.55;margin-left:14px;letter-spacing:0.06em">HTML v70 · AS v17</span></footer>
 
 <!-- MODALS -->
 <!-- Admin Login -->
@@ -981,7 +1027,7 @@ textarea.g-input{resize:vertical;min-height:64px;}
 
 <script>
 // ── CONFIG ─────────────────────────────────────────────
-const APP_VERSION='v66';
+const APP_VERSION='v70';
 const CFG={
   APPS_SCRIPT_URL:'https://script.google.com/macros/s/AKfycbzrzBGUChJvK88w3iRmMwdRdUdrhF6Ysgnfemxax3V_JPr_bQh4agHfBPpn9S8pVmm3Sw/exec',
   OWNER_WA:'919148212422',
@@ -1155,10 +1201,9 @@ function goTo(p){
   }
   if(p===4)buildSummary();
   if(p===5)buildPaymentPage();
-  // Reset scroll on page switch
-  try{document.getElementById('pages-container').scrollTop=0;}catch(e){}
+  // Scroll to top of main content
+  try{document.querySelector('main').scrollIntoView({behavior:'auto',block:'start'});}catch(e){}
   try{document.documentElement.scrollTop=0;document.body.scrollTop=0;}catch(e){}
-  try{pg.scrollIntoView({behavior:'auto',block:'start'});}catch(e){}
 }
 
 function checkDateConflict(){
