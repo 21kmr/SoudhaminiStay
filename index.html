@@ -142,7 +142,7 @@ main{max-width:860px;margin:0 auto;padding:0 20px 60px;}
 .field{display:flex;flex-direction:column;gap:5px;}
 .field label{font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--clay);}
 .field input,.field select,.field textarea{width:100%;padding:9px 11px;border:1px solid var(--border);border-radius:5px;background:var(--bg);font-family:'Lato',sans-serif;font-size:0.9rem;color:var(--text);outline:none;transition:border-color 0.2s;appearance:none;}
-.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--clay);background:#fff;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--clay);background:var(--surface);}
 .field textarea{resize:vertical;min-height:70px;}
 .two-col{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:12px;}
 @media(max-width:540px){.two-col{grid-template-columns:1fr;}}
@@ -158,7 +158,7 @@ main{max-width:860px;margin:0 auto;padding:0 20px 60px;}
 .hidden{display:none;}
 
 /* GUEST SECTION */
-.guest-section{margin-top:16px;padding:15px;background:var(--bg);border-radius:var(--r);border:1px solid var(--border);}
+.guest-section{margin-top:16px;padding:15px;background:var(--warm);border-radius:var(--r);border:1px solid var(--border);}
 .guest-sec-title{font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--clay);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
 .guest-sec-title::after{content:'';flex:1;height:1px;background:var(--border);}
 
@@ -290,7 +290,7 @@ main{max-width:860px;margin:0 auto;padding:0 20px 60px;}
 .modal h3{font-family:'Playfair Display',serif;font-size:1.25rem;font-weight:400;font-style:italic;margin-bottom:16px;}
 .modal-close{position:absolute;top:12px;right:14px;background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--clay);line-height:1;}
 .m-label{font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--clay);display:block;margin-top:11px;margin-bottom:3px;}
-.modal input[type=text],.modal input[type=tel],.modal select,.modal textarea{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:5px;background:#fff;font-family:'Lato',sans-serif;font-size:0.86rem;color:var(--text);outline:none;transition:border-color 0.2s;margin-top:3px;}
+.modal input[type=text],.modal input[type=tel],.modal select,.modal textarea{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:5px;background:var(--surface);font-family:'Lato',sans-serif;font-size:0.86rem;color:var(--text);outline:none;transition:border-color 0.2s;margin-top:3px;}
 .modal input:focus,.modal select:focus,.modal textarea:focus{border-color:var(--clay);}
 .modal textarea{resize:vertical;min-height:75px;}
 
@@ -679,17 +679,17 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
         </div>
         <input type="file" id="g1-id-file" class="hidden" accept="image/*,application/pdf" onchange="handleUpload('g1-id')">
       <!-- Teacher discount — Guest 1 -->
-      <label style="margin-top:11px;display:flex;align-items:center;gap:10px;padding:11px 13px;background:#f0f7ff;border-radius:8px;border:1.5px solid #4a7fc0;cursor:pointer">
+      <label style="margin-top:11px;display:flex;align-items:center;gap:10px;padding:11px 13px;background:var(--surface);border-radius:8px;border:1.5px solid var(--clay);cursor:pointer">
         <input type="checkbox" id="teacher-chk-g1" onchange="toggleTeacher()" style="width:16px;height:16px;accent-color:#4a7fc0;flex-shrink:0;cursor:pointer">
         <div style="flex:1">
-          <strong style="display:block;font-size:0.84rem;color:#2c5282">Full-time Teacher?</strong>
+          <strong style="display:block;font-size:0.84rem;color:var(--clay)">Full-time Teacher?</strong>
           <span style="font-family:'DM Mono',monospace;font-size:0.55rem;letter-spacing:0.07em;text-transform:uppercase;color:#4a7fc0">Upload ID to avail 25% off your share</span>
         </div>
         <span style="font-family:'DM Mono',monospace;font-size:0.56rem;background:#4a7fc0;color:#fff;padding:2px 8px;border-radius:100px;white-space:nowrap">− 25%</span>
       </label>
       <div id="teacher-id-section-g1" style="display:none;margin-top:8px">
         <div class="upload-box" onclick="document.getElementById('teacher-id-g1-file').click()" style="border-color:#4a7fc0;padding:14px 10px">
-          <p style="color:#2c5282;margin:0 0 3px">📎 Tap to upload Teacher ID Card</p>
+          <p style="color:var(--clay);margin:0 0 3px">📎 Tap to upload Teacher ID Card</p>
           <small>Art of Living Teacher ID · JPG, PNG or PDF</small>
           <img id="teacher-id-g1-preview" class="upload-preview-img" alt="">
           <div id="teacher-id-g1-pdf" class="upload-pdf-badge" style="display:none">📄 PDF uploaded ✓</div>
@@ -723,17 +723,17 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
         </div>
         <input type="file" id="g2-id-file" class="hidden" accept="image/*,application/pdf" onchange="handleUpload('g2-id')">
       <!-- Teacher discount — Guest 2 -->
-      <label style="margin-top:11px;display:flex;align-items:center;gap:10px;padding:11px 13px;background:#f0f7ff;border-radius:8px;border:1.5px solid #4a7fc0;cursor:pointer">
+      <label style="margin-top:11px;display:flex;align-items:center;gap:10px;padding:11px 13px;background:var(--surface);border-radius:8px;border:1.5px solid var(--clay);cursor:pointer">
         <input type="checkbox" id="teacher-chk-g2" onchange="toggleTeacher()" style="width:16px;height:16px;accent-color:#4a7fc0;flex-shrink:0;cursor:pointer">
         <div style="flex:1">
-          <strong style="display:block;font-size:0.84rem;color:#2c5282">Full-time Teacher?</strong>
+          <strong style="display:block;font-size:0.84rem;color:var(--clay)">Full-time Teacher?</strong>
           <span style="font-family:'DM Mono',monospace;font-size:0.55rem;letter-spacing:0.07em;text-transform:uppercase;color:#4a7fc0">Upload ID to avail 25% off your share</span>
         </div>
         <span style="font-family:'DM Mono',monospace;font-size:0.56rem;background:#4a7fc0;color:#fff;padding:2px 8px;border-radius:100px;white-space:nowrap">− 25%</span>
       </label>
       <div id="teacher-id-section-g2" style="display:none;margin-top:8px">
         <div class="upload-box" onclick="document.getElementById('teacher-id-g2-file').click()" style="border-color:#4a7fc0;padding:14px 10px">
-          <p style="color:#2c5282;margin:0 0 3px">📎 Tap to upload Teacher ID Card</p>
+          <p style="color:var(--clay);margin:0 0 3px">📎 Tap to upload Teacher ID Card</p>
           <small>Art of Living Teacher ID · JPG, PNG or PDF</small>
           <img id="teacher-id-g2-preview" class="upload-preview-img" alt="">
           <div id="teacher-id-g2-pdf" class="upload-pdf-badge" style="display:none">📄 PDF uploaded ✓</div>
@@ -972,7 +972,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
   </div>
 </section>
 
-<footer id="site-footer">Shanthi &amp; Sangha @ Soudhamini · Peaceful Simple Living · Waste Segregated with Ashram Care<span style="font-family:'DM Mono',monospace;font-size:0.55rem;opacity:0.55;margin-left:14px;letter-spacing:0.06em">HTML v50 · AS v17</span></footer>
+<footer id="site-footer">Shanthi &amp; Sangha @ Soudhamini · Peaceful Simple Living · Waste Segregated with Ashram Care<span style="font-family:'DM Mono',monospace;font-size:0.55rem;opacity:0.55;margin-left:14px;letter-spacing:0.06em">HTML v51 · AS v17</span></footer>
 
 <!-- MODALS -->
 <!-- Admin Login -->
@@ -1004,7 +1004,7 @@ footer{text-align:center;padding:16px;font-family:'DM Mono',monospace;font-size:
 
 <script>
 // ── CONFIG ─────────────────────────────────────────────
-const APP_VERSION='v50';
+const APP_VERSION='v51';
 const CFG={
   APPS_SCRIPT_URL:'https://script.google.com/macros/s/AKfycbzrzBGUChJvK88w3iRmMwdRdUdrhF6Ysgnfemxax3V_JPr_bQh4agHfBPpn9S8pVmm3Sw/exec',
   OWNER_WA:'919148212422',
