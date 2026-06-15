@@ -529,10 +529,22 @@ textarea.g-input{resize:vertical;min-height:64px;}
   <div style="display:flex;gap:7px">
     <button class="admin-btn" onclick="openHostPanel()">📋 Host Panel</button>
     <button class="admin-btn" id="btn-festive-toggle" onclick="toggleFestiveMode()">🎉 Festive OFF</button>
+    <button class="admin-btn" onclick="document.getElementById('festive-panel').style.display=document.getElementById('festive-panel').style.display==='none'?'block':'none';renderFestivePeriodsList()">📅 Festive Dates</button>
     <button class="admin-btn" onclick="adminLogout()">Logout</button>
   </div>
 </div>
 <div id="festive-banner" style="display:none;background:var(--gold);color:#0f0a05;text-align:center;padding:6px;font-family:'DM Mono',monospace;font-size:0.62rem;letter-spacing:0.1em;font-weight:700">🎉 FESTIVE MODE ACTIVE — ALL PRICES DOUBLED · DISCOUNTS DISABLED</div>
+<div id="festive-panel" style="display:none;background:var(--surface);border-bottom:1px solid var(--border);padding:14px 20px;">
+  <div style="max-width:860px;margin:0 auto">
+    <div style="font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--clay);margin-bottom:10px">📅 Festive Pricing Periods — when Festive Mode is ON, guests selecting dates in these ranges get doubled pricing</div>
+    <div id="festive-periods-list"></div>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button onclick="addFestiveRow('','','')" style="padding:6px 12px;background:var(--moss);color:#fff;border:none;border-radius:5px;cursor:pointer;font-family:'DM Mono',monospace;font-size:0.6rem">+ Add Period</button>
+      <button onclick="saveFestivePeriods()" style="padding:6px 12px;background:var(--clay);color:#fff;border:none;border-radius:5px;cursor:pointer;font-family:'DM Mono',monospace;font-size:0.6rem">💾 Save</button>
+    </div>
+    <div style="font-family:'DM Mono',monospace;font-size:0.55rem;color:var(--text-s);margin-top:8px">💡 If no periods defined, Festive Mode applies doubled pricing to ALL dates</div>
+  </div>
+</div>
 
 <header style="position:relative">
   <div style="position:absolute;top:10px;right:12px;display:flex;flex-direction:column;gap:6px;align-items:flex-end;z-index:10">
@@ -970,7 +982,7 @@ textarea.g-input{resize:vertical;min-height:64px;}
   <div class="rooms-video-grid">
     <div class="rooms-video-card">
       <div class="rooms-video-wrap">
-        <iframe src="https://www.youtube.com/embed/UAmxKKO8CdA?rel=0&modestbranding=1&playsinline=1"
+        <iframe src="https://www.youtube.com/embed/Y9mZZevwmms?rel=0&modestbranding=1&playsinline=1"
           allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
         </iframe>
       </div>
@@ -996,7 +1008,7 @@ textarea.g-input{resize:vertical;min-height:64px;}
   </div>
 </section>
 
-<footer id="site-footer">Shanthi &amp; Sangha @ Soudhamini · Peaceful Simple Living · Waste Segregated with Ashram Care<span style="font-family:'DM Mono',monospace;font-size:0.55rem;opacity:0.55;margin-left:14px;letter-spacing:0.06em">HTML v72 · AS v17</span></footer>
+<footer id="site-footer">Shanthi &amp; Sangha @ Soudhamini · Peaceful Simple Living · Waste Segregated with Ashram Care<span style="font-family:'DM Mono',monospace;font-size:0.55rem;opacity:0.55;margin-left:14px;letter-spacing:0.06em">HTML v73 · AS v17</span></footer>
 
 <!-- MODALS -->
 <!-- Admin Login -->
@@ -1028,7 +1040,7 @@ textarea.g-input{resize:vertical;min-height:64px;}
 
 <script>
 // ── CONFIG ─────────────────────────────────────────────
-const APP_VERSION='v72';
+const APP_VERSION='v73';
 const CFG={
   APPS_SCRIPT_URL:'https://script.google.com/macros/s/AKfycbzrzBGUChJvK88w3iRmMwdRdUdrhF6Ysgnfemxax3V_JPr_bQh4agHfBPpn9S8pVmm3Sw/exec',
   OWNER_WA:'919148212422',
@@ -1078,10 +1090,13 @@ function confirmBookingLocally(ref){
 }
 // Load confirmed from localStorage on startup
 confirmedBookings=loadConfirmed();
+try{var _fp=localStorage.getItem('sdm_festive_periods');if(_fp)festivePeriods=JSON.parse(_fp);}catch(e){}
 
 // ── STATE ───────────────────────────────────────────────
 let selRoom=null,nights=0,totalRoomCost=0,advanceAmt=0,grandTotal=0;
 let festiveModeOn=false;
+let festivePeriods=[]; // {from:"YYYY-MM-DD",to:"YYYY-MM-DD",label:"Name"}
+let currentFestivePeriod=null; // set by calcStay
 let twoGuests=false,intlGuest=false,teacherDiscount=false,adminMode=false;
 let visitorSession={fingerprint:null,isAdmin:false,isTestBooking:false,geoLogged:false};
 const prices={attached:{short:2000,long:1500},common:{short:1500,long:1000}};
@@ -1166,11 +1181,11 @@ function recalc(){
   const isLong=nights>5;
   var baseRate=prices[selRoom][isLong?'long':'short'];
   var intlSurcharge=intlGuest?CFG.INTL_SURCHARGE:0;
-  if(festiveModeOn){
+  if(currentFestivePeriod){
     // Festive: everything x2, no discounts
     baseRate=baseRate*2;
     intlSurcharge=intlSurcharge*2;
-    totalRoomCost=Math.round((baseRate+(twoGuests?baseRate*SECOND_MULT-baseRate:0)+intlSurcharge)*nights);
+    totalRoomCost=Math.round((baseRate+(twoGuests?baseRate:0)+intlSurcharge)*nights);
   } else {
     const rate=baseRate+intlSurcharge;
     if(!twoGuests){
@@ -1232,6 +1247,7 @@ function calcStay(){
   nights=Math.round((d2-d1)/86400000);
   if(nights<=0)return;
   if(checkDateConflict())return;
+  currentFestivePeriod=isDateInFestivePeriod(ci,co);
   recalc();
   const isLong=nights>5;
   const baseRate=prices[selRoom][isLong?'long':'short'];
@@ -1247,7 +1263,7 @@ function calcStay(){
   const teacherNote=t1&&t2?' − 25% off both full time teachers':t1?' − 25% off Guest 1':t2?' − 25% off Guest 2':'';
   document.getElementById('stay-desc').textContent=`${nights} night${nights>1?'s':''} · ${isLong?'Long Stay':'Short Stay'} · ₹${rate.toLocaleString('en-IN')}/day${intlNote}${gMult}${teacherNote}`;
   document.getElementById('stay-price-display').textContent=`₹${totalRoomCost.toLocaleString('en-IN')} total`;
-  document.getElementById('stay-note-text').textContent=festiveModeOn?'🎉 Festive mode — prices doubled, discounts off':isLong?'✦ Long stay rate applied (> 5 days)':'✦ Standard short stay rate (≤ 5 days)';
+  document.getElementById('stay-note-text').textContent=currentFestivePeriod?'🎉 Festive: '+(currentFestivePeriod.label||'Festive')+' — prices doubled, no discounts':isLong?'✦ Long stay rate applied (> 5 days)':'✦ Standard short stay rate (≤ 5 days)';
   const baseR=prices[selRoom][isLong?'long':'short'];
   const shortR=prices[selRoom]['short'];
   const g1c=document.getElementById('teacher-chk-g1');
@@ -2591,11 +2607,61 @@ function toggleFestiveMode(){
   }
   var banner=document.getElementById('festive-banner');
   if(banner) banner.style.display=festiveModeOn?'block':'none';
-  // Recalculate if dates already selected
-  if(nights>0) recalc();
-  calcStay();
-  console.log('[SDM] Festive mode:',festiveModeOn);
+  // Recalc if dates already picked
+  if(selRoom&&nights>0){ currentFestivePeriod=isDateInFestivePeriod(document.getElementById('checkin').value,document.getElementById('checkout').value); recalc(); calcStay(); }
 }
+
+function saveFestivePeriods(){
+  var rows=document.querySelectorAll('.festive-row');
+  festivePeriods=[];
+  rows.forEach(function(row){
+    var from=row.querySelector('.fp-from').value;
+    var to=row.querySelector('.fp-to').value;
+    var label=row.querySelector('.fp-label').value.trim();
+    if(from&&to&&label) festivePeriods.push({from:from,to:to,label:label});
+  });
+  // Save to localStorage
+  try{localStorage.setItem('sdm_festive_periods',JSON.stringify(festivePeriods));}catch(e){}
+  renderFestivePeriodsList();
+  alert('Festive periods saved! Guests selecting dates in these ranges will get festive pricing.');
+}
+
+function addFestiveRow(from,to,label){
+  var list=document.getElementById('festive-periods-list');
+  if(!list) return;
+  var row=document.createElement('div');
+  row.className='festive-row';
+  row.style.cssText='display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:6px;margin-bottom:6px;align-items:center';
+  row.innerHTML=(
+    '<input type="date" class="fp-from" value="'+(from||'')+'" style="padding:6px;border:1px solid var(--border);border-radius:5px;background:var(--surface);color:var(--text);font-size:0.8rem">'+
+    '<input type="date" class="fp-to" value="'+(to||'')+'" style="padding:6px;border:1px solid var(--border);border-radius:5px;background:var(--surface);color:var(--text);font-size:0.8rem">'+
+    '<input type="text" class="fp-label" value="'+(label||'')+'" placeholder="e.g. Navaratri" style="padding:6px;border:1px solid var(--border);border-radius:5px;background:var(--surface);color:var(--text);font-size:0.8rem">'+
+    '<button onclick="this.parentElement.remove()" style="padding:5px 9px;background:var(--terr);color:#fff;border:none;border-radius:5px;cursor:pointer;font-size:0.8rem">✕</button>'
+  );
+  list.appendChild(row);
+}
+
+function renderFestivePeriodsList(){
+  var list=document.getElementById('festive-periods-list');
+  if(!list) return;
+  list.innerHTML='';
+  if(festivePeriods.length===0){ addFestiveRow('','',''); return; }
+  festivePeriods.forEach(function(p){ addFestiveRow(p.from,p.to,p.label); });
+}
+
+function isDateInFestivePeriod(ci,co){
+  // Returns festive period label if selected dates overlap any festive period
+  if(!festiveModeOn) return null;
+  if(!festivePeriods.length) return {label:'Festive'};
+  var d1=new Date(ci+'T00:00:00'),d2=new Date(co+'T00:00:00');
+  for(var i=0;i<festivePeriods.length;i++){
+    var p=festivePeriods[i];
+    var pf=new Date(p.from+'T00:00:00'),pt=new Date(p.to+'T00:00:00');
+    if(d1<pt&&d2>pf) return p;
+  }
+  return null;
+}
+
 </script>
 <!-- HOST PANEL -->
 <div class="host-panel" id="host-panel">
