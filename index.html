@@ -528,10 +528,11 @@ textarea.g-input{resize:vertical;min-height:64px;}
   <span>🔐 Admin Mode · <span id="admin-ver-display" style="font-family:'DM Mono',monospace;font-size:0.58rem;opacity:0.8"></span></span>
   <div style="display:flex;gap:7px">
     <button class="admin-btn" onclick="openHostPanel()">📋 Host Panel</button>
-    <button class="admin-btn" onclick="openAdminUpload()">＋ Upload Media</button>
+    <button class="admin-btn" id="btn-festive-toggle" onclick="toggleFestiveMode()">🎉 Festive OFF</button>
     <button class="admin-btn" onclick="adminLogout()">Logout</button>
   </div>
 </div>
+<div id="festive-banner" style="display:none;background:var(--gold);color:#0f0a05;text-align:center;padding:6px;font-family:'DM Mono',monospace;font-size:0.62rem;letter-spacing:0.1em;font-weight:700">🎉 FESTIVE MODE ACTIVE — ALL PRICES DOUBLED · DISCOUNTS DISABLED</div>
 
 <header style="position:relative">
   <div style="position:absolute;top:10px;right:12px;display:flex;flex-direction:column;gap:6px;align-items:flex-end;z-index:10">
@@ -995,7 +996,7 @@ textarea.g-input{resize:vertical;min-height:64px;}
   </div>
 </section>
 
-<footer id="site-footer">Shanthi &amp; Sangha @ Soudhamini · Peaceful Simple Living · Waste Segregated with Ashram Care<span style="font-family:'DM Mono',monospace;font-size:0.55rem;opacity:0.55;margin-left:14px;letter-spacing:0.06em">HTML v70 · AS v17</span></footer>
+<footer id="site-footer">Shanthi &amp; Sangha @ Soudhamini · Peaceful Simple Living · Waste Segregated with Ashram Care<span style="font-family:'DM Mono',monospace;font-size:0.55rem;opacity:0.55;margin-left:14px;letter-spacing:0.06em">HTML v72 · AS v17</span></footer>
 
 <!-- MODALS -->
 <!-- Admin Login -->
@@ -1027,7 +1028,7 @@ textarea.g-input{resize:vertical;min-height:64px;}
 
 <script>
 // ── CONFIG ─────────────────────────────────────────────
-const APP_VERSION='v70';
+const APP_VERSION='v72';
 const CFG={
   APPS_SCRIPT_URL:'https://script.google.com/macros/s/AKfycbzrzBGUChJvK88w3iRmMwdRdUdrhF6Ysgnfemxax3V_JPr_bQh4agHfBPpn9S8pVmm3Sw/exec',
   OWNER_WA:'919148212422',
@@ -1080,6 +1081,7 @@ confirmedBookings=loadConfirmed();
 
 // ── STATE ───────────────────────────────────────────────
 let selRoom=null,nights=0,totalRoomCost=0,advanceAmt=0,grandTotal=0;
+let festiveModeOn=false;
 let twoGuests=false,intlGuest=false,teacherDiscount=false,adminMode=false;
 let visitorSession={fingerprint:null,isAdmin:false,isTestBooking:false,geoLogged:false};
 const prices={attached:{short:2000,long:1500},common:{short:1500,long:1000}};
@@ -1162,25 +1164,27 @@ function toggleTeacher(){
 function recalc(){
   if(!selRoom||!nights)return;
   const isLong=nights>5;
-  const baseRate=prices[selRoom][isLong?'long':'short'];
-  const intlSurcharge=intlGuest?CFG.INTL_SURCHARGE:0;
-  const rate=baseRate+intlSurcharge;
-  if(!twoGuests){
-    // Single guest
-    const g1=document.getElementById('teacher-chk-g1');
-    const t1=g1?g1.checked:false;
-    const mult=t1?0.75:1;
-    totalRoomCost=Math.round(rate*nights*mult);
+  var baseRate=prices[selRoom][isLong?'long':'short'];
+  var intlSurcharge=intlGuest?CFG.INTL_SURCHARGE:0;
+  if(festiveModeOn){
+    // Festive: everything x2, no discounts
+    baseRate=baseRate*2;
+    intlSurcharge=intlSurcharge*2;
+    totalRoomCost=Math.round((baseRate+(twoGuests?baseRate*SECOND_MULT-baseRate:0)+intlSurcharge)*nights);
   } else {
-    // Two guests — each pays half of (rate*nights*1.5), teacher gets 25% off their half
-    const g1=document.getElementById('teacher-chk-g1');
-    const g2=document.getElementById('teacher-chk-g2');
-    const t1=g1?g1.checked:false;
-    const t2=g2?g2.checked:false;
-    const fullCost=rate*nights*SECOND_MULT; // base cost for 2 guests
-    const g1share=fullCost/2*(t1?0.75:1);
-    const g2share=fullCost/2*(t2?0.75:1);
-    totalRoomCost=Math.round(g1share+g2share);
+    const rate=baseRate+intlSurcharge;
+    if(!twoGuests){
+      const g1=document.getElementById('teacher-chk-g1');
+      const t1=g1?g1.checked:false;
+      totalRoomCost=Math.round(rate*nights*(t1?0.75:1));
+    } else {
+      const g1=document.getElementById('teacher-chk-g1');
+      const g2=document.getElementById('teacher-chk-g2');
+      const t1=g1?g1.checked:false;
+      const t2=g2?g2.checked:false;
+      const fullCost=rate*nights*SECOND_MULT;
+      totalRoomCost=Math.round(fullCost/2*(t1?0.75:1)+fullCost/2*(t2?0.75:1));
+    }
   }
   advanceAmt=Math.round(totalRoomCost*0.5);
   grandTotal=advanceAmt+DEPOSIT;
@@ -1243,7 +1247,7 @@ function calcStay(){
   const teacherNote=t1&&t2?' − 25% off both full time teachers':t1?' − 25% off Guest 1':t2?' − 25% off Guest 2':'';
   document.getElementById('stay-desc').textContent=`${nights} night${nights>1?'s':''} · ${isLong?'Long Stay':'Short Stay'} · ₹${rate.toLocaleString('en-IN')}/day${intlNote}${gMult}${teacherNote}`;
   document.getElementById('stay-price-display').textContent=`₹${totalRoomCost.toLocaleString('en-IN')} total`;
-  document.getElementById('stay-note-text').textContent=isLong?'✦ Long stay rate applied (> 5 days)':'✦ Standard short stay rate (≤ 5 days)';
+  document.getElementById('stay-note-text').textContent=festiveModeOn?'🎉 Festive mode — prices doubled, discounts off':isLong?'✦ Long stay rate applied (> 5 days)':'✦ Standard short stay rate (≤ 5 days)';
   const baseR=prices[selRoom][isLong?'long':'short'];
   const shortR=prices[selRoom]['short'];
   const g1c=document.getElementById('teacher-chk-g1');
@@ -2575,6 +2579,23 @@ document.addEventListener('keydown',function(e){
   else if(e.key==='ArrowRight')lbNav(1);
   else if(e.key==='Escape')closeLB();
 });
+
+// ── FESTIVE MODE ───────────────────────────────────────
+function toggleFestiveMode(){
+  festiveModeOn=!festiveModeOn;
+  var btn=document.getElementById('btn-festive-toggle');
+  if(btn){
+    btn.textContent=festiveModeOn?'🎉 Festive ON':'🎉 Festive OFF';
+    btn.style.background=festiveModeOn?'#d4a83a':'';
+    btn.style.color=festiveModeOn?'#0f0a05':'';
+  }
+  var banner=document.getElementById('festive-banner');
+  if(banner) banner.style.display=festiveModeOn?'block':'none';
+  // Recalculate if dates already selected
+  if(nights>0) recalc();
+  calcStay();
+  console.log('[SDM] Festive mode:',festiveModeOn);
+}
 </script>
 <!-- HOST PANEL -->
 <div class="host-panel" id="host-panel">
