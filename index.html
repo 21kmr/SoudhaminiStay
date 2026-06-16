@@ -536,7 +536,11 @@ textarea.g-input{resize:vertical;min-height:64px;}
 <div id="festive-banner" style="display:none;background:var(--gold);color:#0f0a05;text-align:center;padding:6px;font-family:'DM Mono',monospace;font-size:0.62rem;letter-spacing:0.1em;font-weight:700">🎉 FESTIVE MODE ACTIVE — ALL PRICES DOUBLED · DISCOUNTS DISABLED</div>
 <div id="festive-panel" style="display:none;background:var(--surface);border-bottom:1px solid var(--border);padding:14px 20px;">
   <div style="max-width:860px;margin:0 auto">
-    <div style="font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--clay);margin-bottom:10px">📅 Festive Pricing Periods — when Festive Mode is ON, guests selecting dates in these ranges get doubled pricing</div>
+    <div style="font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--clay);margin-bottom:10px">📅 Festive Pricing Periods — guests selecting dates in these ranges get flat festive pricing with custom minimum stay</div>
+    <div style="margin-bottom:10px;display:flex;align-items:center;gap:8px">
+      <label style="font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--text-s)">Default minimum nights (no periods defined):</label>
+      <input type="number" id="festive-global-min" value="10" min="1" style="width:60px;padding:5px 8px;border:1px solid var(--border);border-radius:5px;background:var(--surface);color:var(--text);font-size:0.8rem">
+    </div>
     <div id="festive-periods-list"></div>
     <div style="display:flex;gap:8px;margin-top:8px">
       <button onclick="addFestiveRow('','','')" style="padding:6px 12px;background:var(--moss);color:#fff;border:none;border-radius:5px;cursor:pointer;font-family:'DM Mono',monospace;font-size:0.6rem">+ Add Period</button>
@@ -1008,7 +1012,7 @@ textarea.g-input{resize:vertical;min-height:64px;}
   </div>
 </section>
 
-<footer id="site-footer">Shanthi &amp; Sangha @ Soudhamini · Peaceful Simple Living · Waste Segregated with Ashram Care<span style="font-family:'DM Mono',monospace;font-size:0.55rem;opacity:0.55;margin-left:14px;letter-spacing:0.06em">HTML v75 · AS v18</span></footer>
+<footer id="site-footer">Shanthi &amp; Sangha @ Soudhamini · Peaceful Simple Living · Waste Segregated with Ashram Care<span style="font-family:'DM Mono',monospace;font-size:0.55rem;opacity:0.55;margin-left:14px;letter-spacing:0.06em">HTML v76 · AS v18</span></footer>
 
 <!-- MODALS -->
 <!-- Admin Login -->
@@ -1040,7 +1044,7 @@ textarea.g-input{resize:vertical;min-height:64px;}
 
 <script>
 // ── CONFIG ─────────────────────────────────────────────
-const APP_VERSION='v75';
+const APP_VERSION='v76';
 const CFG={
   APPS_SCRIPT_URL:'https://script.google.com/macros/s/AKfycbzrzBGUChJvK88w3iRmMwdRdUdrhF6Ysgnfemxax3V_JPr_bQh4agHfBPpn9S8pVmm3Sw/exec',
   OWNER_WA:'919148212422',
@@ -1091,25 +1095,31 @@ function confirmBookingLocally(ref){
 // Load confirmed from localStorage on startup
 confirmedBookings=loadConfirmed();
 try{var _fp=localStorage.getItem('sdm_festive_periods');if(_fp)festivePeriods=JSON.parse(_fp);}catch(e){}
+
+
+// ── STATE ───────────────────────────────────────────────
+let selRoom=null,nights=0,totalRoomCost=0,advanceAmt=0,grandTotal=0;
+let festiveModeOn=false;
+let festivePeriods=[]; // {from:"YYYY-MM-DD",to:"YYYY-MM-DD",label:"Name",minNights:10}
+let currentFestivePeriod=null;
+let festiveMinNightsGlobal=10; // fallback when toggled ON without specific periods
+
 // Load festive settings for ALL visitors (not just admin) so banner shows site-wide
 (function(){
   if(CFG.APPS_SCRIPT_URL&&!CFG.APPS_SCRIPT_URL.includes('YOUR_APPS')){
     fetch(CFG.APPS_SCRIPT_URL+'?action=getSettings').then(function(r){return r.json();}).then(function(d){
       if(d.festiveModeOn!==undefined) festiveModeOn=d.festiveModeOn;
       if(d.festivePeriods&&d.festivePeriods.length) festivePeriods=d.festivePeriods;
+      if(d.festiveMinNightsGlobal) festiveMinNightsGlobal=d.festiveMinNightsGlobal;
+      try{localStorage.setItem('sdm_festive_periods',JSON.stringify(festivePeriods));}catch(e){}
       var banner=document.getElementById('festive-banner');
       if(banner) banner.style.display=festiveModeOn?'block':'none';
       var btn=document.getElementById('btn-festive-toggle');
       if(btn){btn.textContent=festiveModeOn?'🎉 Festive ON':'🎉 Festive OFF';btn.style.background=festiveModeOn?'#d4a83a':'';btn.style.color=festiveModeOn?'#0f0a05':'';}
+      console.log('[SDM] public settings loaded: festive=',festiveModeOn,'periods=',festivePeriods.length,'globalMin=',festiveMinNightsGlobal);
     }).catch(function(e){console.warn('[SDM] public getSettings failed:',e);});
   }
 })();
-
-// ── STATE ───────────────────────────────────────────────
-let selRoom=null,nights=0,totalRoomCost=0,advanceAmt=0,grandTotal=0;
-let festiveModeOn=false;
-let festivePeriods=[]; // {from:"YYYY-MM-DD",to:"YYYY-MM-DD",label:"Name"}
-let currentFestivePeriod=null; // set by calcStay
 let twoGuests=false,intlGuest=false,teacherDiscount=false,adminMode=false;
 let visitorSession={fingerprint:null,isAdmin:false,isTestBooking:false,geoLogged:false};
 const prices={attached:{short:2000,long:1500},common:{short:1500,long:1000}};
@@ -1275,8 +1285,9 @@ function calcStay(){
   if(checkDateConflict())return;
   currentFestivePeriod=isDateInFestivePeriod(ci,co);
   // Festive minimum nights enforcement
-  if(currentFestivePeriod&&nights<FESTIVE_MIN_NIGHTS){
-    if(msgEl){msgEl.style.display='block';msgEl.textContent='🎉 Festive period: minimum '+FESTIVE_MIN_NIGHTS+' nights required ('+nights+' selected)';}
+  var minN=currentFestivePeriod?(currentFestivePeriod.minNights||festiveMinNightsGlobal):0;
+  if(currentFestivePeriod&&nights<minN){
+    if(msgEl){msgEl.style.display='block';msgEl.textContent='🎉 Festive period: minimum '+minN+' nights required ('+nights+' selected)';}
     return;
   } else if(msgEl&&msgEl.textContent.indexOf('Festive period')!==-1){
     msgEl.style.display='none';msgEl.textContent='';
@@ -1292,7 +1303,7 @@ function calcStay(){
   document.getElementById('stay-desc').textContent=rateDesc;
   document.getElementById('stay-price-display').textContent='₹'+totalRoomCost.toLocaleString('en-IN')+' total';
   document.getElementById('stay-note-text').textContent=currentFestivePeriod
-    ?'🎉 Festive: '+(currentFestivePeriod.label||'Festive')+' — flat rate, no discounts, min '+FESTIVE_MIN_NIGHTS+' nights'
+    ?'🎉 Festive: '+(currentFestivePeriod.label||'Festive')+' — flat rate, no discounts, min '+minN+' nights'
     :isLong?'✦ Long stay rate applied (> 5 days)':'✦ Standard short stay rate (≤ 5 days)';
   document.getElementById('dep-base-rate').textContent='₹'+baseRate.toLocaleString('en-IN')+'/night × '+nights+' night'+(nights>1?'s':'');
   var iRow=document.getElementById('dep-intl-row');
@@ -1314,7 +1325,7 @@ function calcStay(){
     else tcRow.style.display='none';
   }
   var fRow=document.getElementById('dep-festive-row');
-  if(fRow){fRow.style.display=currentFestivePeriod?'flex':'none';if(currentFestivePeriod){var fl=document.getElementById('dep-festive-label');if(fl)fl.textContent='🎉 '+(currentFestivePeriod.label||'Festive')+' — flat rate, min '+FESTIVE_MIN_NIGHTS+' nights';}}
+  if(fRow){fRow.style.display=currentFestivePeriod?'flex':'none';if(currentFestivePeriod){var fl=document.getElementById('dep-festive-label');if(fl)fl.textContent='🎉 '+(currentFestivePeriod.label||'Festive')+' — flat rate, min '+minN+' nights';}}
   document.getElementById('deposit-box').classList.add('vis');
   document.getElementById('dep-room').textContent='₹'+totalRoomCost.toLocaleString('en-IN');
   document.getElementById('dep-total').textContent='₹'+grandTotal.toLocaleString('en-IN')+' (₹'+advanceAmt.toLocaleString('en-IN')+' advance + ₹1,000 deposit)';
@@ -1658,6 +1669,7 @@ function adminLogin(){
       fetch(CFG.APPS_SCRIPT_URL+'?action=getSettings').then(function(r){return r.json();}).then(function(d){
         if(d.festiveModeOn!==undefined) festiveModeOn=d.festiveModeOn;
         if(d.festivePeriods&&d.festivePeriods.length) festivePeriods=d.festivePeriods;
+        if(d.festiveMinNightsGlobal) festiveMinNightsGlobal=d.festiveMinNightsGlobal;
         try{localStorage.setItem('sdm_festive_periods',JSON.stringify(festivePeriods));}catch(e){}
         var btn=document.getElementById('btn-festive-toggle');
         if(btn){btn.textContent=festiveModeOn?'🎉 Festive ON':'🎉 Festive OFF';btn.style.background=festiveModeOn?'#d4a83a':'';btn.style.color=festiveModeOn?'#0f0a05':'';}
@@ -2642,7 +2654,7 @@ document.addEventListener('keydown',function(e){
 });
 
 // ── FESTIVE MODE ───────────────────────────────────────
-function toggleFestiveMode(){
+async function toggleFestiveMode(){
   festiveModeOn=!festiveModeOn;
   var btn=document.getElementById('btn-festive-toggle');
   if(btn){
@@ -2652,47 +2664,56 @@ function toggleFestiveMode(){
   }
   var banner=document.getElementById('festive-banner');
   if(banner) banner.style.display=festiveModeOn?'block':'none';
-  // Recalc if dates already picked
   if(selRoom&&nights>0){ currentFestivePeriod=isDateInFestivePeriod(document.getElementById('checkin').value,document.getElementById('checkout').value); recalc(); calcStay(); }
-  // Persist toggle state to AS
   if(CFG.APPS_SCRIPT_URL&&!CFG.APPS_SCRIPT_URL.includes('YOUR_APPS')){
-    fetch(CFG.APPS_SCRIPT_URL,{method:'POST',body:JSON.stringify({
-      action:'saveSettings',settings:{festiveModeOn:festiveModeOn,festivePeriods:festivePeriods}
-    })}).catch(function(e){});
+    try{
+      var res=await fetch(CFG.APPS_SCRIPT_URL,{method:'POST',body:JSON.stringify({
+        action:'saveSettings',settings:{festiveModeOn:festiveModeOn,festivePeriods:festivePeriods,festiveMinNightsGlobal:festiveMinNightsGlobal}
+      })});
+      var result=await res.json();
+      console.log('[SDM] festive toggle saved:',JSON.stringify(result));
+    }catch(e){console.warn('[SDM] festive toggle save failed:',e);}
   }
 }
 
-function saveFestivePeriods(){
+async function saveFestivePeriods(){
   var rows=document.querySelectorAll('.festive-row');
   festivePeriods=[];
   rows.forEach(function(row){
     var from=row.querySelector('.fp-from').value;
     var to=row.querySelector('.fp-to').value;
     var label=row.querySelector('.fp-label').value.trim();
-    if(from&&to&&label) festivePeriods.push({from:from,to:to,label:label});
+    var minN=row.querySelector('.fp-minnights');
+    var minNights=minN&&minN.value?parseInt(minN.value):festiveMinNightsGlobal;
+    if(from&&to&&label) festivePeriods.push({from:from,to:to,label:label,minNights:minNights});
   });
-  // Save to localStorage
+  var globalMinInp=document.getElementById('festive-global-min');
+  if(globalMinInp&&globalMinInp.value) festiveMinNightsGlobal=parseInt(globalMinInp.value)||10;
   try{localStorage.setItem('sdm_festive_periods',JSON.stringify(festivePeriods));}catch(e){}
-  // Persist to AS
   if(CFG.APPS_SCRIPT_URL&&!CFG.APPS_SCRIPT_URL.includes('YOUR_APPS')){
-    fetch(CFG.APPS_SCRIPT_URL,{method:'POST',body:JSON.stringify({
-      action:'saveSettings',settings:{festiveModeOn:festiveModeOn,festivePeriods:festivePeriods}
-    })}).catch(function(e){console.warn('saveSettings failed:',e);});
+    try{
+      var res=await fetch(CFG.APPS_SCRIPT_URL,{method:'POST',body:JSON.stringify({
+        action:'saveSettings',settings:{festiveModeOn:festiveModeOn,festivePeriods:festivePeriods,festiveMinNightsGlobal:festiveMinNightsGlobal}
+      })});
+      var result=await res.json();
+      console.log('[SDM] festive periods saved:',JSON.stringify(result));
+    }catch(e){console.warn('[SDM] saveFestivePeriods failed:',e);}
   }
   renderFestivePeriodsList();
-  alert('Festive periods saved!');
+  alert('Festive periods saved and synced!');
 }
 
-function addFestiveRow(from,to,label){
+function addFestiveRow(from,to,label,minNights){
   var list=document.getElementById('festive-periods-list');
   if(!list) return;
   var row=document.createElement('div');
   row.className='festive-row';
-  row.style.cssText='display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:6px;margin-bottom:6px;align-items:center';
+  row.style.cssText='display:grid;grid-template-columns:1fr 1fr 1fr 70px auto;gap:6px;margin-bottom:6px;align-items:center';
   row.innerHTML=(
     '<input type="date" class="fp-from" value="'+(from||'')+'" style="padding:6px;border:1px solid var(--border);border-radius:5px;background:var(--surface);color:var(--text);font-size:0.8rem">'+
     '<input type="date" class="fp-to" value="'+(to||'')+'" style="padding:6px;border:1px solid var(--border);border-radius:5px;background:var(--surface);color:var(--text);font-size:0.8rem">'+
     '<input type="text" class="fp-label" value="'+(label||'')+'" placeholder="e.g. Navaratri" style="padding:6px;border:1px solid var(--border);border-radius:5px;background:var(--surface);color:var(--text);font-size:0.8rem">'+
+    '<input type="number" class="fp-minnights" value="'+(minNights||10)+'" min="1" placeholder="Min nts" title="Minimum nights" style="padding:6px;border:1px solid var(--border);border-radius:5px;background:var(--surface);color:var(--text);font-size:0.8rem">'+
     '<button onclick="this.parentElement.remove()" style="padding:5px 9px;background:var(--terr);color:#fff;border:none;border-radius:5px;cursor:pointer;font-size:0.8rem">✕</button>'
   );
   list.appendChild(row);
@@ -2702,17 +2723,20 @@ function renderFestivePeriodsList(){
   var list=document.getElementById('festive-periods-list');
   if(!list) return;
   list.innerHTML='';
-  if(festivePeriods.length===0){ addFestiveRow('','',''); return; }
-  festivePeriods.forEach(function(p){ addFestiveRow(p.from,p.to,p.label); });
+  var gmin=document.getElementById('festive-global-min');
+  if(gmin) gmin.value=festiveMinNightsGlobal;
+  if(festivePeriods.length===0){ addFestiveRow('','','',festiveMinNightsGlobal); return; }
+  festivePeriods.forEach(function(p){ addFestiveRow(p.from,p.to,p.label,p.minNights); });
 }
 
 function isDateInFestivePeriod(ci,co){
-  // Returns festive period label if selected dates overlap any festive period
   if(!festiveModeOn) return null;
-  if(!festivePeriods.length) return {label:'Festive'};
+  if(!ci||!co) return null;
+  if(!festivePeriods.length) return {label:'Festive',minNights:festiveMinNightsGlobal};
   var d1=new Date(ci+'T00:00:00'),d2=new Date(co+'T00:00:00');
   for(var i=0;i<festivePeriods.length;i++){
     var p=festivePeriods[i];
+    if(!p.from||!p.to) continue;
     var pf=new Date(p.from+'T00:00:00'),pt=new Date(p.to+'T00:00:00');
     if(d1<pt&&d2>pf) return p;
   }
