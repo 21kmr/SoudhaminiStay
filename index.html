@@ -1008,7 +1008,7 @@ textarea.g-input{resize:vertical;min-height:64px;}
   </div>
 </section>
 
-<footer id="site-footer">Shanthi &amp; Sangha @ Soudhamini · Peaceful Simple Living · Waste Segregated with Ashram Care<span style="font-family:'DM Mono',monospace;font-size:0.55rem;opacity:0.55;margin-left:14px;letter-spacing:0.06em">HTML v73 · AS v17</span></footer>
+<footer id="site-footer">Shanthi &amp; Sangha @ Soudhamini · Peaceful Simple Living · Waste Segregated with Ashram Care<span style="font-family:'DM Mono',monospace;font-size:0.55rem;opacity:0.55;margin-left:14px;letter-spacing:0.06em">HTML v74 · AS v18</span></footer>
 
 <!-- MODALS -->
 <!-- Admin Login -->
@@ -1040,7 +1040,7 @@ textarea.g-input{resize:vertical;min-height:64px;}
 
 <script>
 // ── CONFIG ─────────────────────────────────────────────
-const APP_VERSION='v73';
+const APP_VERSION='v74';
 const CFG={
   APPS_SCRIPT_URL:'https://script.google.com/macros/s/AKfycbzrzBGUChJvK88w3iRmMwdRdUdrhF6Ysgnfemxax3V_JPr_bQh4agHfBPpn9S8pVmm3Sw/exec',
   OWNER_WA:'919148212422',
@@ -1099,8 +1099,9 @@ let festivePeriods=[]; // {from:"YYYY-MM-DD",to:"YYYY-MM-DD",label:"Name"}
 let currentFestivePeriod=null; // set by calcStay
 let twoGuests=false,intlGuest=false,teacherDiscount=false,adminMode=false;
 let visitorSession={fingerprint:null,isAdmin:false,isTestBooking:false,geoLogged:false};
-const prices={attached:{short:2000,long:1500},common:{short:1500,long:1000}};
-const DEPOSIT=1000,SECOND_MULT=1.5;
+const prices={attached:4000,common:3000}; // Shanthi=4000, Sangha=3000 per night
+const DEPOSIT=1000,SECOND_MULT=2; // double occupancy = 2x
+const INTL_RATE={attached:5000,common:4000}; // NRI rates per night
 const avatarColors=['#8b4a2a','#4a6741','#7a9e72','#b8962a','#b07c50','#4a6fa5','#7a5c8a'];
 
 // Reviews
@@ -1178,31 +1179,18 @@ function toggleTeacher(){
 
 function recalc(){
   if(!selRoom||!nights)return;
-  const isLong=nights>5;
-  var baseRate=prices[selRoom][isLong?'long':'short'];
-  var intlSurcharge=intlGuest?CFG.INTL_SURCHARGE:0;
-  if(currentFestivePeriod){
-    // Festive: everything x2, no discounts
-    baseRate=baseRate*2;
-    intlSurcharge=intlSurcharge*2;
-    totalRoomCost=Math.round((baseRate+(twoGuests?baseRate:0)+intlSurcharge)*nights);
-  } else {
-    const rate=baseRate+intlSurcharge;
-    if(!twoGuests){
-      const g1=document.getElementById('teacher-chk-g1');
-      const t1=g1?g1.checked:false;
-      totalRoomCost=Math.round(rate*nights*(t1?0.75:1));
-    } else {
-      const g1=document.getElementById('teacher-chk-g1');
-      const g2=document.getElementById('teacher-chk-g2');
-      const t1=g1?g1.checked:false;
-      const t2=g2?g2.checked:false;
-      const fullCost=rate*nights*SECOND_MULT;
-      totalRoomCost=Math.round(fullCost/2*(t1?0.75:1)+fullCost/2*(t2?0.75:1));
-    }
-  }
-  advanceAmt=Math.round(totalRoomCost*0.5);
-  grandTotal=advanceAmt+DEPOSIT;
+  // Base rate per night
+  var baseRate = intlGuest ? INTL_RATE[selRoom] : prices[selRoom];
+  // Festive: double everything
+  if(currentFestivePeriod) baseRate = baseRate * 2;
+  // Double occupancy: x2
+  var guestMult = twoGuests ? SECOND_MULT : 1;
+  // No teacher discount, no long stay discount
+  totalRoomCost = Math.round(baseRate * guestMult * nights);
+  advanceAmt = Math.round(totalRoomCost * 0.5);
+  grandTotal = advanceAmt + DEPOSIT;
+  rate = baseRate;
+  stayType = currentFestivePeriod ? ('Festive — '+(currentFestivePeriod.label||'')) : 'Standard';
 }
 
 function goTo(p){
@@ -1237,52 +1225,38 @@ function checkDateConflict(){
 }
 
 function calcStay(){
-  const ci=document.getElementById('checkin').value;
-  const co=document.getElementById('checkout').value;
+  var ci=document.getElementById('checkin').value;
+  var co=document.getElementById('checkout').value;
   document.getElementById('stay-info').classList.remove('vis');
   document.getElementById('deposit-box').classList.remove('vis');
   document.getElementById('btn-to-guests').disabled=true;
   if(!ci||!co||!selRoom)return;
-  const d1=new Date(ci+"T00:00:00"),d2=new Date(co+"T00:00:00");
-  nights=Math.round((d2-d1)/86400000);
+  nights=Math.round((new Date(co+'T00:00:00')-new Date(ci+'T00:00:00'))/86400000);
   if(nights<=0)return;
   if(checkDateConflict())return;
   currentFestivePeriod=isDateInFestivePeriod(ci,co);
   recalc();
-  const isLong=nights>5;
-  const baseRate=prices[selRoom][isLong?'long':'short'];
-  const intlSurcharge=intlGuest?CFG.INTL_SURCHARGE:0;
-  const rate=baseRate+intlSurcharge;
-  const gMult=twoGuests?' × 1.5 (2 guests)':''
-  const intlNote=intlGuest?' + ₹500 intl surcharge':''
+  var baseRate=intlGuest?INTL_RATE[selRoom]:prices[selRoom];
+  if(currentFestivePeriod) baseRate=baseRate*2;
+  var rateDesc='₹'+baseRate.toLocaleString('en-IN')+'/night';
+  if(twoGuests) rateDesc+=' × 2 (double occupancy)';
   document.getElementById('stay-info').classList.add('vis');
-  const g1chk=document.getElementById('teacher-chk-g1');
-  const g2chk=document.getElementById('teacher-chk-g2');
-  const t1=g1chk?g1chk.checked:false;
-  const t2=g2chk&&twoGuests?g2chk.checked:false;
-  const teacherNote=t1&&t2?' − 25% off both full time teachers':t1?' − 25% off Guest 1':t2?' − 25% off Guest 2':'';
-  document.getElementById('stay-desc').textContent=`${nights} night${nights>1?'s':''} · ${isLong?'Long Stay':'Short Stay'} · ₹${rate.toLocaleString('en-IN')}/day${intlNote}${gMult}${teacherNote}`;
-  document.getElementById('stay-price-display').textContent=`₹${totalRoomCost.toLocaleString('en-IN')} total`;
-  document.getElementById('stay-note-text').textContent=currentFestivePeriod?'🎉 Festive: '+(currentFestivePeriod.label||'Festive')+' — prices doubled, no discounts':isLong?'✦ Long stay rate applied (> 5 days)':'✦ Standard short stay rate (≤ 5 days)';
-  const baseR=prices[selRoom][isLong?'long':'short'];
-  const shortR=prices[selRoom]['short'];
-  const g1c=document.getElementById('teacher-chk-g1');
-  const g2c=document.getElementById('teacher-chk-g2');
-  const tA=g1c?g1c.checked:false;
-  const tB=g2c&&twoGuests?g2c.checked:false;
-  document.getElementById('dep-base-rate').textContent='₹'+baseR.toLocaleString('en-IN')+'/night × '+nights+' night'+(nights>1?'s':'');
-  const iRow=document.getElementById('dep-intl-row');
-  if(intlGuest){iRow.style.display='flex';document.getElementById('dep-intl').textContent='+₹'+(CFG.INTL_SURCHARGE*nights).toLocaleString('en-IN')+' (₹'+CFG.INTL_SURCHARGE+' × '+nights+')';}
+  document.getElementById('stay-desc').textContent=nights+' night'+(nights>1?'s':'')+' · '+rateDesc;
+  document.getElementById('stay-price-display').textContent='₹'+totalRoomCost.toLocaleString('en-IN')+' total';
+  document.getElementById('stay-note-text').textContent=currentFestivePeriod
+    ?'🎉 Festive: '+(currentFestivePeriod.label||'Festive')+' — prices doubled, no discounts'
+    :intlGuest?'❖ NRI rate applied':'❖ Standard rate';
+  document.getElementById('dep-base-rate').textContent='₹'+baseRate.toLocaleString('en-IN')+'/night × '+nights+' night'+(nights>1?'s':'');
+  var iRow=document.getElementById('dep-intl-row');
+  if(intlGuest){iRow.style.display='flex';document.getElementById('dep-intl').textContent='NRI rate (₹'+(INTL_RATE[selRoom]*(currentFestivePeriod?2:1)).toLocaleString('en-IN')+'/night)';}
   else iRow.style.display='none';
-  const lRow=document.getElementById('dep-long-row');
-  if(isLong){lRow.style.display='flex';document.getElementById('dep-long').textContent='−₹'+((shortR-baseR)*nights).toLocaleString('en-IN')+' saved';}
-  else lRow.style.display='none';
-  const tRow=document.getElementById('dep-two-row');
-  if(twoGuests){tRow.style.display='flex';}
-  else tRow.style.display='none';
-  const tcRow=document.getElementById('dep-teacher-row');
-  if(tA||tB){tcRow.style.display='flex';document.getElementById('dep-teacher').textContent=tA&&tB?'−25% both full time teachers':tA?'−25% full time teacher G1':'−25% full time teacher G2';}
-  else tcRow.style.display='none';
+  var lRow=document.getElementById('dep-long-row');if(lRow)lRow.style.display='none';
+  var tRow=document.getElementById('dep-two-row');
+  if(twoGuests){tRow.style.display='flex';var te=document.getElementById('dep-two');if(te)te.textContent=currentFestivePeriod?'×2 (festive, no discount)':'×2 (double occupancy)';}
+  else{if(tRow)tRow.style.display='none';}
+  var tcRow=document.getElementById('dep-teacher-row');if(tcRow)tcRow.style.display='none';
+  var fRow=document.getElementById('dep-festive-row');
+  if(fRow){fRow.style.display=currentFestivePeriod?'flex':'none';if(currentFestivePeriod){var fl=document.getElementById('dep-festive-label');if(fl)fl.textContent='🎉 '+(currentFestivePeriod.label||'Festive')+' (all prices ×2)';}}
   document.getElementById('deposit-box').classList.add('vis');
   document.getElementById('dep-room').textContent='₹'+totalRoomCost.toLocaleString('en-IN');
   document.getElementById('dep-total').textContent='₹'+grandTotal.toLocaleString('en-IN')+' (₹'+advanceAmt.toLocaleString('en-IN')+' advance + ₹1,000 deposit)';
@@ -1621,6 +1595,19 @@ function adminLogin(){
     document.body.classList.add('admin-mode');closeModal('admin-login-modal');
     document.getElementById('admin-pw').value='';document.getElementById('admin-err').style.display='none';
     renderGallery();
+    // Load festive settings from AS
+    if(CFG.APPS_SCRIPT_URL&&!CFG.APPS_SCRIPT_URL.includes('YOUR_APPS')){
+      fetch(CFG.APPS_SCRIPT_URL+'?action=getSettings').then(function(r){return r.json();}).then(function(d){
+        if(d.festiveModeOn!==undefined) festiveModeOn=d.festiveModeOn;
+        if(d.festivePeriods&&d.festivePeriods.length) festivePeriods=d.festivePeriods;
+        try{localStorage.setItem('sdm_festive_periods',JSON.stringify(festivePeriods));}catch(e){}
+        var btn=document.getElementById('btn-festive-toggle');
+        if(btn){btn.textContent=festiveModeOn?'🎉 Festive ON':'🎉 Festive OFF';btn.style.background=festiveModeOn?'#d4a83a':'';btn.style.color=festiveModeOn?'#0f0a05':'';}
+        var banner=document.getElementById('festive-banner');
+        if(banner) banner.style.display=festiveModeOn?'block':'none';
+        console.log('[SDM] settings loaded: festive=',festiveModeOn,'periods=',festivePeriods.length);
+      }).catch(function(e){console.warn('[SDM] getSettings failed:',e);});
+    }
   } else if(pw===CFG.HOST_PW){
     closeModal('admin-login-modal');
     document.getElementById('admin-pw').value='';document.getElementById('admin-err').style.display='none';
@@ -2609,6 +2596,12 @@ function toggleFestiveMode(){
   if(banner) banner.style.display=festiveModeOn?'block':'none';
   // Recalc if dates already picked
   if(selRoom&&nights>0){ currentFestivePeriod=isDateInFestivePeriod(document.getElementById('checkin').value,document.getElementById('checkout').value); recalc(); calcStay(); }
+  // Persist toggle state to AS
+  if(CFG.APPS_SCRIPT_URL&&!CFG.APPS_SCRIPT_URL.includes('YOUR_APPS')){
+    fetch(CFG.APPS_SCRIPT_URL,{method:'POST',body:JSON.stringify({
+      action:'saveSettings',settings:{festiveModeOn:festiveModeOn,festivePeriods:festivePeriods}
+    })}).catch(function(e){});
+  }
 }
 
 function saveFestivePeriods(){
@@ -2622,8 +2615,14 @@ function saveFestivePeriods(){
   });
   // Save to localStorage
   try{localStorage.setItem('sdm_festive_periods',JSON.stringify(festivePeriods));}catch(e){}
+  // Persist to AS
+  if(CFG.APPS_SCRIPT_URL&&!CFG.APPS_SCRIPT_URL.includes('YOUR_APPS')){
+    fetch(CFG.APPS_SCRIPT_URL,{method:'POST',body:JSON.stringify({
+      action:'saveSettings',settings:{festiveModeOn:festiveModeOn,festivePeriods:festivePeriods}
+    })}).catch(function(e){console.warn('saveSettings failed:',e);});
+  }
   renderFestivePeriodsList();
-  alert('Festive periods saved! Guests selecting dates in these ranges will get festive pricing.');
+  alert('Festive periods saved!');
 }
 
 function addFestiveRow(from,to,label){
