@@ -1092,9 +1092,24 @@ function confirmBookingLocally(ref){
   saveConfirmed(confirmedBookings);
   return bk;
 }
-// Load confirmed from localStorage on startup
+// Load confirmed from localStorage on startup (fast local cache, may be stale/empty
+// on a device that never made or confirmed a booking before)
 confirmedBookings=loadConfirmed();
 try{var _fp=localStorage.getItem('sdm_festive_periods');if(_fp)festivePeriods=JSON.parse(_fp);}catch(e){}
+
+// ── SYNC CONFIRMED BOOKINGS FOR EVERY VISITOR ────────────
+// The Google Sheet is the source of truth. Without this, a booking confirmed on
+// the host's device only blocked the calendar on the host's own browser (via
+// localStorage) — every other visitor's device still showed those dates as free
+// until they happened to open the Host Panel. Pulling from the sheet on load (and
+// again right before someone opens the calendar) keeps availability in sync
+// across all devices.
+(function(){
+  if(CFG.APPS_SCRIPT_URL&&!CFG.APPS_SCRIPT_URL.includes('YOUR_APPS')){
+    loadBookingsFromSheet().then(function(){ renderCal(); })
+      .catch(function(e){ console.warn('[SDM] initial bookings sync failed:',e); });
+  }
+})();
 
 
 // ── STATE ───────────────────────────────────────────────
@@ -1247,7 +1262,15 @@ function goTo(p){
   var pg=document.getElementById('page'+p);
   if(!pg)return;
   pg.classList.add('active');
-  if(p===2)renderCal();
+  if(p===2){
+    renderCal();
+    // Re-sync from the sheet right as the guest opens the calendar, so a booking
+    // confirmed moments ago on the host's device is already blocked here too.
+    if(CFG.APPS_SCRIPT_URL&&!CFG.APPS_SCRIPT_URL.includes('YOUR_APPS')){
+      loadBookingsFromSheet().then(function(){ renderCal(); })
+        .catch(function(e){ console.warn('[SDM] calendar bookings sync failed:',e); });
+    }
+  }
   for(let i=1;i<=5;i++){
     const n=document.getElementById('sn'+i);
     n.classList.remove('active','done');
@@ -1864,11 +1887,15 @@ function switchHPTab(tab,btn){
 }
 
 async function loadBookingsFromSheet(){
+  // hp-last-refresh only exists inside the Host Panel markup — guard every access
+  // so this function also works when called for public visitors on page load,
+  // before that part of the DOM may even be parsed yet.
+  const refreshEl=document.getElementById('hp-last-refresh');
   if(!CFG.APPS_SCRIPT_URL||CFG.APPS_SCRIPT_URL==='YOUR_APPS_SCRIPT_WEB_APP_URL_HERE'){
-    document.getElementById('hp-last-refresh').textContent='⚠ Apps Script URL not set in CONFIG';
+    if(refreshEl)refreshEl.textContent='⚠ Apps Script URL not set in CONFIG';
     return;
   }
-  document.getElementById('hp-last-refresh').textContent='Loading...';
+  if(refreshEl)refreshEl.textContent='Loading...';
   try{
     const url=CFG.APPS_SCRIPT_URL+'?action=getBookings';
     const res=await fetch(url);
@@ -1917,11 +1944,12 @@ async function loadBookingsFromSheet(){
           });
         }
       });
-      document.getElementById('hp-last-refresh').textContent='Last refreshed: '+new Date().toLocaleTimeString('en-IN')+' · '+data.bookings.length+' bookings in sheet';
-            renderHP();
+      if(refreshEl)refreshEl.textContent='Last refreshed: '+new Date().toLocaleTimeString('en-IN')+' · '+data.bookings.length+' bookings in sheet';
+      // renderHP() only makes sense while the Host Panel is actually open/present
+      if(document.getElementById('host-panel'))renderHP();
     }
   } catch(err){
-    document.getElementById('hp-last-refresh').textContent='Error loading from sheet: '+err.message;
+    if(refreshEl)refreshEl.textContent='Error loading from sheet: '+err.message;
   }
 }
 
